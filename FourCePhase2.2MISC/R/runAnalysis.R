@@ -49,13 +49,13 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   if(verbose == TRUE){ print("Loading the internal file with the variant date")}
   if(verbose == TRUE){ print("Checking that the country is on the right format")}
 
-  if( tolower(country) %in% c("us", "france", "spain", "london")){
-    variantsDates <- read.delim("./inst/variantsDates.txt", sep = "\t") %>%
-      mutate( Country == tolower( Country )) %>%
-      filter( Country == tolower( country ) )
-  }
+  #if( tolower(country) %in% c("us", "france", "spain", "london")){
+  #  variantsDates <- read.delim("./inst/variantsDates.txt", sep = "\t") %>%
+  #    mutate( Country == tolower( Country )) %>%
+  #    filter( Country == tolower( country ) )
+  #}
 
-  print( country )
+  #print( country )
   print( "Done")
 
 }
