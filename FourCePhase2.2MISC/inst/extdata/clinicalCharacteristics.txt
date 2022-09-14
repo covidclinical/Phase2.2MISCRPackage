@@ -1,0 +1,22 @@
+variableName	concept_code	description
+Shock	R57	Shock, not elsewhere classified
+Shock	R57.0	Cardiogenic shock
+Shock	R57.1	Hypovolemic shock
+Shock	R57.8	Other shock
+Shock	R57.9	Shock, unspecified
+Heart failure	I50	Heart failure
+Heart failure	I50.21	Acute systolic (congestive) heart failure
+Heart failure	I50.31	Acute diastolic (congestive) heart failure
+Cardiac arrest	I46	Cardiac arrest
+Cardiac arrest	I46.2	Cardiac arrest due to underlying cardiac condition
+Cardiac arrest	I46.8	Cardiac arrest due to other underlying condition
+Cardiac arrest	I46.9	Cardiac arrest, cause unspecified
+Cardiac arrest	I97.1	Other postprocedural cardiac functional disturbances
+Respiratory failure	J96.0	Acute respiratory failure
+Respiratory failure	J96.00	Acute respiratory failure unspecified whether with hypoxia or hypercapnia
+Respiratory failure	J96.01	Acute respiratory failure with hypoxia
+Respiratory failure	J96.02	Acute respiratory failure with hypercapnia
+ECMO	ECMO	ECMO
+CPR	CPR	CPR
+SICARDIAC	SICARDIAC	SICARDIAC
+elevatedCRP	R79.82	Elevated C-reactive protein (CRP)

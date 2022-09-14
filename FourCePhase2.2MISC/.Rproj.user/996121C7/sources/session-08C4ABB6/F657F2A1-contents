@@ -1,0 +1,29 @@
+Package: FourCePhase2.2MISC
+Type: Package
+Title: 4CE Consortium for COVID-19 - MISC Pediatric group
+Version: 0.1.0
+Authors@R: 
+    person(given = "Alba", family = "Gutierrez",role = c("aut", "cre"),email = "alba_gutierrez@hms.harvard.edu"),
+    person(given = "Simran", family = "Makwana",role = c("aut", "cre"),email = "simran_makwana@hms.harvard.edu")
+Description: Package developed to perform the analysis of MISC for the 4CE Consortium data. Generates aggregate counts and perform statistical test for posterior meta-analysis.
+License: Apache License 2.0
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 4.0.1)
+Imports:
+    dplyr,
+    tidyr,
+    tidyverse,
+    ggplot2,
+    RColorBrewer,
+    knitr,
+    kableExtra,
+    tableone,
+    gridExtra,
+    dplyr,
+    lubridate,
+    MatchIt,
+    table1
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1

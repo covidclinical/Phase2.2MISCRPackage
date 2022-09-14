@@ -1,0 +1,61 @@
+#' Function to run the 4CE MISC pediatric project using as input the 2.2 4CE misc cohort dataset
+#'
+#' Information about how to create the 2.2 data can be found here: https://github.com/covidclinical/PhaseX.2SqlDataExtraction
+#' The additional script required to create the MISC cohort can be found here: https://github.com/covidclinical/PhaseX.2SqlDataExtraction/blob/main/Extras/4CE_PhaseX.2_CustomCohorts_MISCPatients_mssql.sql
+#'
+#' @param dir.input The path where the 2.2 MISC cohort files are located.
+#' @param dir.output The path to the output directory where the aggregate counts and plots will be saved.
+#' @param obfuscation Determine the obfuscation threshold (FALSE if no obfuscation, or the numeric value of the obfuscation threshold if any). By default \code{FALSE}
+#' @param raceAvailable set as TRUE or FALSE depending on whether the variable is being collected at your site. By default \code{TRUE}
+#' @param dateFormat Specify the format of the date at your site (e.g., for "03-AUG-20", the format would be "%d-%b-%y", see documentation](https://www.stat.berkeley.edu/~s133/dates.html))
+#' @param data_update_date date at which the data has been updated in the local data warehouse. Used to estimate patient age at time of visit, since patients age in the 4CE demographic file is expected the age at data update.
+#' @param country Specify the country of origin or your data (e.g, US, France, London, Spain)
+#' @param verbose By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.
+#' @return An object of class \code{list} with the \code{data.frames}.
+#' @examples
+#'
+#' FourCePhase2.2MISC::runAnalysis()
+#' @export runAnalysis
+
+
+runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, verbose ) {
+
+  ## Read the 2.2 files
+  if(verbose == TRUE){ print("Reading input files")}
+
+  files <- FourCePhase2.2MISC::readInputFiles( path = dir.input,
+                                      separator = ",",
+                                      skip      = 0,
+                                      verbose   = verbose )
+
+  ## Create the output folder if it doesn't exist
+  if(verbose == TRUE){ print("Creating the output folder if it doesn't exist")}
+
+  if (! dir.output %in% list.dirs()) dir.create(dir.output)
+
+  ### Extract the patient summary and observation information.
+  demo_raw <- files[["patientSummary"]]
+  obs_raw <- files[["patientObservations"]]
+  clinical_raw <- files[["patientClinicalCourse"]]
+
+  ### Read the file containing race information for those sites recording this variable
+  if(verbose == TRUE & raceAvailable == TRUE){ print("Reading the LocalPatientRace.csv")}
+
+  if( raceAvailable == TRUE ){
+    race_raw <- read.delim(file.path(dir.input, "/LocalPatientRace.csv"), sep = ",", skip = 0)
+  }
+
+  ### Read the file containing the variants dates per country
+  if(verbose == TRUE){ print("Loading the internal file with the variant date")}
+  if(verbose == TRUE){ print("Checking that the country is on the right format")}
+
+  if( tolower(country) %in% c("us", "france", "spain", "london")){
+    variantsDates <- read.delim("./inst/variantsDates.txt", sep = "\t") %>%
+      mutate( Country == tolower( Country )) %>%
+      filter( Country == tolower( country ) )
+  }
+
+  print( country )
+  print( "Done")
+
+}

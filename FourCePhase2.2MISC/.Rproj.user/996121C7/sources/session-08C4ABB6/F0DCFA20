@@ -1,0 +1,26 @@
+{
+    "id": "F0DCFA20",
+    "path": "~/Desktop/FourCePhase2.2MISC/R/runAnalysis.R",
+    "project_path": "R/runAnalysis.R",
+    "type": "r_source",
+    "hash": "763585158",
+    "contents": "",
+    "dirty": false,
+    "created": 1663192319034.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "33,58",
+        "scrollLine": "13"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1663193944,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1663193944137,
+    "read_only": false,
+    "read_only_alternatives": []
+}

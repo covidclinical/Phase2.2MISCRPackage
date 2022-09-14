@@ -1,0 +1,3 @@
+variableName	units	concept_code	highRange
+troponine	ug/mL	6598-7	TBD
+CRP	mg/L	1988-5	TBD
