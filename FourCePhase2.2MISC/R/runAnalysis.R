@@ -49,13 +49,18 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   if(verbose == TRUE){ print("Loading the internal file with the variant date")}
   if(verbose == TRUE){ print("Checking that the country is on the right format")}
 
-  #if( tolower(country) %in% c("us", "france", "spain", "london")){
-  #  variantsDates <- read.delim("./inst/variantsDates.txt", sep = "\t") %>%
-  #    mutate( Country == tolower( Country )) %>%
-  #    filter( Country == tolower( country ) )
-  #}
+  if( tolower(country) %in% c("us", "france", "spain", "london")){
+    variantsDates <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
+                                          "variantsDates.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
+    variantsDates <- variantsDates %>%
+      filter(  tolower( Country ) == tolower( country ) )
+  }
 
-  #print( country )
-  print( "Done")
+  ## merge all the files as one data frame for the analysis
+  misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw,dateFormat = dateFormat, verbose = verbose )
+
+  ## estimate the number of MISC patients per period
+  misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = TRUE, verbose = verbose)
+
 
 }
