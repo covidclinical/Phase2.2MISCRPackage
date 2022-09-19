@@ -12,6 +12,8 @@ runAnalysis(
   dateFormat,
   data_update_date,
   country,
+  cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
+    "#D55E00", "#CC79A7"),
   verbose
 )
 }
@@ -29,6 +31,8 @@ runAnalysis(
 \item{data_update_date}{date at which the data has been updated in the local data warehouse. Used to estimate patient age at time of visit, since patients age in the 4CE demographic file is expected the age at data update.}
 
 \item{country}{Specify the country of origin or your data (e.g, US, France, London, Spain)}
+
+\item{cbPalette}{Color palette to use for the plots (set up by default)}
 
 \item{verbose}{By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.}
 }

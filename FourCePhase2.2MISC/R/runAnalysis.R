@@ -10,6 +10,7 @@
 #' @param dateFormat Specify the format of the date at your site (e.g., for "03-AUG-20", the format would be "%d-%b-%y", see documentation](https://www.stat.berkeley.edu/~s133/dates.html))
 #' @param data_update_date date at which the data has been updated in the local data warehouse. Used to estimate patient age at time of visit, since patients age in the 4CE demographic file is expected the age at data update.
 #' @param country Specify the country of origin or your data (e.g, US, France, London, Spain)
+#' @param cbPalette Color palette to use for the plots (set up by default)
 #' @param verbose By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.
 #' @return An object of class \code{list} with the \code{data.frames}.
 #' @examples
@@ -18,7 +19,7 @@
 #' @export runAnalysis
 
 
-runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, verbose ) {
+runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"), verbose ) {
 
   ## Read the 2.2 files
   if(verbose == TRUE){ print("Reading input files")}
@@ -61,6 +62,10 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
   ## estimate the number of MISC patients per period
   misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = TRUE, verbose = verbose)
+
+  ## sex and age distribution overview
+  misc_overview( integrated_df =  misc_complete, output_plot = TRUE, output_df = TRUE, cbPalette = cbPalette, verbose= verbose )
+
 
 
 }

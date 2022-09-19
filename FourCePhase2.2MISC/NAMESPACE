@@ -3,5 +3,6 @@
 export(allFilesInOne)
 export(count_sequences_hospitalisation)
 export(misc_cases_perTimePeriod)
+export(misc_overview)
 export(readInputFiles)
 export(runAnalysis)
