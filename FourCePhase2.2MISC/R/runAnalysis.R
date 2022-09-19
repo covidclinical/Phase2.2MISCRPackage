@@ -60,6 +60,11 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## merge all the files as one data frame for the analysis
   misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw,dateFormat = dateFormat, verbose = verbose )
 
+  #### estimate hospitalization count and length
+
+  #### Integrate it with the misc_complete df
+
+
   ## estimate the number of MISC patients per period
   misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = TRUE, verbose = verbose)
 

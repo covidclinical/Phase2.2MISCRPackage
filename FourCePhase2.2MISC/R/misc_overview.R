@@ -23,6 +23,8 @@
 
 misc_overview <- function( integrated_df, output_plot = FALSE, output_df = TRUE, cbPalette = cbPalette, verbose ){
 
+  currSiteId <- unique( integrated_df$siteid )
+
   if( verbose == TRUE){
     print("Estimating the sex ratio per wave")
   }
