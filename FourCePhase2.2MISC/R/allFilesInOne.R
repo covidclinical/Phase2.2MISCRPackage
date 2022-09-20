@@ -30,7 +30,9 @@ allFilesInOne <- function(obs_df, demo_df, clinical_df, dateFormat, verbose = FA
     print("merging observation data with clinical data by patient_num and days_since_admission")
   }
 
-  misc_all <- left_join( obs_df, clinical_df[, c("patient_num", "days_since_admission", "calendar_date", "in_hospital", "severe", "in_icu", "dead")], by=c("patient_num", "days_since_admission"))
+  misc_all <- left_join( obs_df,
+                         clinical_df[, c("patient_num", "days_since_admission", "calendar_date", "in_hospital", "severe", "in_icu", "dead", "n_hospitalisation", "len_hospitalisation")],
+                         by=c("patient_num", "days_since_admission"))
 
   if(verbose == TRUE){
     print("merging it with the demographic data by patient_num")

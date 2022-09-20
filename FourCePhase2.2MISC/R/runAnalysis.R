@@ -57,12 +57,20 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
       filter(  tolower( Country ) == tolower( country ) )
   }
 
-  ## merge all the files as one data frame for the analysis
-  misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw,dateFormat = dateFormat, verbose = verbose )
-
   #### estimate hospitalization count and length
+  # there are some warnings being generated here, I do not believe they are important but I don't know why they are coming
+  hospitalisations_seq_df <- clinical_raw %>%
+    distinct(patient_num, cohort, days_since_admission, in_hospital) %>%
+    group_by(patient_num, cohort) %>%
+    group_modify(count_sequences_hospitalisation)
+
+  clinical_raw <- left_join(clinical_raw,
+                            hospitalisations_seq_df,
+                            by = c("patient_num", "cohort", "days_since_admission"))
 
   #### Integrate it with the misc_complete df
+  ## merge all the files as one data frame for the analysis
+  misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw,dateFormat = dateFormat, verbose = verbose )
 
 
   ## estimate the number of MISC patients per period
@@ -74,3 +82,4 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
 
 }
+

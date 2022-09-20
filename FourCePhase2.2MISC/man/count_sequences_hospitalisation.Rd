@@ -4,7 +4,7 @@
 \alias{count_sequences_hospitalisation}
 \title{Function to estimate the sequences of hospitalization in Phase 2.2 data}
 \usage{
-count_sequences_hospitalisation(df, ...)
+count_sequences_hospitalisation(df, verbose = FALSE)
 }
 \arguments{
 \item{df}{The clinical_raw data frame generated when applying the readInputFiles function.}
@@ -17,10 +17,9 @@ and \code{n_hospitalisation}.
 }
 \description{
 Given the \code{df} LocalPatientClinicalCourse data use the in_hospital column
-that can get the values 1 when the patient is hospitalized, and 0 when the patient
-is not hospitalized and generates two new columns, the \code{n_hospitalisation} one
-that represents the number of distinct hospitalizations, and the \code{len_hospitalisation}
-with the actual number of consecutive days the patient spent at the hospital.
+that generates two new columns, \code{n_hospitalisation} which represents which hospitalization,
+and the \code{len_hospitalisation} which represents the number of consecutive days
+the patient spent at the hospital for that hospitalization.
 }
 \examples{
 
