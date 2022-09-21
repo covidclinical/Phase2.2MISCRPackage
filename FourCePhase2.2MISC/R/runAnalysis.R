@@ -72,12 +72,16 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## merge all the files as one data frame for the analysis
   misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw,dateFormat = dateFormat, verbose = verbose )
 
+  ### QC
+  qc_summary( complete_df =  misc_complete, during_misc_hosp = TRUE)
+
 
   ## estimate the number of MISC patients per period
   misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = TRUE, verbose = verbose)
 
   ## sex and age distribution overview
   misc_overview( integrated_df =  misc_complete, output_plot = TRUE, output_df = TRUE, cbPalette = cbPalette, verbose= verbose )
+
 
 
 
