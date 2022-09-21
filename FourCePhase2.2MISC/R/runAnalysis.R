@@ -85,7 +85,9 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## format the table for the statistical analysis
   misc_formated <- format_data_for_stats( integrated_df = misc_complete, raceAvailable, verbose )
 
-
+  ## table 1
+  site <- unique( misc_complete$siteid )
+  t1_misc <- misc_table1( formated_df = misc_formated, currSiteId = site, verbose )
 
 
 

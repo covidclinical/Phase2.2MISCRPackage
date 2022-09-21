@@ -20,6 +20,8 @@
 
 format_data_for_stats <- function( integrated_df, raceAvailable, verbose ){
 
+  currSiteId <- unique( integrated_df$siteid )
+
   mainTable <- integrated_df %>%
     filter( n_hospitalisation == 1 ) %>%
     select( patient_num, date, variant_misc, len_hospitalisation, age, sex, in_icu, dead )
