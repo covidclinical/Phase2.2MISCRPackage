@@ -72,12 +72,33 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## merge all the files as one data frame for the analysis
   misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw,dateFormat = dateFormat, verbose = verbose )
 
+  ### check how many of the patients got hospitalized in day_since_admission = 0
+  ### filter
+  totalMISCpatients <- length( unique( misc_complete$patient_num ) )
+  print( paste0( "Total MISC patients: ", totalMISCpatients ))
+
+  misc_hospitalization_flag <- misc_complete %>%
+    dplyr::mutate( misc_hospitalized = ifelse( days_since_admission == 0 & in_hospital == 1, 1, 0)) %>%
+    dplyr::group_by( patient_num ) %>%
+    dplyr::summarise( misc_hospitalized = max( misc_hospitalized ))
+
+  misc_no_hosp <- misc_hospitalization_flag %>%
+    dplyr::filter( misc_hospitalized == 0 )
+  print( paste0( "MISC patients not hospitalized during the MISC admission date provided: ", length(unique( misc_no_hosp$patient_num)) ))
+
+  misc_complete <- left_join( misc_complete, misc_hospitalization_flag )
+
+  ## filter to focus only on those that were hospitalized
+  misc_complete <- misc_complete %>% filter( misc_hospitalized == 1)
+
+
   ### QC
   qc_summary( complete_df =  misc_complete, during_misc_hosp = TRUE)
 
 
   ## estimate the number of MISC patients per period
   misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = TRUE, verbose = verbose)
+
 
   ## sex and age distribution overview
   misc_overview( integrated_df =  misc_complete, output_plot = TRUE, output_df = TRUE, cbPalette = cbPalette, verbose= verbose )
