@@ -23,8 +23,11 @@ format_data_for_stats <- function( integrated_df, raceAvailable, verbose ){
   currSiteId <- unique( integrated_df$siteid )
 
   mainTable <- integrated_df %>%
-    filter( n_hospitalisation == 1 ) %>%
-    select( patient_num, date, variant_misc, len_hospitalisation, age, sex, in_icu, dead )
+    dplyr::filter( n_hospitalisation == 1 ) %>%
+    dplyr::select( patient_num, date, variant_misc, len_hospitalisation, age, sex, in_icu, dead ) %>%
+    dplyr::group_by( patient_num, date, variant_misc, len_hospitalisation, age, sex ) %>%
+    dplyr::summarise( in_icu = max( in_icu ),
+                      dead = max( dead ))
 
   if( raceAvailable == TRUE ){
     mainTable <- left_join( mainTable, race_raw %>% select( patient_num, race_4ce), by="patient_num")
