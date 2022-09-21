@@ -42,7 +42,7 @@ misc_table1 <- function( formated_df, currSiteId, verbose ){
   label(formated_df$cardiovascular_outcome) <- "Cardiovascular Outcome"
   label(formated_df$len_hospitalisation)    <- "Length of hospitalization (days)"
 
-  misc_t1 <- table1::table1(~ age + race_4ce + len_hospitalisation + in_icu + dead + cardiovascular_outcome + Shock + SICARDIAC + ECMO + `Heart failure` + `Cardiac arrest` + `Respiratory failure` | variant_misc,
+  misc_t1 <- table1::table1(~ age + sex + race_4ce + len_hospitalisation + in_icu + dead + cardiovascular_outcome + Shock + SICARDIAC + ECMO + `Heart failure` + `Cardiac arrest` + `Respiratory failure` | variant_misc,
                  data=formated_df )
 
   ## Save the generated table 1

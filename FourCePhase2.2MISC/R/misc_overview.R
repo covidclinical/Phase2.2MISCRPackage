@@ -41,6 +41,8 @@ misc_overview <- function( integrated_df, output_plot = FALSE, output_df = TRUE,
   }
 
   misc_age_distribution <- integrated_df %>%
+    dplyr::select( patient_num, age, variant_misc) %>%
+    unique() %>%
     dplyr::group_by( variant_misc ) %>%
     dplyr::summarize(min = min(age),
               q1 = quantile(age, 0.25),
@@ -72,6 +74,8 @@ misc_overview <- function( integrated_df, output_plot = FALSE, output_df = TRUE,
 
   ### length hospitalization
   hospitalization_length <- first_hospitalization %>%
+    dplyr::select( patient_num, len_hospitalisation, variant_misc) %>%
+    unique() %>%
     dplyr::group_by( variant_misc ) %>%
     dplyr::summarize(min = min(len_hospitalisation),
                      q1 = quantile(len_hospitalisation, 0.25),

@@ -110,7 +110,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   site <- unique( misc_complete$siteid )
   t1_misc <- misc_table1( formated_df = misc_formated, currSiteId = site, verbose )
 
-
+  t1_misc
 
 }
 
