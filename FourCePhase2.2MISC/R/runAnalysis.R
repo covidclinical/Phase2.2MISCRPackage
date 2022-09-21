@@ -82,6 +82,10 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## sex and age distribution overview
   misc_overview( integrated_df =  misc_complete, output_plot = TRUE, output_df = TRUE, cbPalette = cbPalette, verbose= verbose )
 
+  ## format the table for the statistical analysis
+  misc_formated <- format_data_for_stats( integrated_df = misc_complete, raceAvailable, verbose )
+
+
 
 
 

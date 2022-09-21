@@ -2,6 +2,7 @@
 
 export(allFilesInOne)
 export(count_sequences_hospitalisation)
+export(format_data_for_stats)
 export(misc_cases_perTimePeriod)
 export(misc_overview)
 export(qc_summary)
