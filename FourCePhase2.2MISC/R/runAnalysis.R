@@ -70,7 +70,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
   #### Integrate it with the misc_complete df
   ## merge all the files as one data frame for the analysis
-  misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw,dateFormat = dateFormat, verbose = verbose )
+  misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw, variants_df = variantsDates, dateFormat = dateFormat, verbose = verbose )
 
   ### check how many of the patients got hospitalized in day_since_admission = 0
   ### filter

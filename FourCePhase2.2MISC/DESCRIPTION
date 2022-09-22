@@ -10,8 +10,7 @@ License: Apache License 2.0
 Encoding: UTF-8
 LazyData: true
 Depends:
-    R (>= 4.0.1)
-Imports:
+    R (>= 4.0.1),
     dplyr,
     tidyr,
     tidyverse,

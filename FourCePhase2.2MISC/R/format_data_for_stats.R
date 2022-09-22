@@ -30,6 +30,7 @@ format_data_for_stats <- function( integrated_df, raceAvailable, verbose ){
                       dead = max( dead ))
 
   if( raceAvailable == TRUE ){
+    race_raw <- read.delim(file.path(dir.input, "/LocalPatientRace.csv"), sep = ",", skip = 0)
     mainTable <- left_join( mainTable, race_raw %>% select( patient_num, race_4ce), by="patient_num")
   }
 

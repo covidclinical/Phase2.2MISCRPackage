@@ -6,9 +6,18 @@
 and add additional information of interest, as the variant_misc assesed based on
 the date and the country}
 \usage{
-allFilesInOne(obs_df, demo_df, clinical_df, dateFormat, verbose = FALSE)
+allFilesInOne(
+  obs_df,
+  demo_df,
+  clinical_df,
+  variants_df,
+  dateFormat,
+  verbose = FALSE
+)
 }
 \arguments{
+\item{variants_df}{Data frame with the variant dates filtered by country in run_analysis()}
+
 \item{verbose}{By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.}
 
 \item{obs_raw}{Data frame with all the observations for the MISC patients}
