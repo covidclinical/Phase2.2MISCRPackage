@@ -23,8 +23,6 @@ Depends:
     dplyr,
     lubridate,
     MatchIt,
-    table1,
-    xml2, 
-    rvest
+    table1
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1

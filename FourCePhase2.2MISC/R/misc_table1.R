@@ -49,19 +49,6 @@ misc_table1 <- function( formated_df, obfuscation_threshold, currSiteId, dir.out
   misc_t1 <- table1::table1(~ age + sex + race_4ce + len_hospitalisation + in_icu + dead + cardiovascular_outcome + Shock + SICARDIAC + ECMO + `Heart failure` + `Cardiac arrest` + `Respiratory failure` | variant_misc,
                  data=formated_df )
 
-  misc_t1_df <- as.data.frame(xml2::read_html(misc_t1) %>% rvest::html_table(fill=TRUE))
-
-
-  ## Save the generated table 1
-  #if( obfuscation_threshold == FALSE ){
-  #  write.table( x         = misc_t1_df,
-  #               file      = file.path(dir.output,paste0(currSiteId, "_misc_t1.txt")),
-  #               col.names = TRUE,
-  #               row.names = FALSE,
-  #               quote     = FALSE,
-  #               sep       = "\t" )
-  }
-
 
   return( misc_t1 )
 }

@@ -55,7 +55,7 @@ misc_cases_perTimePeriod <- function( integrated_df, period = "month", output_pl
     misc_counts_plot <- ggplot2::ggplot(data=misc_cases, aes(x=period, y=distinct_patients)) +
       geom_bar(stat="identity") +
       ggtitle(paste0("MISC patients per ", period )) +
-      xlab("Number of distinct MISC patients") + ylab(paste0("By ", period )) +
+      ylab("Number of distinct MISC patients") + xlab(paste0("By ", period )) +
       theme_bw() +
       theme(plot.title = element_text(hjust = 0.5))
 
