@@ -108,8 +108,11 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
   ## table 1
   site <- unique( misc_complete$siteid )
-  t1_misc <- misc_table1( formated_df = misc_formated, currSiteId = site, verbose )
-  t1_misc
+  t1_misc <- misc_table1( formated_df = misc_formated, currSiteId = site, obfuscation_threshold = obfuscation, verbose )
+
+  if( obfuscation == FALSE ){
+    t1_misc
+  }
 
 }
 
