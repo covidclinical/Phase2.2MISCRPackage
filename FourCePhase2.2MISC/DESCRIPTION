@@ -24,6 +24,8 @@ Imports:
     dplyr,
     lubridate,
     MatchIt,
-    table1
+    table1,
+    xml2, 
+    rvest
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
