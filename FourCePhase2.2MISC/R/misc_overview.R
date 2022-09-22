@@ -122,15 +122,15 @@ misc_overview <- function( integrated_df, obfuscation_threshold, dir.output, out
   if( output_plot == TRUE ){
 
     ### sex ratio plot barplot
-    misc_sex_ratio_plot <-ggplot2::ggplot(misc_sex_ratio, aes(fill=variant_misc, y=ratio, x=sex)) +
-      geom_bar(position="dodge", stat="identity") +
-      scale_fill_manual( values = cbPalette) +
-      ggtitle("Sex ratio in MISC patients per wave") +
-      xlab("Sex") + ylab("Ratio") +
-      theme_bw() +
-      theme(plot.title = element_text(hjust = 0.5))
-
-    ggplot2::ggsave(filename=file.path(dir.output,paste0(currSiteId, "_misc_sex_ratio_plot.png")),plot=print(misc_sex_ratio_plot))
+    # misc_sex_ratio_plot <-ggplot2::ggplot(misc_sex_ratio, aes(fill=variant_misc, y=ratio, x=sex)) +
+    #   geom_bar(position="dodge", stat="identity") +
+    #   scale_fill_manual( values = cbPalette) +
+    #   ggtitle("Sex ratio in MISC patients per wave") +
+    #   xlab("Sex") + ylab("Ratio") +
+    #   theme_bw() +
+    #   theme(plot.title = element_text(hjust = 0.5))
+    #
+    # ggplot2::ggsave(filename=file.path(dir.output,paste0(currSiteId, "_misc_sex_ratio_plot.png")),plot=print(misc_sex_ratio_plot))
 
     ## age distribution plot
     misc_age_dsitribution_plot <- integrated_df %>%
