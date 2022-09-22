@@ -97,19 +97,18 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
 
   ## estimate the number of MISC patients per period
-  misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = TRUE, verbose = verbose)
+  misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = TRUE, dir.output = dir.output, verbose = verbose)
 
 
   ## sex and age distribution overview
-  misc_overview( integrated_df =  misc_complete, output_plot = TRUE, output_df = TRUE, cbPalette = cbPalette, verbose= verbose )
+  misc_overview( integrated_df =  misc_complete, obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = TRUE, dir.output = dir.output,cbPalette = cbPalette, verbose= verbose )
 
   ## format the table for the statistical analysis
-  misc_formated <- format_data_for_stats( integrated_df = misc_complete, raceAvailable, verbose )
+  misc_formated <- format_data_for_stats( integrated_df = misc_complete, dir.input = dir.input, raceAvailable, verbose )
 
   ## table 1
   site <- unique( misc_complete$siteid )
   t1_misc <- misc_table1( formated_df = misc_formated, currSiteId = site, verbose )
-
   t1_misc
 
 }

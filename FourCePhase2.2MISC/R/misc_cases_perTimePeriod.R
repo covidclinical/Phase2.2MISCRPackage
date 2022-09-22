@@ -8,6 +8,7 @@
 #' @param period The counts can be done by weeks, months or year. By default it is done by month.
 #' @param output_plot By default \code{FALSE}. Change it to \code{TRUE} to get a barplot output.
 #' @param output_df By default \code{TRUE}. Change it to \code{FALSE} to not to get the counts as a data.frame.
+#' @param dir.output The path to the output directory where the aggregate counts and plots will be saved.
 #' @param verbose By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.
 #' @return An object of class \code{data.frame} with the counts, and the plot when output_plot is set to TRUE.
 #' @examples
@@ -16,12 +17,13 @@
 #'               integrated_df = misc_complete,
 #'               period = "month",
 #'               output_plot = FALSE,
-#'               output_df   = TRUE
+#'               output_df   = TRUE,
+#'               dir.output
 #'              )
 #' @export misc_cases_perTimePeriod
 #'
 
-misc_cases_perTimePeriod <- function( integrated_df, period = "month", output_plot = FALSE, output_df = TRUE, verbose ){
+misc_cases_perTimePeriod <- function( integrated_df, period = "month", output_plot = FALSE, output_df = TRUE, dir.output, verbose ){
 
   #check that the period value is one of the allowed ones
   if( period %in% c("weeks", "month", "year")){

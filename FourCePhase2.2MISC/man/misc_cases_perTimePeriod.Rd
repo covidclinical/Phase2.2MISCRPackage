@@ -9,6 +9,7 @@ misc_cases_perTimePeriod(
   period = "month",
   output_plot = FALSE,
   output_df = TRUE,
+  dir.output,
   verbose
 )
 }
@@ -20,6 +21,8 @@ misc_cases_perTimePeriod(
 \item{output_plot}{By default \code{FALSE}. Change it to \code{TRUE} to get a barplot output.}
 
 \item{output_df}{By default \code{TRUE}. Change it to \code{FALSE} to not to get the counts as a data.frame.}
+
+\item{dir.output}{The path to the output directory where the aggregate counts and plots will be saved.}
 
 \item{verbose}{By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.}
 }
@@ -37,6 +40,7 @@ casesCounts <- misc_cases_perTimePeriod(
               integrated_df = misc_complete,
               period = "month",
               output_plot = FALSE,
-              output_df   = TRUE
+              output_df   = TRUE,
+              dir.output
              )
 }
