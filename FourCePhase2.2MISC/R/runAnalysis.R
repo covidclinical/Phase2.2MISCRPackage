@@ -93,7 +93,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
 
   ### QC
-  qc_summary( complete_df =  misc_complete, during_misc_hosp = TRUE)
+  qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation, during_misc_hosp = TRUE)
 
 
   ## estimate the number of MISC patients per period

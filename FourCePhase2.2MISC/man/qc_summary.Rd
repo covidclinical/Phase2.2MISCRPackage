@@ -4,10 +4,12 @@
 \alias{qc_summary}
 \title{Function to create a summary table of the MISC Phase 2.2 data}
 \usage{
-qc_summary(complete_df, during_misc_hosp = TRUE)
+qc_summary(complete_df, obfuscation_threshold, during_misc_hosp = TRUE)
 }
 \arguments{
 \item{complete_df}{The combined dataframe generated from the allFilesInOne function}
+
+\item{obfuscation_threshold}{FALSE if no obfuscation is needed, the numeric value when there is obfuscation}
 
 \item{during_misc_hosp}{By default \code{TRUE}, meaning that the summary will only be generated for data during the first MISC hospitalization.}
 

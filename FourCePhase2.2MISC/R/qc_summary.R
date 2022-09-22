@@ -6,6 +6,7 @@
 #' the patient spent at the hospital for that hospitalization.
 #'
 #' @param complete_df The combined dataframe generated from the allFilesInOne function
+#' @param obfuscation_threshold FALSE if no obfuscation is needed, the numeric value when there is obfuscation
 #' @param during_misc_hosp By default \code{TRUE}, meaning that the summary will only be generated for data during the first MISC hospitalization.
 #' @param verbose By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.
 #' @return An object of class \code{data.frame} containing the summaries of labs, meds, and procedures described in the SRC
@@ -20,7 +21,7 @@
 # testing code
 #complete_df <- misc_complete
 
-qc_summary <- function(complete_df, during_misc_hosp = TRUE){
+qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TRUE){
 
   if(during_misc_hosp){
     complete_df <- complete_df %>% filter(n_hospitalisation == 1)
@@ -51,7 +52,8 @@ qc_summary <- function(complete_df, during_misc_hosp = TRUE){
               max_value = max(value),
               mean_value = mean(value),
               n_patients = n_distinct(patient_num)) %>%
-    mutate(perc_patients = (n_patients / total_n) * 100)
+  mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
+          perc_patients = (n_patients / total_n) * 100)
 
   ### create medication value summary
   # include: number of patients and %
@@ -63,8 +65,9 @@ qc_summary <- function(complete_df, during_misc_hosp = TRUE){
   # lab summary table
   med_sum <- med_sum %>%
     group_by(variableName) %>%
-    summarise(n_patients = n_distinct(patient_num)) %>%
-    mutate(perc_patients = (n_patients / total_n) * 100)
+    summarise( n_patients = n_distinct(patient_num)) %>%
+    mutate(n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),,
+           perc_patients = (n_patients / total_n) * 100)
 
   ### create procedures value summary
   # include: number of patients and %
@@ -72,7 +75,8 @@ qc_summary <- function(complete_df, during_misc_hosp = TRUE){
     filter(concept_type == 'PROC-GROUP') %>%
     group_by(concept_code) %>%
     summarise(n_patients = n_distinct(patient_num)) %>%
-    mutate(perc_patients = (n_patients / total_n) * 100)
+    mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
+            perc_patients = (n_patients / total_n) * 100)
 
   proc_sum
 
