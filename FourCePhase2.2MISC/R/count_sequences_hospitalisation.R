@@ -19,7 +19,7 @@
 # using clinical_raw as input df
 # df for testing. use patient 104511172,
 #df <- clinical_raw %>%
-#  filter(patient_num == 104511172)
+#  filter(patient_num %in% c(104511172, 296596))
 
 #####
 
@@ -29,12 +29,6 @@ count_sequences_hospitalisation <- function(df, verbose = FALSE) {
   if(verbose == TRUE){
     print('Creating the sequence data')
   }
-
-  # not sure what this is for
-  seq_hospitalisation_df <- data.frame(total_span = seq(min(df$days_since_admission),
-                                                        max(df$days_since_admission))) %>%
-    left_join(df, by = c("total_span" = "days_since_admission")) %>%
-    replace_na(list(in_hospital = 0))
 
   if(verbose == TRUE){
     print('Estimating the length of hospitalization')
