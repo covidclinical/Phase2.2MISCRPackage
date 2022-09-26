@@ -6,11 +6,10 @@ ALT U/L  1742-6  TBD
 WBC 10*3/uL  6690-2  TBD
 lymphocyte  10*3/uL  731-0  TBD
 neutrophil  10*3/uL 751-8 TBD
-PLT RANDOM  1988-5  TBD
+platelets 10*3/uL  777-3  TBD
 albumin g/dL  1751-7 TBD
 d_dimer ng/mL{FEU}  448065-7 TBD
 d_dimer ng/mL{DDU}  48066-5 TBD
 PT  s  5902-2 TBD
 fibrinogen  mg/dL  3255-7 TBD
 ferritin  ng/mL  2276-4 TBD
-sodium  RANDOM  1975-2  TBD
