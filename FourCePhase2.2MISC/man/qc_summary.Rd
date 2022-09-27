@@ -4,7 +4,13 @@
 \alias{qc_summary}
 \title{Function to create a summary table of the MISC Phase 2.2 data}
 \usage{
-qc_summary(complete_df, obfuscation_threshold, during_misc_hosp = TRUE)
+qc_summary(
+  complete_df,
+  obfuscation_threshold,
+  during_misc_hosp = TRUE,
+  output_path,
+  site_id
+)
 }
 \arguments{
 \item{complete_df}{The combined dataframe generated from the allFilesInOne function}

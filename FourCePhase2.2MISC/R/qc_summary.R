@@ -21,7 +21,7 @@
 # testing code
 #complete_df <- misc_complete
 
-qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TRUE){
+qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TRUE, output_path, site_id){
 
   if(during_misc_hosp){
     complete_df <- complete_df %>% filter(n_hospitalisation == 1)
@@ -51,9 +51,13 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
               min_value = min(value),
               max_value = max(value),
               mean_value = mean(value),
+              sd_value = sd(value),
               n_patients = n_distinct(patient_num)) %>%
   mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
-          perc_patients = (n_patients / total_n) * 100)
+          perc_patients = (n_patients / total_n) * 100,
+          siteid = site_id)
+
+  write.table(lab_sum, paste0(output_path, site_id, '_MISC', 'lab_summary.txt'), quote = FALSE, row.names = FALSE)
 
   ### create medication value summary
   # include: number of patients and %
@@ -62,12 +66,16 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     select(siteid, cohort, patient_num, concept_code, value) %>%
     left_join(meds_of_interest, by = 'concept_code')
 
-  # lab summary table
+  # medication summary table
   med_sum <- med_sum %>%
     group_by(variableName) %>%
     summarise( n_patients = n_distinct(patient_num)) %>%
     mutate(n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),,
-           perc_patients = (n_patients / total_n) * 100)
+           perc_patients = (n_patients / total_n) * 100,
+           siteid = site_id)
+
+   write.table(med_sum, paste0(output_path, site_id, '_MISC', 'medication_summary.txt'), quote = FALSE, row.names = FALSE)
+
 
   ### create procedures value summary
   # include: number of patients and %
@@ -76,11 +84,13 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     group_by(concept_code) %>%
     summarise(n_patients = n_distinct(patient_num)) %>%
     mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
-            perc_patients = (n_patients / total_n) * 100)
+            perc_patients = (n_patients / total_n) * 100,
+            siteid = site_id)
 
   proc_sum
 
-  ## how to export / show summary table?
+  write.table(proc_sum, paste0(output_path, site_id, '_MISC', 'procedure_summary.txt'), quote = FALSE, row.names = FALSE)
+
   print(lab_sum)
   print(med_sum)
   print(proc_sum)

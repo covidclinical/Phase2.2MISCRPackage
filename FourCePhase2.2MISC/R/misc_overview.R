@@ -51,6 +51,7 @@ misc_overview <- function( integrated_df, obfuscation_threshold, dir.output, out
               median = median(age),
               mean = mean(age),
               q3 = quantile(age, 0.75),
+              sd = sd(age),
               max = max(age))
 
   print("#### Sex ratio")
@@ -85,6 +86,7 @@ misc_overview <- function( integrated_df, obfuscation_threshold, dir.output, out
                      median = median(len_hospitalisation),
                      mean = mean(len_hospitalisation),
                      q3 = quantile(len_hospitalisation, 0.75),
+                     sd = sd(len_hospitalisation),
                      max = max(len_hospitalisation))
   print("#### Length of the MISC hospitalization")
   print( hospitalization_length )

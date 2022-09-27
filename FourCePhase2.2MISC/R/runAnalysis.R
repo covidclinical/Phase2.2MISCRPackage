@@ -70,6 +70,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   #### Integrate it with the misc_complete df
   ## merge all the files as one data frame for the analysis
   misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw, variants_df = variantsDates, dateFormat = dateFormat, verbose = verbose )
+  site <- unique( misc_complete$siteid )
 
   ### check how many of the patients got hospitalized in day_since_admission = 0
   ### filter
@@ -92,7 +93,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
 
   ### QC
-  qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation, during_misc_hosp = TRUE)
+  qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation, during_misc_hosp = TRUE, output_path=dir.output, site_id = site)
 
 
   ## estimate the number of MISC patients per period
@@ -106,7 +107,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   misc_formated <- format_data_for_stats( integrated_df = misc_complete, dir.input = dir.input, raceAvailable, verbose )
 
   ## table 1
-  site <- unique( misc_complete$siteid )
+
   t1_misc <- misc_table1( formated_df = misc_formated, currSiteId = site, obfuscation_threshold = obfuscation, verbose )
 
   if( obfuscation == FALSE ){
