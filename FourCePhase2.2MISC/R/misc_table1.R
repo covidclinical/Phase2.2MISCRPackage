@@ -106,17 +106,26 @@ misc_table1 <- function( formated_df, obfuscation_threshold, currSiteId, dir.out
   # paste the information together so that it is prettier to print
   # cut off decimals
   test4 <- test2 %>%
-    mutate(age_mean_sd_iqr = paste0(age_mean, ' (', age_sd, '), IQR=', age_iqr),
-           age_med_min_max = paste0(age_med, ' [', age_min, ',', age_max, ']'),
-           len_hosp_mean_sd_iqr = paste0(len_hosp_mean, ' (', len_hosp_sd, '), IQR=', len_hosp_iqr),
-           len_hosp_med_min_max = paste0(len_hosp_med, ' [', len_hosp_min, ',', len_hosp_max, ']')) %>%
+    mutate(age_mean_sd_iqr = paste0(round(age_mean, digits = 2), ' (', round(age_sd, digits = 2), '), IQR=', round(age_iqr, digits = 2)),
+           age_med_min_max = paste0(round(age_med, digits = 2), ' [', round(age_min, digits = 2), ',', round(age_max, digits = 2), ']'),
+           len_hosp_mean_sd_iqr = paste0(round(len_hosp_mean, digits = 2), ' (', round(len_hosp_sd, digits = 2), '), IQR=', round(len_hosp_iqr, digits = 2)),
+           len_hosp_med_min_max = paste0(round(len_hosp_med, digits = 2), ' [', round(len_hosp_min, digits = 2), ',', round(len_hosp_max, digits = 2), ']'),
+           sex_male_n = paste0(sex_male_n, ' (', round((sex_male_n / (sex_male_n + sex_female_n)) * 100, digits = 2), '%)'),
+           sex_female_n = paste0(sex_female_n, ' (', round((sex_female_n / (sex_male_n + sex_female_n)) * 100, digits = 2), '%)'),
+           race_white_n = paste0(race_white_n, ' (', round((race_white_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
+           race_black_n = paste0(race_black_n, ' (', round((race_black_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
+           race_asian_n = paste0(race_asian_n, ' (', round((race_asian_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
+           race_amerind_n = paste0(race_amerind_n, ' (', round((race_amerind_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
+           race_other_n = paste0(race_other_n, ' (', round((race_other_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
+           race_na_n = paste0(race_na_n, ' (', round((race_na_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)')) %>%
     select(-c(age_mean, age_sd, age_iqr, age_med, age_min, age_max,
-              len_hosp_mean, len_hosp_sd, len_hosp_iqr, len_hosp_med, len_hosp_min, len_hosp_max))
+              len_hosp_mean, len_hosp_sd, len_hosp_iqr, len_hosp_med, len_hosp_min, len_hosp_max)) %>%
+    select(variant_misc, age_mean_sd_iqr, age_med_min_max, len_hosp_mean_sd_iqr, len_hosp_med_min_max, sex_male_n, everything())
 
   test5 <- as.data.frame(t(test4))
   colnames(test5) <- test5[1,]
   test5 <- test5[-1,]
-  head(test5)
+  head(test5, 15)
 
   return(test5)
 
