@@ -32,6 +32,9 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( variableName, variant_misc, patient_num ) %>%
     dplyr::mutate( selected_value = ifelse( worstValue == "lowest", min( value), max(value ))) %>%
+    dplyr::ungroup( ) %>%
+    dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
+    unique() %>%
     dplyr::group_by( variableName, variant_misc ) %>%
     dplyr::mutate( median_value = round( median(selected_value), 2),
                    iqr_value = round( IQR(selected_value), 2),
@@ -51,6 +54,9 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( variableName, patient_num ) %>%
     dplyr::mutate( selected_value = ifelse( worstValue == "lowest", min( value), max(value ))) %>%
+    dplyr::ungroup( ) %>%
+    dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
+    unique() %>%
     dplyr::group_by( variableName) %>%
     dplyr::mutate( variant_misc = "total_n",
                    median_value = round( median(selected_value), 2),
@@ -73,6 +79,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( patient_num, variableName ) %>%
     dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
+    dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
     dplyr::group_by( variableName, variant_misc ) %>%
@@ -94,6 +101,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( patient_num, variableName ) %>%
     dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
+    dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
     dplyr::group_by( variableName ) %>%
@@ -156,6 +164,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( variableName, variant_misc, patient_num ) %>%
     dplyr::mutate( selected_value = ifelse( worstValue == "lowest", min( value), max(value ))) %>%
+    dplyr::ungroup( ) %>%
     dplyr::group_by( variableName ) %>%
     do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
   stats_kruskal_atAdmission$time_point <- "At admission day 0"
