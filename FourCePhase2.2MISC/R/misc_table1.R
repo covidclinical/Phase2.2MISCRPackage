@@ -19,9 +19,10 @@
 #'              )
 #' @export misc_table1
 #'
-misc_table1 <- function( formated_df, obfuscation_threshold, currSiteId, dir.output, verbose, complete_df, raceAvailable){
+misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.output, verbose, raceAvailable){
 
   clinicalChar <- read.delim('inst/extdata/clinicalCharacteristics.txt')
+  total_n_patients <- length(unique(complete_df$patient_num))
 
   # insert race
   if( raceAvailable == TRUE ){
@@ -36,19 +37,25 @@ misc_table1 <- function( formated_df, obfuscation_threshold, currSiteId, dir.out
   # merge clinicalChar so we have the names and categories for each code
   df <- left_join(df, clinicalChar, by = 'concept_code')
 
-  # demographics summaries
-  race_summary <- df %>%
-    group_by(race_4ce) %>%
-    mutate(total_n = n_distinct(patient_num)) %>%
-    group_by(race_4ce, variant_misc) %>%
-    summarise(n = n_distinct(patient_num),
-              perc = (n / total_n) * 100) %>%
-    unique() %>%
-    rename(variableName = race_4ce)
+  # demographics summaries IF sites have race available
+  if (raceAvailable == TRUE) {
+    race_summary <- df %>%
+      group_by(variant_misc) %>%
+      mutate(total_n = n_distinct(patient_num)) %>%
+      group_by(race_4ce, variant_misc) %>%
+      summarise(n = n_distinct(patient_num),
+                perc = (n / total_n) * 100) %>%
+      unique() %>%
+      rename(variableName = race_4ce)
+  } else {
+    race_summary <- data.frame(variableName = '', variant_misc = '', n = '', perc = '')
+    race_summary <- race_summary[-1,]
+  }
+
 
   # summarise by category
   category_summary <- df %>%
-    group_by(category) %>%
+    group_by(variant_misc) %>%
     mutate(total_n = n_distinct(patient_num)) %>%
     group_by(category, variant_misc) %>%
     summarise(n = n_distinct(patient_num),
@@ -57,7 +64,7 @@ misc_table1 <- function( formated_df, obfuscation_threshold, currSiteId, dir.out
 
   # summarise by code
   concept_summary <- df %>%
-    group_by(variableName) %>%
+    group_by(variant_misc) %>%
     mutate(total_n = n_distinct(patient_num)) %>%
     group_by(variableName, variant_misc) %>%
     summarise(n = n_distinct(patient_num),
@@ -78,13 +85,16 @@ misc_table1 <- function( formated_df, obfuscation_threshold, currSiteId, dir.out
                     'Cardiovascular symptoms', 'chest pain', 'palpitations', 'lower extremety edema', 'pre-syncope_syncope','ventricular dysfunction', 'heart failure', 'shock',
                     'Neurologic symptoms', 'headache', 'confusion', 'irritability', 'seizures', 'muscle weakness', 'encephalopathy', 'meningoencephalitis', 'lethargy', 'stroke',
                     'Renal involvement', 'renal dysfunction', 'acute renal failure',
-                    'Liver involvement', 'hepatitis', 'liver dysfunction', 'acute liver failure')
-  other_rows <- df2$variableName[!df2$variableName %in% ordered_rows]
+                    'Liver involvement', 'hepatitis', 'liver dysfunction', 'acute liver failure',
+                    'Kawasaki')
+  other_rows <- df2$variableName[!df2$variableName %in% ordered_rows] %>% unique()
 
   # reorder combined df
   df2 <- df2 %>%
     mutate(variableName =  factor(variableName, levels = c(ordered_rows, other_rows))) %>%
-    arrange(variableName)
+    arrange(variableName) %>%
+    group_by(variableName) %>%
+    mutate(total_n = paste0(sum(n), ' (', round(sum(n) / total_n_patients, digits = 2) * 100, '%)'))
 
   # pivot df with combined n / percentage cells
   df3 <- df2 %>%
@@ -99,8 +109,16 @@ misc_table1 <- function( formated_df, obfuscation_threshold, currSiteId, dir.out
            orig_len_hosp = len_hospitalisation) %>%
     group_by(variant_misc) %>%
     unique() %>%
-    summarise(age = paste0(median(orig_age), ' (', round(IQR(orig_age), digits = 2), '), [', min(orig_age), ',', max(orig_age), ']'),
-              length_hospitalization = paste0(median(orig_len_hosp), ' (', round(IQR(orig_len_hosp), digits = 2), '), [', min(orig_len_hosp), ',', max(orig_len_hosp), ']')) %>%
+    summarise(age = paste0('median: ', median(orig_age),
+                           ', IQR: (', round(IQR(orig_age), digits = 2),
+                           '), min,max: [', min(orig_age), ',', max(orig_age),
+                           '], mean= ', round(mean(orig_age), digits = 2),
+                           ', SD=', round(sd(orig_age), digits = 2)),
+              length_hospitalization = paste0('median: ', median(orig_len_hosp),
+                                              ', IQR: (', round(IQR(orig_len_hosp), digits = 2),
+                                              '), min,max: [', min(orig_len_hosp), ',', max(orig_len_hosp),
+                                              '], mean= ', round(mean(orig_len_hosp), digits = 2),
+                                              ', SD=', round(sd(orig_len_hosp), digits = 2))) %>%
     t() %>%
     as.data.frame()
   colnames(continuous_summary) <- continuous_summary[1,]
@@ -108,139 +126,34 @@ misc_table1 <- function( formated_df, obfuscation_threshold, currSiteId, dir.out
   rownames(continuous_summary) <- NULL
   continuous_summary <- continuous_summary[-1,]
 
+  # find totals of the continuous variables
+  continuous_total_summary <- df %>%
+    select(patient_num, age, len_hospitalisation) %>%
+    rename(orig_age = age,
+           orig_len_hosp = len_hospitalisation) %>%
+    unique() %>%
+    summarise(age = paste0('median: ', median(orig_age),
+                           ', IQR: (', round(IQR(orig_age), digits = 2),
+                           '), min,max: [', min(orig_age), ',', max(orig_age),
+                           '], mean= ', round(mean(orig_age), digits = 2),
+                           ', SD=', round(sd(orig_age), digits = 2)),
+              length_hospitalization = paste0('median: ', median(orig_len_hosp),
+                                              ', IQR: (', round(IQR(orig_len_hosp), digits = 2),
+                                              '), min,max: [', min(orig_len_hosp), ',', max(orig_len_hosp),
+                                              '], mean= ', round(mean(orig_len_hosp), digits = 2),
+                                              ', SD=', round(sd(orig_len_hosp), digits = 2))) %>%
+    t() %>%
+    as.data.frame()
+  colnames(continuous_total_summary) <- 'total_n'
+  continuous_total_summary$variableName <- rownames(continuous_total_summary)
+  rownames(continuous_total_summary) <- NULL
+
+  continuous_summary <- left_join(continuous_summary, continuous_total_summary)
+
   df4 <- rbind(continuous_summary, df3) %>%
-    select(variableName, everything())
+    select(variableName, total_n, everything())
 
   return(df4)
-
-  # pivot df so that each CODE is a column
-  #df$value <- 1
-  #df2 <- pivot_wider(df, names_from = concept_code, values_fill = 0)
-
-  #formated_df$sex           <- factor(formated_df$sex, levels=c("male", "female"), labels=c("Male", "Female"))
-  #formated_df$variant_misc  <- factor(formated_df$variant_misc)
-  #formated_df$race_4ce      <- factor(formated_df$race_4ce,
-  #                                    levels=c("white", "black", "asian", "american_indian", "other", "no_information"),
-  #                                    labels=c("White", "Black", "Asian", "American indian", "Other", "Not Available"))
-  #formated_df$in_icu  <- as.logical(formated_df$in_icu == 1)
-  #formated_df$dead    <- as.logical(formated_df$dead == 1)
-  #formated_df$Shock   <- as.logical(formated_df$Shock == 1)
-  #formated_df$ECMO    <- as.logical(formated_df$ECMO == 1)
-  #formated_df$SICARDIAC <- as.logical(formated_df$SICARDIAC == 1)
-  #formated_df$CPR       <- as.logical(formated_df$CPR == 1)
-
-  #formated_df$cardiovascular_outcome  <- as.logical(formated_df$cardiovascular_outcome == 1)
-  #formated_df$`Heart failure`         <- as.logical(formated_df$`Heart failure` == 1)
-  #formated_df$`Respiratory failure`   <- as.logical(formated_df$`Respiratory failure` == 1)
-  #formated_df$`Cardiac arrest`        <- as.logical(formated_df$`Cardiac arrest` == 1)
-
-  #label(formated_df$race_4ce) <- "Race"
-  #label(formated_df$age)      <- "Age"
-  #label(formated_df$sex)      <- "Sex"
-  #label(formated_df$in_icu)   <- "ICU"
-  #label(formated_df$variant_misc)   <- "Variant MIS-C"
-  #label(formated_df$cardiovascular_outcome) <- "Cardiovascular Outcome"
-  #label(formated_df$len_hospitalisation)    <- "Length of hospitalization (days)"
-
-  #misc_t1 <- table1::table1(~ age + sex + race_4ce + len_hospitalisation + in_icu + dead + cardiovascular_outcome + Shock + SICARDIAC + ECMO + `Heart failure` + `Cardiac arrest` + `Respiratory failure` | variant_misc,
-                 #data=formated_df )
-
-
-  #return( misc_t1 )
-
-  # compile all of the information that we were originally getting via the table1 function above, plus iqr for continuous variables
-  #test2 <- test %>%
-  #  group_by(variant_misc) %>%
-  #  summarise(age_mean = mean(age),
-  #            age_sd = sd(age),
-  #            age_min = min(age),
-  #            age_med = median(age),
-  #            age_max = max(age),
-  #             age_iqr = IQR(age),
-  #             sex_male_n = as.numeric(sum(sex == 'Male')),
-  #             sex_female_n = as.numeric(sum(sex == 'Female')),
-  #             race_white_n = sum(race_4ce == 'white'),
-  #             race_black_n = sum(race_4ce == 'black'),
-  #             race_asian_n = sum(race_4ce == 'asian'),
-  #             race_amerind_n = sum(race_4ce == 'american_indian'),
-  #             race_other_n = sum(race_4ce == 'other'),
-  #             race_na_n = sum(race_4ce == 'no_information'),
-  #             len_hosp_mean = mean(len_hospitalisation),
-  #             len_hosp_sd = sd(len_hospitalisation),
-  #             len_hosp_min = min(len_hospitalisation),
-  #             len_hosp_med = median(len_hospitalisation),
-  #             len_hosp_max = max(len_hospitalisation),
-  #             len_hosp_iqr = IQR(len_hospitalisation),
-  #             icu_yes_n = sum(in_icu),
-  #             icu_no_n = sum(!in_icu),
-  #             dead_yes_n = sum(dead),
-  #             dead_no_n = sum(!dead),
-  #             cardio_outcome_yes_n = sum(cardiovascular_outcome),
-  #             cardio_outcome_no_n = sum(!cardiovascular_outcome),
-  #             shock_yes_n = sum(Shock),
-  #             shock_no_n = sum(!Shock),
-  #             sicardiac_yes_n = sum(SICARDIAC),
-  #             sicardiac_no_n = sum(!SICARDIAC),
-  #             ecmo_yes_n = sum(ECMO),
-  #             ecmo_no_n = sum(!ECMO),
-  #             heart_failure_yes_n = sum(`Heart failure`),
-  #             heart_failure_no_n = sum(!`Heart failure`),
-  #             cardiac_arrest_yes_n = sum(`Cardiac arrest`),
-  #             cardiac_arrest_no_n = sum(!`Cardiac arrest`),
-  #             resp_failure_yes_n = sum(`Respiratory failure`),
-  #             resp_failure_no_n = sum(!`Respiratory failure`)
-  #   )
-  #
-  # # pivot
-  # test3 <- as.data.frame(t(test2))
-  # colnames(test3) <- test3[1,]
-  # test3 <- test3[-1,]
-  # head(test3)
-  #
-  # # paste the information together so that it is prettier to print
-  # # cut off decimals
-  # test4 <- test2 %>%
-  #   mutate(age_mean_sd_iqr = paste0(round(age_mean, digits = 2), ' (', round(age_sd, digits = 2), '), IQR=', round(age_iqr, digits = 2)),
-  #          age_med_min_max = paste0(round(age_med, digits = 2), ' [', round(age_min, digits = 2), ',', round(age_max, digits = 2), ']'),
-  #          len_hosp_mean_sd_iqr = paste0(round(len_hosp_mean, digits = 2), ' (', round(len_hosp_sd, digits = 2), '), IQR=', round(len_hosp_iqr, digits = 2)),
-  #          len_hosp_med_min_max = paste0(round(len_hosp_med, digits = 2), ' [', round(len_hosp_min, digits = 2), ',', round(len_hosp_max, digits = 2), ']'),
-  #          sex_male = paste0(sex_male_n, ' (', round((sex_male_n / (sex_male_n + sex_female_n)) * 100, digits = 2), '%)'),
-  #          sex_female = paste0(sex_female_n, ' (', round((sex_female_n / (sex_male_n + sex_female_n)) * 100, digits = 2), '%)'),
-  #          race_white = paste0(race_white_n, ' (', round((race_white_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
-  #          race_black = paste0(race_black_n, ' (', round((race_black_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
-  #          race_asian = paste0(race_asian_n, ' (', round((race_asian_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
-  #          race_amerind = paste0(race_amerind_n, ' (', round((race_amerind_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
-  #          race_other = paste0(race_other_n, ' (', round((race_other_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
-  #          race_na = paste0(race_na_n, ' (', round((race_na_n / (race_white_n + race_black_n + race_asian_n + race_amerind_n + race_other_n + race_na_n)) * 100, digits = 2), '%)'),
-  #          in_icu = paste0(icu_yes_n, ' (', round((icu_yes_n / (icu_yes_n + icu_no_n)) * 100, digits = 2), '%)'),
-  #          is_dead = paste0(dead_yes_n, ' (', round((dead_yes_n / (dead_yes_n + dead_no_n)) * 100, digits = 2), '%)'),
-  #          cardio_outcome = paste0(cardio_outcome_yes_n, ' (', round((cardio_outcome_yes_n / (cardio_outcome_yes_n + cardio_outcome_no_n)) * 100, digits = 2), '%)'),
-  #          in_shock = paste0(shock_yes_n, ' (', round((shock_yes_n / (shock_yes_n + shock_no_n)) * 100, digits = 2), '%)'),
-  #          sicardiac = paste0(sicardiac_yes_n, ' (', round((sicardiac_yes_n / (sicardiac_yes_n + sicardiac_no_n)) * 100, digits = 2), '%)'),
-  #          ecmo = paste0(ecmo_yes_n, ' (', round((ecmo_yes_n / (ecmo_yes_n + ecmo_no_n)) * 100, digits = 2), '%)'),
-  #          heart_failure = paste0(heart_failure_yes_n, ' (', round((heart_failure_yes_n / (heart_failure_yes_n + heart_failure_no_n)) * 100, digits = 2), '%)'),
-  #          cardiac_arrest = paste0(cardiac_arrest_yes_n, ' (', round((cardiac_arrest_yes_n / (cardiac_arrest_yes_n + cardiac_arrest_no_n)) * 100, digits = 2), '%)'),
-  #          resp_failure = paste0(resp_failure_yes_n, ' (', round((resp_failure_yes_n / (resp_failure_yes_n + resp_failure_no_n)) * 100, digits = 2), '%)')) %>%
-  #   select(-c(colnames(test2)[-1])) %>%
-  #   select(variant_misc, everything())
-  #
-  # test5 <- as.data.frame(t(test4))
-  # colnames(test5) <- test5[1,]
-  # test5 <- test5[-1,]
-  # head(test5, 15)
-  #
-  # rownames <- c("Age mean (SD), IQR", "Age median [min, max]", "Length of hospitalization (SD), IQR", "Length of hospitalization median [min, max]",
-  #               "Number of male patients (ratio)", "Number of female patients (ratio)", "Number of white patients (ratio)",
-  #               "Number of black patients (ratio)", "Number of asian patients (ratio)", "Number of american indian patients (ratio)",
-  #               "Number of patients with race other (ratio)", "Number of patients with NA race (ratio)", "Number of patients in ICU (ratio)",
-  #               "Number of dead patients (ratio)", "Number of patients with cardiovascular outcomes (ratio)", "Number of patients in shock (ratio)",
-  #               "Number of sicardiac patients (ratio)", "Number of patients with ecmo (ratio)", "Number of patients with heart failure (ratio)",
-  #               "Number of patients with cardiac arrest (ratio)", "Number of patients with respiratory failure (ratio)")
-  #
-  # rownames(test5) <- rownames
-  #
-  # return(test5)
-
 
 
 
