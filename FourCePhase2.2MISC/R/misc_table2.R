@@ -177,6 +177,6 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
 
   output_table2_with_stats <- left_join( output_table2, stats_kurskal, by=c("variableName", "time_point"))
   # return the final output table
-  return( output_table2 )
+  return( output_table2_with_stats )
 
 }
