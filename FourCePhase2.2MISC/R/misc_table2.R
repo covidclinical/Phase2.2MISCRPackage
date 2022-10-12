@@ -43,6 +43,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
     dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
     unique()
 
+
   atAdmission_total <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 & days_since_admission == 0 ) %>%
     dplyr::filter( concept_type == "LAB-LOINC" ) %>%
@@ -147,6 +148,34 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
     mutate(variableName =  factor(variableName, levels = ordered_rows)) %>%
     arrange(variableName)
 
+  # estimate the p-value
+  stats_kruskal_atAdmission <- complete_df %>%
+    dplyr::filter( n_hospitalisation == 1 & days_since_admission == 0 ) %>%
+    dplyr::filter( concept_type == "LAB-LOINC" ) %>%
+    dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
+    dplyr::filter( ! is.na( variableName )) %>%
+    dplyr::group_by( variableName, variant_misc, patient_num ) %>%
+    dplyr::mutate( selected_value = ifelse( worstValue == "lowest", min( value), max(value ))) %>%
+    dplyr::group_by( variableName ) %>%
+    do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
+  stats_kruskal_atAdmission$time_point <- "At admission day 0"
+
+  stats_kruskal_duringAdmission <- complete_df %>%
+    dplyr::filter( n_hospitalisation == 1 ) %>%
+    dplyr::filter( concept_type == "LAB-LOINC" ) %>%
+    dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
+    dplyr::filter( ! is.na( variableName )) %>%
+    dplyr::group_by( patient_num, variableName ) %>%
+    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
+    dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
+    unique() %>%
+    dplyr::group_by( variableName )%>%
+    do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
+  stats_kruskal_duringAdmission$time_point <- "During hospitalization"
+
+  stats_kurskal <- rbind( stats_kruskal_atAdmission, stats_kruskal_duringAdmission)
+
+  output_table2_with_stats <- left_join( output_table2, stats_kurskal, by=c("variableName", "time_point"))
   # return the final output table
   return( output_table2 )
 
