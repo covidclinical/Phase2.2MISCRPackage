@@ -104,11 +104,11 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   misc_overview( integrated_df =  misc_complete, obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = TRUE, dir.output = dir.output,cbPalette = cbPalette, verbose= verbose )
 
   ## format the table for the statistical analysis
-  misc_formated <- format_data_for_stats( integrated_df = misc_complete, dir.input = dir.input, raceAvailable, verbose )
+  #misc_formated <- format_data_for_stats( integrated_df = misc_complete, dir.input = dir.input, raceAvailable, verbose )
 
   ## table 1
 
-  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, verbose, raceAvailable )
+  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, verbose )
 
   if( obfuscation == FALSE ){
     t1_misc
