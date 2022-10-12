@@ -1,22 +1,196 @@
-variableName	concept_code	description
-Shock	R57	Shock, not elsewhere classified
-Shock	R57.0	Cardiogenic shock
-Shock	R57.1	Hypovolemic shock
-Shock	R57.8	Other shock
-Shock	R57.9	Shock, unspecified
-Heart failure	I50	Heart failure
-Heart failure	I50.21	Acute systolic (congestive) heart failure
-Heart failure	I50.31	Acute diastolic (congestive) heart failure
-Cardiac arrest	I46	Cardiac arrest
-Cardiac arrest	I46.2	Cardiac arrest due to underlying cardiac condition
-Cardiac arrest	I46.8	Cardiac arrest due to other underlying condition
-Cardiac arrest	I46.9	Cardiac arrest, cause unspecified
-Cardiac arrest	I97.1	Other postprocedural cardiac functional disturbances
-Respiratory failure	J96.0	Acute respiratory failure
-Respiratory failure	J96.00	Acute respiratory failure unspecified whether with hypoxia or hypercapnia
-Respiratory failure	J96.01	Acute respiratory failure with hypoxia
-Respiratory failure	J96.02	Acute respiratory failure with hypercapnia
-ECMO	ECMO	ECMO
-CPR	CPR	CPR
-SICARDIAC	SICARDIAC	SICARDIAC
-elevatedCRP	R79.82	Elevated C-reactive protein (CRP)
+category	variableName	concept_code
+baseline comorbidities	obesity	E23.6
+baseline comorbidities	obesity	E.27.8
+baseline comorbidities	obesity	E66.01
+baseline comorbidities	obesity	E66.2
+baseline comorbidities	obesity	E66.09
+baseline comorbidities	obesity	E66.1
+baseline comorbidities	obesity	E66.8
+baseline comorbidities	obesity	E66.9
+baseline comorbidities	obesity	E68
+baseline comorbidities	obesity	Z68.3
+baseline comorbidities	obesity	Z68.30
+baseline comorbidities	obesity	Z68.31
+baseline comorbidities	obesity	Z68.32
+baseline comorbidities	obesity	Z68.33
+baseline comorbidities	obesity	Z68.34
+baseline comorbidities	obesity	Z68.35
+baseline comorbidities	obesity	Z68.36
+baseline comorbidities	obesity	Z68.37
+baseline comorbidities	obesity	Z68.38
+baseline comorbidities	obesity	Z68.39
+baseline comorbidities	obesity	Z68.4
+baseline comorbidities	obesity	Z68.41
+baseline comorbidities	obesity	Z68.42
+baseline comorbidities	obesity	Z68.43
+baseline comorbidities	obesity	Z68.44
+baseline comorbidities	obesity	Z68.45
+baseline comorbidities	obesity	Z68.5
+baseline comorbidities	obesity	Z68.54
+baseline comorbidities	overweight	E66.3
+baseline comorbidities	overweight	Z68.25
+baseline comorbidities	overweight	Z68.26
+baseline comorbidities	overweight	Z68.27
+baseline comorbidities	overweight	Z68.28
+baseline comorbidities	overweight	Z68.29
+baseline comorbidities	overweight	Z68.53
+baseline comorbidities	asthma	J45.909
+generalized symptoms	fatigue_asthenia	R53.1
+generalized symptoms	fatigue_asthenia	R53.83
+generalized symptoms	ras_erythema	R21
+generalized symptoms	ras_erythema	L53.9
+GI symptoms	abdominal pain	R10.0
+GI symptoms	abdominal pain	R10.2
+GI symptoms	abdominal pain	R10.9
+GI symptoms	abdominal pain	R10.10
+GI symptoms	abdominal pain	R10.11
+GI symptoms	abdominal pain	R10.12
+GI symptoms	abdominal pain	R10.13
+GI symptoms	abdominal pain	R10.30
+GI symptoms	abdominal pain	R10.31
+GI symptoms	abdominal pain	R10.32
+GI symptoms	abdominal pain	R10.33
+GI symptoms	abdominal pain	R10.83
+GI symptoms	abdominal pain	R10.84
+GI symptoms	nausea	R11.0
+GI symptoms	nausea	R11.2
+GI symptoms	vomiting	R11.10
+GI symptoms	vomiting	R11.11
+GI symptoms	vomiting	R11.12
+GI symptoms	vomiting	R11.14
+GI symptoms	vomiting	R.11.15
+GI symptoms	vomiting	R11.2
+GI symptoms	diarrhea_enteritis_ileitis	K58.0
+GI symptoms	diarrhea_enteritis_ileitis	K58.9
+GI symptoms	diarrhea_enteritis_ileitis	A04.8
+GI symptoms	diarrhea_enteritis_ileitis	A04.9
+GI symptoms	diarrhea_enteritis_ileitis	A08.4
+GI symptoms	diarrhea_enteritis_ileitis	A09
+GI symptoms	diarrhea_enteritis_ileitis	P78.3
+GI symptoms	diarrhea_enteritis_ileitis	K52.9
+GI symptoms	diarrhea_enteritis_ileitis	K58.9
+GI symptoms	apendicitis_peritonitis	K35.30
+GI symptoms	apendicitis_peritonitis	K35.31
+GI symptoms	apendicitis_peritonitis	K35.33
+GI symptoms	apendicitis_peritonitis	K35.80
+GI symptoms	apendicitis_peritonitis	K36
+GI symptoms	apendicitis_peritonitis	K37
+GI symptoms	apendicitis_peritonitis	K65.9
+Respiratory symptoms	cough	R05.1
+Respiratory symptoms	cough	R05.2
+Respiratory symptoms	cough	R05.3
+Respiratory symptoms	cough	R05.8
+Respiratory symptoms	cough	R05.9
+Respiratory symptoms	cough	J45.991
+Respiratory symptoms	rhinitis rhinorrhea	J31.0
+Respiratory symptoms	sore throat	J31.0
+Respiratory symptoms	sore throat	J02.9
+Respiratory symptoms	conjunctivitis	H10.9
+Respiratory symptoms	tachypnea	R06.82
+Respiratory symptoms	dyspnea_shortness of breath	R06.00
+Respiratory symptoms	dyspnea_shortness of breath	R06.01
+Respiratory symptoms	dyspnea_shortness of breath	R06.02
+Respiratory symptoms	dyspnea_shortness of breath	R06.4
+Respiratory symptoms	dyspnea_shortness of breath	J45.901
+Respiratory symptoms	dyspnea_shortness of breath	J45.902
+Respiratory symptoms	dyspnea_shortness of breath	J45.909
+Respiratory symptoms	respiratory failure	J96.00
+Respiratory symptoms	respiratory failure	J96.01
+Respiratory symptoms	respiratory failure	J96.02
+Respiratory symptoms	respiratory failure	J96.20
+Respiratory symptoms	respiratory failure	J96.21
+Respiratory symptoms	respiratory failure	J96.22
+Respiratory symptoms	respiratory failure	J96.91
+Respiratory symptoms	respiratory failure	J96.92
+Neurologic symptoms	headache	R51.9
+Neurologic symptoms	headache	G43.909
+Neurologic symptoms	headache	G44.009
+Neurologic symptoms	headache	G44.209
+Neurologic symptoms	headache	G44.219
+Neurologic symptoms	headache	G44.53
+Neurologic symptoms	headache	G44.84
+Neurologic symptoms	headache	G44.85
+Neurologic symptoms	headache	G43.909
+Neurologic symptoms	confusion	R41.0
+Neurologic symptoms	confusion	F44.89
+Neurologic symptoms	irritability	R45.4
+Neurologic symptoms	encephalopathy_meningoencephalitis	G04.30
+Neurologic symptoms	encephalopathy_meningoencephalitis	G04.31
+Neurologic symptoms	encephalopathy_meningoencephalitis	G96.9
+Neurologic symptoms	seizures	R56.9
+Neurologic symptoms	seizures	G40.909
+Neurologic symptoms	lethargy	R53.83
+Neurologic symptoms	stroke	I62.9
+Neurologic symptoms	stroke	I63.9
+Neurologic symptoms	coma	R40.20
+Neurologic symptoms	muscle weakness	R53.1
+Neurologic symptoms	muscle weakness	M62.81
+Neurologic symptoms	ataxia	R27.0
+Cardiovascular symptoms	chest pain	R07.1
+Cardiovascular symptoms	chest pain	R07.2
+Cardiovascular symptoms	chest pain	R07.81
+Cardiovascular symptoms	chest pain	R07.89
+Cardiovascular symptoms	chest pain	I20.9
+Cardiovascular symptoms	chest pain	R07.9
+Cardiovascular symptoms	palpitations	F45.8
+Cardiovascular symptoms	peripheral edema	R60.0
+Cardiovascular symptoms	peripheral edema	R60.9
+Cardiovascular symptoms	peripheral edema	I87.1
+Cardiovascular symptoms	hypotension	I95.9
+Cardiovascular symptoms	pre-syncope_syncope	R00.1
+Cardiovascular symptoms	pre-syncope_syncope	R55
+Cardiovascular symptoms	pre-syncope_syncope	R05.4
+Cardiovascular symptoms	ventricular dysfunction	I51.9
+Cardiovascular symptoms	heart failure	I50.20
+Cardiovascular symptoms	heart failure	I50.21
+Cardiovascular symptoms	heart failure	I50.23
+Cardiovascular symptoms	heart failure	I50.30
+Cardiovascular symptoms	heart failure	I50.31
+Cardiovascular symptoms	heart failure	I50.33
+Cardiovascular symptoms	heart failure	I50.40
+Cardiovascular symptoms	heart failure	I50.41
+Cardiovascular symptoms	heart failure	I50.42
+Cardiovascular symptoms	heart failure	I50.43
+Cardiovascular symptoms	heart failure	I50.82
+Cardiovascular symptoms	heart failure	I50.810
+Cardiovascular symptoms	heart failure	I50.811
+Cardiovascular symptoms	heart failure	I50.813
+Cardiovascular symptoms	heart failure	I50.814
+Cardiovascular symptoms	heart failure	I50.9
+Cardiovascular symptoms	cardiorespiratory failure	R09.2
+Cardiovascular symptoms	arrhythmias	I45.89
+Cardiovascular symptoms	arrhythmias	I45.9
+Cardiovascular symptoms	arrhythmias	I47.0
+Cardiovascular symptoms	arrhythmias	I47.1
+Cardiovascular symptoms	arrhythmias	I47.2
+Cardiovascular symptoms	arrhythmias	I47.9
+Cardiovascular symptoms	arrhythmias	I49.5
+Cardiovascular symptoms	arrhythmias	I49.8
+Cardiovascular symptoms	arrhythmias	I49.9
+Cardiovascular symptoms	cardiac arrest	I46.2
+Cardiovascular symptoms	cardiac arrest	I46.9
+Cardiovascular symptoms	cardiac arrest	I97.12
+Cardiovascular symptoms	cardiac arrest	I97.71
+Cardiovascular symptoms	pulmonary embolism	I26.99	
+Cardiovascular symptoms	coronary aneurysm	I25.41
+Cardiovascular symptoms	shock	R57.0
+Cardiovascular symptoms	shock	R57.1
+Cardiovascular symptoms	shock	R57.9
+Cardiovascular symptoms	shock	A41.9
+Cardiovascular symptoms	shock	A48.3
+Renal involvement	kidney dysfunction	N28.9
+Renal involvement	acute renal failure	N17.0
+Renal involvement	acute renal failure	N17.1
+Renal involvement	acute renal failure	N17.2
+Renal involvement	acute renal failure	N17.9
+Liver involvement	hepatitis	B17.9
+Liver involvement	hepatitis	K76.2
+Liver involvement	liver dysfunction	K76.89
+Liver involvement	hepatic failure	K72.00
+Liver involvement	hepatic failure	K72.90
+COVID-19	covid19 exposure	Z20.822
+COVID-19	covid19 infection	U07.1
+COVID-19	covid19 history of	Z86.16
+COVID-19	unvaccinated	Z28.310
+COVID-19	partially vaccinated	Z28.311
+Kawasaki	kawasaki	M30.3
