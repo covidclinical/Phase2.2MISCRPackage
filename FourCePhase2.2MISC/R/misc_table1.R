@@ -46,7 +46,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
       mutate(total_n = n_distinct(patient_num)) %>%
       group_by(race_4ce, variant_misc) %>%
       summarise(n = n_distinct(patient_num),
-                perc = (n / total_n) * 100) %>%
+                n_obfuscated = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n, 0.5),
+                perc = (n_obfuscated / total_n) * 100) %>%
       unique() %>%
       rename(variableName = race_4ce)
   } else {
@@ -61,7 +62,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
     mutate(total_n = n_distinct(patient_num)) %>%
     group_by(category, variant_misc) %>%
     summarise(n = n_distinct(patient_num),
-             perc = (n / total_n) * 100) %>%
+              n_obfuscated = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n, 0.5),
+             perc = (n_obfuscated / total_n) * 100) %>%
     unique()
 
   # summarise by code
@@ -70,7 +72,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
     mutate(total_n = n_distinct(patient_num)) %>%
     group_by(variableName, variant_misc) %>%
     summarise(n = n_distinct(patient_num),
-              perc = (n / total_n) * 100) %>%
+              n_obfuscated = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n, 0.5),
+              perc = (n_obfuscated / total_n) * 100) %>%
     unique()
 
   # combine
@@ -96,7 +99,11 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
     mutate(variableName =  factor(variableName, levels = c(ordered_rows, other_rows))) %>%
     arrange(variableName) %>%
     group_by(variableName) %>%
-    mutate(total_n = paste0(sum(n), ' (', round(sum(n) / total_n_patients, digits = 2) * 100, '%)'))
+    mutate( sum_n = sum(n),
+            n = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n, 0.5),
+            sum_n = ifelse( sum_n > obfuscation_threshold | isFALSE( obfuscation_threshold), sum_n, 0.5),
+            total_n = paste0(sum_n, ' (', round(sum_n / total_n_patients, digits = 2) * 100, '%)')) %>%
+    select(-sum_n)
 
   # pivot df with combined n / percentage cells
   df3 <- df2 %>%
