@@ -11,8 +11,8 @@ misc_table1(
   obfuscation_threshold,
   currSiteId,
   dir.output,
-  verbose,
-  raceAvailable
+  raceAvailable,
+  verbose
 )
 }
 \arguments{
@@ -21,6 +21,8 @@ misc_table1(
 \item{currSiteId}{Site ID}
 
 \item{dir.output}{The path to the output directory where the aggregate counts and plots will be saved.}
+
+\item{raceAvailable}{TRUE for sites including race in their data extract}
 
 \item{verbose}{By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.}
 
@@ -40,6 +42,7 @@ t1 <- misc_table1(
               formated_df,
               currSiteID,
               dir.output,
+              raceAvailable,
               verbose
              )
 }
