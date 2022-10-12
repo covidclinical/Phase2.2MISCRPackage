@@ -108,11 +108,15 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
   ## table 1
 
-  t1_misc <- misc_table1( formated_df = misc_formated, currSiteId = site, obfuscation_threshold = obfuscation, verbose )
+  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, verbose, raceAvailable )
 
   if( obfuscation == FALSE ){
     t1_misc
   }
+
+  # table 2
+  t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, verbose )
+
 
 }
 

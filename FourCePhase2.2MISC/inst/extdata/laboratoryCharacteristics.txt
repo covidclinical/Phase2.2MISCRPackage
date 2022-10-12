@@ -1,15 +1,16 @@
-variableName  units	concept_code	highRange
-troponin	ng/mL	6598-7	TBD
-CRP	mg/L	1988-5	TBD
-creatinine  mg/dL  2160-0  TBD
-ALT U/L  1742-6  TBD
-WBC 10*3/uL  6690-2  TBD
-lymphocyte  10*3/uL  731-0  TBD
-neutrophil  10*3/uL 751-8 TBD
-platelets 10*3/uL  777-3  TBD
-albumin g/dL  1751-7 TBD
-d_dimer ng/mL{FEU}  448065-7 TBD
-d_dimer ng/mL{DDU}  48066-5 TBD
-PT  s  5902-2 TBD
-fibrinogen  mg/dL  3255-7 TBD
-ferritin  ng/mL  2276-4 TBD
+variableName	units	concept_code	worstValue
+white blood cell count (Leukocytes)	10*3/uL	6690-2	highest
+lymphocyte	10*3/uL	731-0	lowest
+neutrophil	10*3/uL	751-8	highest
+platelets	10*3/uL	777-3	highest
+albumin	g/dL	1751-7	lowest
+d_dimer	ng/mL{FEU}	48065-7	highest
+d_dimer	ng/mL{DDU}	48066-5	highest
+prothrombin time (PT)	s	5902-2	highest
+fibrinogen	mg/dL	3255-7	highest
+ferritin	ng/mL	2276-4	highest
+alanine aminotransferase (ALT)	U/L	1742-6	highest
+aspartate aminotransferase (AST)	U/L	1920-8	highest
+creatinine	mg/dL	2160-0	highest
+troponin	ng/mL	6598-7	highest
+CRP	mg/L	1988-5	highest
