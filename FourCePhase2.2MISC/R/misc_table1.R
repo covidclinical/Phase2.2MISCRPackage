@@ -49,7 +49,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
                 n_obfuscated = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n, 0.5),
                 perc = (n_obfuscated / total_n) * 100) %>%
       unique() %>%
-      rename(variableName = race_4ce)
+      rename(variableName = race_4ce) %>%
+      select(-n_obfuscated)
   } else {
     race_summary <- data.frame(variableName = '', variant_misc = '', n = '', perc = '')
     race_summary <- race_summary[-1,]
@@ -64,7 +65,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
     summarise(n = n_distinct(patient_num),
               n_obfuscated = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n, 0.5),
              perc = (n_obfuscated / total_n) * 100) %>%
-    unique()
+    unique() %>%
+    select(-n_obfuscated)
 
   # summarise by code
   concept_summary <- df %>%
@@ -74,7 +76,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
     summarise(n = n_distinct(patient_num),
               n_obfuscated = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n, 0.5),
               perc = (n_obfuscated / total_n) * 100) %>%
-    unique()
+    unique()%>%
+    select(-n_obfuscated)
 
   # combine
   colnames(category_summary)[1] <- 'variableName'
