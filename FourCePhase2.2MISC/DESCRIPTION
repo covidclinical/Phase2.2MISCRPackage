@@ -23,6 +23,7 @@ Depends:
     dplyr,
     lubridate,
     MatchIt,
-    table1
+    table1,
+    broom
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
