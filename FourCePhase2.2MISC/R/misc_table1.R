@@ -112,7 +112,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
   df3 <- df2 %>%
     mutate(n_perc = paste0(n, ' (', round(perc, digits = 2), '%)')) %>%
     select(-n, -perc) %>%
-    pivot_wider(names_from = variant_misc, values_from = n_perc, values_fill = '0 (0%)')
+    unique() %>%
+    tidyr::pivot_wider(names_from = variant_misc, values_from = n_perc, values_fill = '0 (0%)')
 
   # add in continuous variables
   continuous_summary <- df %>%
@@ -164,6 +165,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
 
   df4 <- rbind(continuous_summary, df3) %>%
     select(variableName, total_n, everything())
+
+  write.table(df4, paste0(dir.output, currSiteId, '_table1.txt'), sep = "\t", quote = FALSE, row.names = FALSE)
 
   return(df4)
 

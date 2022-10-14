@@ -21,7 +21,7 @@
 #'
 #'
 
-misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose){
+misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.output, verbose){
 
   labs_of_interest <- read.delim('inst/extdata/laboratoryCharacteristics.txt', header = TRUE)
 
@@ -132,10 +132,10 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
 
 
   duringAdmission_output <- duringAdmission %>%
-    mutate( output_value = paste0('median: ', median_value, ' IQR(', iqr_value, ')',
-                            'mean: ', mean_value, ' SD(', sd_value, ')',
-                            '[', min_value, ' , ', max_value, ']',
-                            ' patients: ', ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))) %>%
+     mutate( output_value = paste0('median: ', median_value, ' IQR(', iqr_value, ')',
+                             'mean: ', mean_value, ' SD(', sd_value, ')',
+                             '[', min_value, ' , ', max_value, ']',
+                             ' patients: ', ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))) %>%
     select(-median_value, -iqr_value, -mean_value, -sd_value, -min_value, -max_value, -n_patients )%>%
     tidyr::pivot_wider( names_from = variant_misc,
                         values_from = output_value)
@@ -182,9 +182,16 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, verbose)
     do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
   stats_kruskal_duringAdmission$time_point <- "During hospitalization"
 
-  stats_kurskal <- rbind( stats_kruskal_atAdmission, stats_kruskal_duringAdmission)
+  stats_kurskal <- rbind( stats_kruskal_atAdmission, stats_kruskal_duringAdmission) %>%
+    mutate( statistic = round( statistic, 3),
+            p.value   = round( p.value, 3)) %>%
+    select( variableName, statistic, p.value, time_point )
 
   output_table2_with_stats <- left_join( output_table2, stats_kurskal, by=c("variableName", "time_point"))
+
+
+  write.csv(output_table2_with_stats, paste0(dir.output, currSiteId, '_table2.csv'), quote = FALSE, row.names = FALSE)
+
   # return the final output table
   return( output_table2_with_stats )
 

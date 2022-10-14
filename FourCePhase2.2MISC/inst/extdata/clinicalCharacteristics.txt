@@ -1,44 +1,44 @@
 category	variableName	concept_code
-baseline comorbidities	obesity	E23.6
-baseline comorbidities	obesity	E.27.8
-baseline comorbidities	obesity	E66.01
-baseline comorbidities	obesity	E66.2
-baseline comorbidities	obesity	E66.09
-baseline comorbidities	obesity	E66.1
-baseline comorbidities	obesity	E66.8
-baseline comorbidities	obesity	E66.9
-baseline comorbidities	obesity	E68
-baseline comorbidities	obesity	Z68.3
-baseline comorbidities	obesity	Z68.30
-baseline comorbidities	obesity	Z68.31
-baseline comorbidities	obesity	Z68.32
-baseline comorbidities	obesity	Z68.33
-baseline comorbidities	obesity	Z68.34
-baseline comorbidities	obesity	Z68.35
-baseline comorbidities	obesity	Z68.36
-baseline comorbidities	obesity	Z68.37
-baseline comorbidities	obesity	Z68.38
-baseline comorbidities	obesity	Z68.39
-baseline comorbidities	obesity	Z68.4
-baseline comorbidities	obesity	Z68.41
-baseline comorbidities	obesity	Z68.42
-baseline comorbidities	obesity	Z68.43
-baseline comorbidities	obesity	Z68.44
-baseline comorbidities	obesity	Z68.45
-baseline comorbidities	obesity	Z68.5
-baseline comorbidities	obesity	Z68.54
-baseline comorbidities	overweight	E66.3
-baseline comorbidities	overweight	Z68.25
-baseline comorbidities	overweight	Z68.26
-baseline comorbidities	overweight	Z68.27
-baseline comorbidities	overweight	Z68.28
-baseline comorbidities	overweight	Z68.29
-baseline comorbidities	overweight	Z68.53
-baseline comorbidities	asthma	J45.909
+obesity_overweight	obesity	E23.6
+obesity_overweight	obesity	E.27.8
+obesity_overweight	obesity	E66.01
+obesity_overweight	obesity	E66.2
+obesity_overweight	obesity	E66.09
+obesity_overweight	obesity	E66.1
+obesity_overweight	obesity	E66.8
+obesity_overweight	obesity	E66.9
+obesity_overweight	obesity	E68
+obesity_overweight	obesity	Z68.3
+obesity_overweight	obesity	Z68.30
+obesity_overweight	obesity	Z68.31
+obesity_overweight	obesity	Z68.32
+obesity_overweight	obesity	Z68.33
+obesity_overweight	obesity	Z68.34
+obesity_overweight	obesity	Z68.35
+obesity_overweight	obesity	Z68.36
+obesity_overweight	obesity	Z68.37
+obesity_overweight	obesity	Z68.38
+obesity_overweight	obesity	Z68.39
+obesity_overweight	obesity	Z68.4
+obesity_overweight	obesity	Z68.41
+obesity_overweight	obesity	Z68.42
+obesity_overweight	obesity	Z68.43
+obesity_overweight	obesity	Z68.44
+obesity_overweight	obesity	Z68.45
+obesity_overweight	obesity	Z68.5
+obesity_overweight	obesity	Z68.54
+obesity_overweight	overweight	E66.3
+obesity_overweight	overweight	Z68.25
+obesity_overweight	overweight	Z68.26
+obesity_overweight	overweight	Z68.27
+obesity_overweight	overweight	Z68.28
+obesity_overweight	overweight	Z68.29
+obesity_overweight	overweight	Z68.53
+asthma	asthma	J45.909
 generalized symptoms	fatigue_asthenia	R53.1
 generalized symptoms	fatigue_asthenia	R53.83
-generalized symptoms	ras_erythema	R21
-generalized symptoms	ras_erythema	L53.9
+generalized symptoms	rash_erythema	R21
+generalized symptoms	rash_erythema	L53.9
 GI symptoms	abdominal pain	R10.0
 GI symptoms	abdominal pain	R10.2
 GI symptoms	abdominal pain	R10.9
@@ -167,11 +167,11 @@ Cardiovascular symptoms	arrhythmias	I47.9
 Cardiovascular symptoms	arrhythmias	I49.5
 Cardiovascular symptoms	arrhythmias	I49.8
 Cardiovascular symptoms	arrhythmias	I49.9
-Cardiovascular symptoms	cardiac arrest	I46.2
-Cardiovascular symptoms	cardiac arrest	I46.9
-Cardiovascular symptoms	cardiac arrest	I97.12
-Cardiovascular symptoms	cardiac arrest	I97.71
-Cardiovascular symptoms	pulmonary embolism	I26.99	
+Cardiac arrest	cardiac arrest	I46.2
+Cardiac arrest	cardiac arrest	I46.9
+Cardiac arrest	cardiac arrest	I97.12
+Cardiac arrest	cardiac arrest	I97.71
+Cardiovascular symptoms	pulmonary embolism	I26.99
 Cardiovascular symptoms	coronary aneurysm	I25.41
 Cardiovascular symptoms	shock	R57.0
 Cardiovascular symptoms	shock	R57.1
@@ -191,6 +191,6 @@ Liver involvement	hepatic failure	K72.90
 COVID-19	covid19 exposure	Z20.822
 COVID-19	covid19 infection	U07.1
 COVID-19	covid19 history of	Z86.16
-COVID-19	unvaccinated	Z28.310
-COVID-19	partially vaccinated	Z28.311
+unvaccinated	unvaccinated	Z28.310
+partially vaccinated	partially vaccinated	Z28.311
 Kawasaki	kawasaki	M30.3

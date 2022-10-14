@@ -107,11 +107,13 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   #misc_formated <- format_data_for_stats( integrated_df = misc_complete, dir.input = dir.input, raceAvailable, verbose )
 
   ## table 1
-  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, verbose )
+  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.output = dir.output, verbose )
 
   # table 2
-  t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, verbose )
+  t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, dir.output = dir.output, verbose )
 
+  ## table 3
+  t3_misc <- misc_table3( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.output = dir.output, verbose )
 
 }
 
