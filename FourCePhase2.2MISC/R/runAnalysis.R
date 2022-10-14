@@ -115,5 +115,8 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## table 3
   t3_misc <- misc_table3( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.output = dir.output, verbose )
 
+  ## table 1 categorical with p-value
+  t1_misc_categorical <- misc_table1_cat( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.output = dir.output,verbose)
+
 }
 

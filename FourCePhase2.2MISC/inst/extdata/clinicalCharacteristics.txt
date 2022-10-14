@@ -39,155 +39,155 @@ generalized symptoms	fatigue_asthenia	R53.1
 generalized symptoms	fatigue_asthenia	R53.83
 generalized symptoms	rash_erythema	R21
 generalized symptoms	rash_erythema	L53.9
-GI symptoms	abdominal pain	R10.0
-GI symptoms	abdominal pain	R10.2
-GI symptoms	abdominal pain	R10.9
-GI symptoms	abdominal pain	R10.10
-GI symptoms	abdominal pain	R10.11
-GI symptoms	abdominal pain	R10.12
-GI symptoms	abdominal pain	R10.13
-GI symptoms	abdominal pain	R10.30
-GI symptoms	abdominal pain	R10.31
-GI symptoms	abdominal pain	R10.32
-GI symptoms	abdominal pain	R10.33
-GI symptoms	abdominal pain	R10.83
-GI symptoms	abdominal pain	R10.84
-GI symptoms	nausea	R11.0
-GI symptoms	nausea	R11.2
-GI symptoms	vomiting	R11.10
-GI symptoms	vomiting	R11.11
-GI symptoms	vomiting	R11.12
-GI symptoms	vomiting	R11.14
-GI symptoms	vomiting	R.11.15
-GI symptoms	vomiting	R11.2
-GI symptoms	diarrhea_enteritis_ileitis	K58.0
-GI symptoms	diarrhea_enteritis_ileitis	K58.9
-GI symptoms	diarrhea_enteritis_ileitis	A04.8
-GI symptoms	diarrhea_enteritis_ileitis	A04.9
-GI symptoms	diarrhea_enteritis_ileitis	A08.4
-GI symptoms	diarrhea_enteritis_ileitis	A09
-GI symptoms	diarrhea_enteritis_ileitis	P78.3
-GI symptoms	diarrhea_enteritis_ileitis	K52.9
-GI symptoms	diarrhea_enteritis_ileitis	K58.9
-GI symptoms	apendicitis_peritonitis	K35.30
-GI symptoms	apendicitis_peritonitis	K35.31
-GI symptoms	apendicitis_peritonitis	K35.33
-GI symptoms	apendicitis_peritonitis	K35.80
-GI symptoms	apendicitis_peritonitis	K36
-GI symptoms	apendicitis_peritonitis	K37
-GI symptoms	apendicitis_peritonitis	K65.9
-Respiratory symptoms	cough	R05.1
-Respiratory symptoms	cough	R05.2
-Respiratory symptoms	cough	R05.3
-Respiratory symptoms	cough	R05.8
-Respiratory symptoms	cough	R05.9
-Respiratory symptoms	cough	J45.991
-Respiratory symptoms	rhinitis rhinorrhea	J31.0
-Respiratory symptoms	sore throat	J31.0
-Respiratory symptoms	sore throat	J02.9
-Respiratory symptoms	conjunctivitis	H10.9
-Respiratory symptoms	tachypnea	R06.82
-Respiratory symptoms	dyspnea_shortness of breath	R06.00
-Respiratory symptoms	dyspnea_shortness of breath	R06.01
-Respiratory symptoms	dyspnea_shortness of breath	R06.02
-Respiratory symptoms	dyspnea_shortness of breath	R06.4
-Respiratory symptoms	dyspnea_shortness of breath	J45.901
-Respiratory symptoms	dyspnea_shortness of breath	J45.902
-Respiratory symptoms	dyspnea_shortness of breath	J45.909
-Respiratory symptoms	respiratory failure	J96.00
-Respiratory symptoms	respiratory failure	J96.01
-Respiratory symptoms	respiratory failure	J96.02
-Respiratory symptoms	respiratory failure	J96.20
-Respiratory symptoms	respiratory failure	J96.21
-Respiratory symptoms	respiratory failure	J96.22
-Respiratory symptoms	respiratory failure	J96.91
-Respiratory symptoms	respiratory failure	J96.92
-Neurologic symptoms	headache	R51.9
-Neurologic symptoms	headache	G43.909
-Neurologic symptoms	headache	G44.009
-Neurologic symptoms	headache	G44.209
-Neurologic symptoms	headache	G44.219
-Neurologic symptoms	headache	G44.53
-Neurologic symptoms	headache	G44.84
-Neurologic symptoms	headache	G44.85
-Neurologic symptoms	headache	G43.909
-Neurologic symptoms	confusion	R41.0
-Neurologic symptoms	confusion	F44.89
-Neurologic symptoms	irritability	R45.4
-Neurologic symptoms	encephalopathy_meningoencephalitis	G04.30
-Neurologic symptoms	encephalopathy_meningoencephalitis	G04.31
-Neurologic symptoms	encephalopathy_meningoencephalitis	G96.9
-Neurologic symptoms	seizures	R56.9
-Neurologic symptoms	seizures	G40.909
-Neurologic symptoms	lethargy	R53.83
-Neurologic symptoms	stroke	I62.9
-Neurologic symptoms	stroke	I63.9
-Neurologic symptoms	coma	R40.20
-Neurologic symptoms	muscle weakness	R53.1
-Neurologic symptoms	muscle weakness	M62.81
-Neurologic symptoms	ataxia	R27.0
-Cardiovascular symptoms	chest pain	R07.1
-Cardiovascular symptoms	chest pain	R07.2
-Cardiovascular symptoms	chest pain	R07.81
-Cardiovascular symptoms	chest pain	R07.89
-Cardiovascular symptoms	chest pain	I20.9
-Cardiovascular symptoms	chest pain	R07.9
-Cardiovascular symptoms	palpitations	F45.8
-Cardiovascular symptoms	peripheral edema	R60.0
-Cardiovascular symptoms	peripheral edema	R60.9
-Cardiovascular symptoms	peripheral edema	I87.1
-Cardiovascular symptoms	hypotension	I95.9
-Cardiovascular symptoms	pre-syncope_syncope	R00.1
-Cardiovascular symptoms	pre-syncope_syncope	R55
-Cardiovascular symptoms	pre-syncope_syncope	R05.4
-Cardiovascular symptoms	ventricular dysfunction	I51.9
-Cardiovascular symptoms	heart failure	I50.20
-Cardiovascular symptoms	heart failure	I50.21
-Cardiovascular symptoms	heart failure	I50.23
-Cardiovascular symptoms	heart failure	I50.30
-Cardiovascular symptoms	heart failure	I50.31
-Cardiovascular symptoms	heart failure	I50.33
-Cardiovascular symptoms	heart failure	I50.40
-Cardiovascular symptoms	heart failure	I50.41
-Cardiovascular symptoms	heart failure	I50.42
-Cardiovascular symptoms	heart failure	I50.43
-Cardiovascular symptoms	heart failure	I50.82
-Cardiovascular symptoms	heart failure	I50.810
-Cardiovascular symptoms	heart failure	I50.811
-Cardiovascular symptoms	heart failure	I50.813
-Cardiovascular symptoms	heart failure	I50.814
-Cardiovascular symptoms	heart failure	I50.9
-Cardiovascular symptoms	cardiorespiratory failure	R09.2
-Cardiovascular symptoms	arrhythmias	I45.89
-Cardiovascular symptoms	arrhythmias	I45.9
-Cardiovascular symptoms	arrhythmias	I47.0
-Cardiovascular symptoms	arrhythmias	I47.1
-Cardiovascular symptoms	arrhythmias	I47.2
-Cardiovascular symptoms	arrhythmias	I47.9
-Cardiovascular symptoms	arrhythmias	I49.5
-Cardiovascular symptoms	arrhythmias	I49.8
-Cardiovascular symptoms	arrhythmias	I49.9
+GI SYMPTOMS	abdominal pain	R10.0
+GI SYMPTOMS	abdominal pain	R10.2
+GI SYMPTOMS	abdominal pain	R10.9
+GI SYMPTOMS	abdominal pain	R10.10
+GI SYMPTOMS	abdominal pain	R10.11
+GI SYMPTOMS	abdominal pain	R10.12
+GI SYMPTOMS	abdominal pain	R10.13
+GI SYMPTOMS	abdominal pain	R10.30
+GI SYMPTOMS	abdominal pain	R10.31
+GI SYMPTOMS	abdominal pain	R10.32
+GI SYMPTOMS	abdominal pain	R10.33
+GI SYMPTOMS	abdominal pain	R10.83
+GI SYMPTOMS	abdominal pain	R10.84
+GI SYMPTOMS	nausea_vomiting	R11.0
+GI SYMPTOMS	nausea_vomiting	R11.2
+GI SYMPTOMS	nausea_vomiting	R11.10
+GI SYMPTOMS	nausea_vomiting	R11.11
+GI SYMPTOMS	nausea_vomiting	R11.12
+GI SYMPTOMS	nausea_vomiting	R11.14
+GI SYMPTOMS	nausea_vomiting	R.11.15
+GI SYMPTOMS	nausea_vomiting	R11.2
+GI SYMPTOMS	diarrhea_enteritis_ileitis	K58.0
+GI SYMPTOMS	diarrhea_enteritis_ileitis	K58.9
+GI SYMPTOMS	diarrhea_enteritis_ileitis	A04.8
+GI SYMPTOMS	diarrhea_enteritis_ileitis	A04.9
+GI SYMPTOMS	diarrhea_enteritis_ileitis	A08.4
+GI SYMPTOMS	diarrhea_enteritis_ileitis	A09
+GI SYMPTOMS	diarrhea_enteritis_ileitis	P78.3
+GI SYMPTOMS	diarrhea_enteritis_ileitis	K52.9
+GI SYMPTOMS	diarrhea_enteritis_ileitis	K58.9
+GI SYMPTOMS	apendicitis_peritonitis	K35.30
+GI SYMPTOMS	apendicitis_peritonitis	K35.31
+GI SYMPTOMS	apendicitis_peritonitis	K35.33
+GI SYMPTOMS	apendicitis_peritonitis	K35.80
+GI SYMPTOMS	apendicitis_peritonitis	K36
+GI SYMPTOMS	apendicitis_peritonitis	K37
+GI SYMPTOMS	apendicitis_peritonitis	K65.9
+RESPIRATORY SYMPTOMS	cough	R05.1
+RESPIRATORY SYMPTOMS	cough	R05.2
+RESPIRATORY SYMPTOMS	cough	R05.3
+RESPIRATORY SYMPTOMS	cough	R05.8
+RESPIRATORY SYMPTOMS	cough	R05.9
+RESPIRATORY SYMPTOMS	cough	J45.991
+RESPIRATORY SYMPTOMS	rhinitis rhinorrhea	J31.0
+RESPIRATORY SYMPTOMS	sore throat	J31.0
+RESPIRATORY SYMPTOMS	sore throat	J02.9
+RESPIRATORY SYMPTOMS	conjunctivitis	H10.9
+RESPIRATORY SYMPTOMS	tachypnea	R06.82
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	R06.00
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	R06.01
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	R06.02
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	R06.4
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	J45.901
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	J45.902
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	J45.909
+RESPIRATORY SYMPTOMS	respiratory failure	J96.00
+RESPIRATORY SYMPTOMS	respiratory failure	J96.01
+RESPIRATORY SYMPTOMS	respiratory failure	J96.02
+RESPIRATORY SYMPTOMS	respiratory failure	J96.20
+RESPIRATORY SYMPTOMS	respiratory failure	J96.21
+RESPIRATORY SYMPTOMS	respiratory failure	J96.22
+RESPIRATORY SYMPTOMS	respiratory failure	J96.91
+RESPIRATORY SYMPTOMS	respiratory failure	J96.92
+NEUROLOGIC SYMPTOMS	headache	R51.9
+NEUROLOGIC SYMPTOMS	headache	G43.909
+NEUROLOGIC SYMPTOMS	headache	G44.009
+NEUROLOGIC SYMPTOMS	headache	G44.209
+NEUROLOGIC SYMPTOMS	headache	G44.219
+NEUROLOGIC SYMPTOMS	headache	G44.53
+NEUROLOGIC SYMPTOMS	headache	G44.84
+NEUROLOGIC SYMPTOMS	headache	G44.85
+NEUROLOGIC SYMPTOMS	headache	G43.909
+NEUROLOGIC SYMPTOMS	confusion	R41.0
+NEUROLOGIC SYMPTOMS	confusion	F44.89
+NEUROLOGIC SYMPTOMS	irritability	R45.4
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G04.30
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G04.31
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G96.9
+NEUROLOGIC SYMPTOMS	seizures	R56.9
+NEUROLOGIC SYMPTOMS	seizures	G40.909
+NEUROLOGIC SYMPTOMS	lethargy	R53.83
+NEUROLOGIC SYMPTOMS	stroke	I62.9
+NEUROLOGIC SYMPTOMS	stroke	I63.9
+NEUROLOGIC SYMPTOMS	coma	R40.20
+NEUROLOGIC SYMPTOMS	muscle weakness	R53.1
+NEUROLOGIC SYMPTOMS	muscle weakness	M62.81
+NEUROLOGIC SYMPTOMS	ataxia	R27.0
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.1
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.2
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.81
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.89
+CARDIOVASCULAR SYMPTOMS	chest pain	I20.9
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.9
+CARDIOVASCULAR SYMPTOMS	palpitations	F45.8
+CARDIOVASCULAR SYMPTOMS	peripheral edema	R60.0
+CARDIOVASCULAR SYMPTOMS	peripheral edema	R60.9
+CARDIOVASCULAR SYMPTOMS	peripheral edema	I87.1
+CARDIOVASCULAR SYMPTOMS	hypotension	I95.9
+CARDIOVASCULAR SYMPTOMS	pre-syncope_syncope	R00.1
+CARDIOVASCULAR SYMPTOMS	pre-syncope_syncope	R55
+CARDIOVASCULAR SYMPTOMS	pre-syncope_syncope	R05.4
+CARDIOVASCULAR SYMPTOMS	ventricular dysfunction	I51.9
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.20
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.21
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.23
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.30
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.31
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.33
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.40
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.41
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.42
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.43
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.82
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.810
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.811
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.813
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.814
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.9
+CARDIOVASCULAR SYMPTOMS	cardiorespiratory failure	R09.2
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I45.89
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I45.9
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I47.0
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I47.1
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I47.2
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I47.9
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I49.5
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I49.8
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I49.9
 Cardiac arrest	cardiac arrest	I46.2
 Cardiac arrest	cardiac arrest	I46.9
 Cardiac arrest	cardiac arrest	I97.12
 Cardiac arrest	cardiac arrest	I97.71
-Cardiovascular symptoms	pulmonary embolism	I26.99
-Cardiovascular symptoms	coronary aneurysm	I25.41
-Cardiovascular symptoms	shock	R57.0
-Cardiovascular symptoms	shock	R57.1
-Cardiovascular symptoms	shock	R57.9
-Cardiovascular symptoms	shock	A41.9
-Cardiovascular symptoms	shock	A48.3
-Renal involvement	kidney dysfunction	N28.9
-Renal involvement	acute renal failure	N17.0
-Renal involvement	acute renal failure	N17.1
-Renal involvement	acute renal failure	N17.2
-Renal involvement	acute renal failure	N17.9
-Liver involvement	hepatitis	B17.9
-Liver involvement	hepatitis	K76.2
-Liver involvement	liver dysfunction	K76.89
-Liver involvement	hepatic failure	K72.00
-Liver involvement	hepatic failure	K72.90
+CARDIOVASCULAR SYMPTOMS	pulmonary embolism	I26.99
+CARDIOVASCULAR SYMPTOMS	coronary aneurysm	I25.41
+CARDIOVASCULAR SYMPTOMS	shock	R57.0
+CARDIOVASCULAR SYMPTOMS	shock	R57.1
+CARDIOVASCULAR SYMPTOMS	shock	R57.9
+CARDIOVASCULAR SYMPTOMS	shock	A41.9
+CARDIOVASCULAR SYMPTOMS	shock	A48.3
+RENAL INVOLVEMENT	kidney dysfunction	N28.9
+RENAL INVOLVEMENT	acute renal failure	N17.0
+RENAL INVOLVEMENT	acute renal failure	N17.1
+RENAL INVOLVEMENT	acute renal failure	N17.2
+RENAL INVOLVEMENT	acute renal failure	N17.9
+LIVER INVOLVEMENT	hepatitis or liver dysfunction	B17.9
+LIVER INVOLVEMENT	hepatitis or liver dysfunction	K76.2
+LIVER INVOLVEMENT	hepatitis or liver dysfunction	K76.89
+LIVER INVOLVEMENT	hepatic failure	K72.00
+LIVER INVOLVEMENT	hepatic failure	K72.90
 COVID-19	covid19 exposure	Z20.822
 COVID-19	covid19 infection	U07.1
 COVID-19	covid19 history of	Z86.16

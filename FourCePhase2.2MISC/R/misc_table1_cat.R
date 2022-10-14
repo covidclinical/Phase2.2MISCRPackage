@@ -41,7 +41,8 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
     mainTable <- left_join( mainTable, race_raw %>% select( patient_num, race_4ce), by="patient_num")
   }
 
-  clin_var <- complete_df %>%
+  # at category level
+  clin_var_category <- complete_df %>%
     filter( concept_code %in% clinicalChar$concept_code ) %>%
     left_join( clinicalChar, by = "concept_code") %>%
     mutate( value = 1 ) %>%
@@ -54,6 +55,22 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
     summarise(across(everything(), sum)) %>%
     unique()
 
+  #at variable name level
+  clin_var_variable_name <- complete_df %>%
+    filter( concept_code %in% clinicalChar$concept_code ) %>%
+    left_join( clinicalChar, by = "concept_code") %>%
+    mutate( value = 1 ) %>%
+    select( patient_num, concept_code, variableName, value) %>%
+    unique() %>%
+    spread(key = variableName, value =  value, fill = 0) %>%
+    select( -concept_code) %>%
+    unique() %>%
+    group_by( patient_num ) %>%
+    summarise(across(everything(), sum)) %>%
+    unique()
+
+  # merge both
+  clin_var <- merge( clin_var_category, clin_var_variable_name)
 
   ### add the new variables and
   mainTable <- mainTable %>%
@@ -72,24 +89,35 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
     }
   }
 
+  varsNoPatientsVarLevel <- clinicalChar %>%
+    dplyr::select( variableName ) %>%
+    unique( ) %>%
+    dplyr::filter(! variableName %in% colnames( mainTable ))
+
+  if( length( varsNoPatientsVarLevel$variableName) != 0){
+    for( i in 1:length( varsNoPatientsVarLevel$variableName )){
+      mainTable[ varsNoPatientsVarLevel$variableName[i]] <- 0
+    }
+  }
+
+
 
 
   #re-pivot it
   long_table <- mainTable %>%
     tidyr::pivot_longer(
-      cols = c("in_icu", "dead",   "asthma", "Cardiac arrest", "Cardiovascular symptoms", "COVID-19", "generalized symptoms",
-               "GI symptoms","Kawasaki","Liver involvement","Neurologic symptoms","obesity_overweight","Renal involvement",
-               "Respiratory symptoms" ),
+      cols = c(6,7,9:ncol(mainTable)),
       names_to = "categories",
       values_to = "value")
-
 
 
 
   ## estimate the p-value (fisher test)
   fisherTest <- long_table %>%
     group_by( categories ) %>%
-    mutate( p.value =round( fisher.test( value, variant_misc )$p.value, 3) ) %>%
+    mutate( n_distinct_values = length(unique( value )),
+            p.value = ifelse( n_distinct_values > 1, round( fisher.test( value, variant_misc )$p.value, 3), NA))%>%
+            #p.value = round( fisher.test( value, variant_misc )$p.value, 3) ) %>%
     select( categories, p.value ) %>%
     unique()
 
@@ -124,13 +152,36 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
     select(-n, -perc) %>%
     unique() %>%
     tidyr::pivot_wider(names_from = variant_misc, values_from = n_perc, values_fill = '0 (0%)') %>%
-    left_join( fisherTest )
+    right_join( fisherTest )
+
+  # order rows
+  ordered_rows <- c('overweight', 'obesity',
+                    'fatigue_asthenia', 'rash_erythema',
+                    'GI SYMPTOMS', 'abdominal pain', 'nausea_vomiting', 'diarrhea_enteritis_ileitis', 'apendicitis_peritonitis',
+                    'RESPIRATORY SYMPTOMS', 'cough', 'rhinitis rhinorrhea', 'sore throat', 'tachypnea', 'dyspnea_shortness of breath',
+                    'CARDIOVASCULAR SYMPTOMS', 'chest pain', 'palpitations', 'peripheral edema','hypotension', 'pre-syncope_syncope','ventricular dysfunction', 'heart failure', 'shock',
+                    'NEUROLOGIC SYMPTOMS', 'headache', 'confusion', 'irritability', 'seizures', 'muscle weakness', 'encephalopathy_meningoencephalitis', 'lethargy', 'stroke',
+                    'RENAL INVOLVEMENT', 'kidney dysfunction', 'acute renal failure',
+                    'LIVER INVOLVEMENT', 'hepatitis', 'liver dysfunction', 'hepatic failure',
+                    'Kawasaki')
+
+  # reorder combined df
+  output_table1_cat_with_stats <- output_table1_cat_with_stats %>%
+    filter( categories %in% ordered_rows ) %>%
+    mutate(categories =  factor(categories, levels = ordered_rows)) %>%
+    arrange(categories)
+
+  # change NA by 0 (0%)
+  output_table1_cat_with_stats[ is.na( output_table1_cat_with_stats$Alpha ), ]$Alpha <- "0 (0%)"
+  output_table1_cat_with_stats[ is.na( output_table1_cat_with_stats$Delta ), ]$Delta <- "0 (0%)"
+  output_table1_cat_with_stats[ is.na( output_table1_cat_with_stats$Omicron ), ]$Omicron <- "0 (0%)"
+  output_table1_cat_with_stats[ is.na( output_table1_cat_with_stats$total ), ]$total <- "0 (0%)"
 
   # export table
   write.csv(output_table1_cat_with_stats, paste0(dir.output, currSiteId, '_table1_cat.csv'), quote = FALSE, row.names = FALSE)
 
   # return the final output table
-  return( output_table3_with_stats )
+  return( output_table1_cat_with_stats )
 
 
 }
