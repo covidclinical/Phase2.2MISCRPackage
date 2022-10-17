@@ -46,3 +46,5 @@ Composite adverse cardiovascular outcome	I47.9
 Composite adverse cardiovascular outcome	I49.5
 Composite adverse cardiovascular outcome	I49.8
 Composite adverse cardiovascular outcome	I49.9
+Composite adverse cardiovascular outcome	I25.41
+Composite adverse cardiovascular outcome	ECMO

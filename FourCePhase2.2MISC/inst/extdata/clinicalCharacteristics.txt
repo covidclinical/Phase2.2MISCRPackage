@@ -157,7 +157,6 @@ CARDIOVASCULAR SYMPTOMS	heart failure	I50.811
 CARDIOVASCULAR SYMPTOMS	heart failure	I50.813
 CARDIOVASCULAR SYMPTOMS	heart failure	I50.814
 CARDIOVASCULAR SYMPTOMS	heart failure	I50.9
-CARDIOVASCULAR SYMPTOMS	cardiorespiratory failure	R09.2
 CARDIOVASCULAR SYMPTOMS	arrhythmias	I45.89
 CARDIOVASCULAR SYMPTOMS	arrhythmias	I45.9
 CARDIOVASCULAR SYMPTOMS	arrhythmias	I47.0
@@ -171,6 +170,7 @@ Cardiac arrest	cardiac arrest	I46.2
 Cardiac arrest	cardiac arrest	I46.9
 Cardiac arrest	cardiac arrest	I97.12
 Cardiac arrest	cardiac arrest	I97.71
+Cardiac arrest	cardiac arrest	R09.2
 CARDIOVASCULAR SYMPTOMS	pulmonary embolism	I26.99
 CARDIOVASCULAR SYMPTOMS	coronary aneurysm	I25.41
 CARDIOVASCULAR SYMPTOMS	shock	R57.0
