@@ -192,7 +192,7 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
   write.csv(output_table1_cat_with_stats, paste0(dir.output, currSiteId, '_table1_cat.csv'), quote = FALSE, row.names = FALSE)
 
   # return the final output table
-  return( output_table1_cat_with_stats )
+  return( mainTable )
 
 
 }

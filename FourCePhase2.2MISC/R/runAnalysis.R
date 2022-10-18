@@ -122,6 +122,9 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   t1_misc_categorical <- misc_table1_cat( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
   print("Table 1 categorical successfully generated")
 
+  tableForModelAnalysis <- merge( t1_misc_categorical, t3_misc,
+                                  by = c("patient_num","variant_misc", "len_hospitalisation", "age", "sex","in_icu","dead", "race_4ce"))
+
 
 }
 

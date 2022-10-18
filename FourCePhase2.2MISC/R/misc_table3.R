@@ -157,7 +157,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   write.csv(output_table3_with_stats, paste0(dir.output, currSiteId, '_table3.csv'), quote = FALSE, row.names = FALSE)
 
   # return the final output table
-  return( output_table3_with_stats )
+  return( mainTable )
 
 
 }
