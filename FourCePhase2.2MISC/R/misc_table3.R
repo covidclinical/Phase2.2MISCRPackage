@@ -59,17 +59,18 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
     dplyr::left_join( clin_var, by = "patient_num") %>%
     replace(is.na(.), 0)
 
+  # do not add in non-present variables, because you cannot run fisher test on these
   ## any non-present variable as empty column all with 0
-  varsNoPatients <- outcomeVar %>%
-    dplyr::select( category ) %>%
-    unique( ) %>%
-    dplyr::filter(! category %in% colnames( mainTable ))
+  #varsNoPatients <- outcomeVar %>%
+  #  dplyr::select( category ) %>%
+  #  unique( ) %>%
+  #  dplyr::filter(! category %in% colnames( mainTable ))
 
-  if( length( varsNoPatients$category) != 0){
-    for( i in 1:length( varsNoPatients$category )){
-      mainTable[ varsNoPatients$category[i]] <- 0
-    }
-  }
+  #if( length( varsNoPatients$category) != 0){
+  #  for( i in 1:length( varsNoPatients$category )){
+  #    mainTable[ varsNoPatients$category[i]] <- 0
+  #  }
+  #}
 
 
   ## Add a column called cardiovascular outcome
@@ -78,16 +79,18 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
   mainTable <- mainTable %>%
     dplyr::mutate( cardiovascular_outcome = ifelse( "Composite adverse cardiovascular outcome" == 1 | dead == 1 , 1, 0))
 
+  outcomes <- c("in_icu", "dead", "Anticoagulation therapy", "Cardiac arrest",
+                "Composite adverse cardiovascular outcome", "Coronary aneurysm","Diuretic therapy",
+                "ECMO","Inotropic support","Invasive monitoring (arterial line)",
+                "Oxygen supplementation","Sedation or muscle relaxant", "cardiovascular_outcome" )
 
   #re-pivot it
   long_table <- mainTable %>%
     tidyr::pivot_longer(
-      cols = c("in_icu", "dead", "Anticoagulation therapy", "Cardiac arrest",
-               "Composite adverse cardiovascular outcome", "Coronary aneurysm","Diuretic therapy",
-               "ECMO","Inotropic support","Invasive monitoring (arterial line)",
-               "Oxygen supplementation","Sedation or muscle relaxant", "cardiovascular_outcome" ),
+      cols = colnames(mainTable)[colnames(mainTable) %in% outcomes],
       names_to = "categories",
       values_to = "value")
+
 
 
   ## estimate the p-value (fisher test)
