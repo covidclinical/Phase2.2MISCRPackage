@@ -46,10 +46,9 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
     filter( concept_code %in% clinicalChar$concept_code ) %>%
     left_join( clinicalChar, by = "concept_code") %>%
     mutate( value = 1 ) %>%
-    select( patient_num, concept_code, category, value) %>%
+    select( patient_num, category, value) %>%
     unique() %>%
     spread(key = category, value =  value, fill = 0) %>%
-    select( -concept_code) %>%
     unique() %>%
     group_by( patient_num ) %>%
     summarise(across(everything(), sum)) %>%
@@ -60,10 +59,9 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
     filter( concept_code %in% clinicalChar$concept_code ) %>%
     left_join( clinicalChar, by = "concept_code") %>%
     mutate( value = 1 ) %>%
-    select( patient_num, concept_code, variableName, value) %>%
+    select( patient_num, variableName, value) %>%
     unique() %>%
     spread(key = variableName, value =  value, fill = 0) %>%
-    select( -concept_code) %>%
     unique() %>%
     group_by( patient_num ) %>%
     summarise(across(everything(), sum)) %>%
@@ -101,12 +99,21 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
   }
 
 
+  vars_of_interest <- c("in_icu","dead",'overweight', 'obesity',
+                    'fatigue_asthenia', 'rash_erythema',
+                    'GI SYMPTOMS', 'abdominal pain', 'nausea_vomiting', 'diarrhea_enteritis_ileitis', 'apendicitis_peritonitis',
+                    'RESPIRATORY SYMPTOMS', 'cough', 'rhinitis rhinorrhea', 'sore throat', 'tachypnea', 'dyspnea_shortness of breath',
+                    'CARDIOVASCULAR SYMPTOMS', 'chest pain', 'palpitations', 'peripheral edema','hypotension', 'pre-syncope_syncope','ventricular dysfunction', 'heart failure', 'shock',
+                    'NEUROLOGIC SYMPTOMS', 'headache', 'confusion', 'irritability', 'seizures', 'muscle weakness', 'encephalopathy_meningoencephalitis', 'lethargy', 'stroke',
+                    'RENAL INVOLVEMENT', 'kidney dysfunction', 'acute renal failure',
+                    'LIVER INVOLVEMENT', 'hepatitis or liver dysfunction', 'hepatic failure',
+                    'Kawasaki')
 
 
   #re-pivot it
   long_table <- mainTable %>%
     tidyr::pivot_longer(
-      cols = c(6,7,9:ncol(mainTable)),
+      cols = c(vars_of_interest),
       names_to = "categories",
       values_to = "value")
 
@@ -117,7 +124,6 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
     group_by( categories ) %>%
     mutate( n_distinct_values = length(unique( value )),
             p.value = ifelse( n_distinct_values > 1, round( fisher.test( value, variant_misc )$p.value, 3), NA))%>%
-            #p.value = round( fisher.test( value, variant_misc )$p.value, 3) ) %>%
     select( categories, p.value ) %>%
     unique()
 
@@ -162,7 +168,7 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
                     'CARDIOVASCULAR SYMPTOMS', 'chest pain', 'palpitations', 'peripheral edema','hypotension', 'pre-syncope_syncope','ventricular dysfunction', 'heart failure', 'shock',
                     'NEUROLOGIC SYMPTOMS', 'headache', 'confusion', 'irritability', 'seizures', 'muscle weakness', 'encephalopathy_meningoencephalitis', 'lethargy', 'stroke',
                     'RENAL INVOLVEMENT', 'kidney dysfunction', 'acute renal failure',
-                    'LIVER INVOLVEMENT', 'hepatitis', 'liver dysfunction', 'hepatic failure',
+                    'LIVER INVOLVEMENT', 'hepatitis or liver dysfunction', 'hepatic failure',
                     'Kawasaki')
 
   # reorder combined df
@@ -176,6 +182,9 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
   output_table1_cat_with_stats[ is.na( output_table1_cat_with_stats$Delta ), ]$Delta <- "0 (0%)"
   output_table1_cat_with_stats[ is.na( output_table1_cat_with_stats$Omicron ), ]$Omicron <- "0 (0%)"
   output_table1_cat_with_stats[ is.na( output_table1_cat_with_stats$total ), ]$total <- "0 (0%)"
+
+
+  ##### add the continuous variables estimation
 
   # export table
   write.csv(output_table1_cat_with_stats, paste0(dir.output, currSiteId, '_table1_cat.csv'), quote = FALSE, row.names = FALSE)

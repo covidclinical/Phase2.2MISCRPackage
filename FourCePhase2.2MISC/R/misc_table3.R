@@ -45,10 +45,9 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
     filter( concept_code %in% outcomeVar$concept_code ) %>%
     left_join( outcomeVar, by = "concept_code") %>%
     mutate( value = 1 ) %>%
-    select( patient_num, concept_code, category, value) %>%
+    select( patient_num,category, value) %>%
     unique() %>%
     spread(key = category, value =  value, fill = 0) %>%
-    select( -concept_code) %>%
     unique() %>%
     group_by( patient_num ) %>%
     summarise(across(everything(), sum)) %>%
