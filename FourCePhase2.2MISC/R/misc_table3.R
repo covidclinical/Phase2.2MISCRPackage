@@ -98,7 +98,12 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
     group_by( categories ) %>%
     mutate( p.value =round( fisher.test( value, variant_misc )$p.value, 3) ) %>%
     select( categories, p.value ) %>%
-    unique()
+    unique() %>%
+    ############## not working as expected
+    # add in the variables with no patients as 0
+    ungroup() %>%
+    add_row(categories = colnames(mainTable)[!colnames(mainTable) %in% outcomes],
+            p.value = NA)
 
   ## estimate the N and percentage per category
   counts_percentages <- long_table %>%
@@ -132,6 +137,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.outp
     unique() %>%
     tidyr::pivot_wider(names_from = variant_misc, values_from = n_perc, values_fill = '0 (0%)') %>%
     left_join( fisherTest )
+
 
   # export table
   write.csv(output_table3_with_stats, paste0(dir.output, currSiteId, '_table3.csv'), quote = FALSE, row.names = FALSE)
