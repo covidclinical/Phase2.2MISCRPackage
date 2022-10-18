@@ -107,16 +107,20 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   #misc_formated <- format_data_for_stats( integrated_df = misc_complete, dir.input = dir.input, raceAvailable, verbose )
 
   ## table 1
-  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.output = dir.output, verbose )
+  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
+  print("Table 1 successfully generated")
 
   # table 2
   t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, dir.output = dir.output, verbose )
+  print("Table 2 successfully generated")
 
   ## table 3
-  t3_misc <- misc_table3( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.output = dir.output, verbose )
+  t3_misc <- misc_table3( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
+  print("Table 3 successfully generated")
 
   ## table 1 categorical with p-value
-  t1_misc_categorical <- misc_table1_cat( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.output = dir.output,verbose)
+  t1_misc_categorical <- misc_table1_cat( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
+  print("Table 1 categorical successfully generated")
 
 
 }

@@ -10,6 +10,7 @@ misc_table1(
   complete_df,
   obfuscation_threshold,
   currSiteId,
+  dir.input,
   dir.output,
   raceAvailable,
   verbose
@@ -19,6 +20,8 @@ misc_table1(
 \item{obfuscation_threshold}{FALSE if no obfuscation is needed, the numeric value when there is obfuscation}
 
 \item{currSiteId}{Site ID}
+
+\item{dir.input}{The path where the 2.2 MISC cohort files are located.}
 
 \item{dir.output}{The path to the output directory where the aggregate counts and plots will be saved.}
 

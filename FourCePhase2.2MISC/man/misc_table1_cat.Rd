@@ -10,6 +10,7 @@ misc_table1_cat(
   complete_df,
   obfuscation_threshold,
   currSiteId,
+  dir.input,
   dir.output,
   raceAvailable,
   verbose
@@ -21,6 +22,8 @@ misc_table1_cat(
 \item{obfuscation_threshold}{FALSE if no obfuscation is needed, the numeric value when there is obfuscation}
 
 \item{currSiteId}{Site ID}
+
+\item{dir.input}{The path where the 2.2 MISC cohort files are located.}
 
 \item{verbose}{By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.}
 }

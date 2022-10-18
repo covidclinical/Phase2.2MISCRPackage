@@ -7,6 +7,7 @@
 #' @param obfuscation_threshold FALSE if no obfuscation is needed, the numeric value when there is obfuscation
 #' @param currSiteId Site ID
 #' @param dir.output The path to the output directory where the aggregate counts and plots will be saved.
+#' @param dir.input The path where the 2.2 MISC cohort files are located.
 #' @param raceAvailable TRUE for sites including race in their data extract
 #' @param verbose By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.
 #' @return Table 1 for the manuscript.
@@ -21,7 +22,7 @@
 #'              )
 #' @export misc_table1
 #'
-misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.output, raceAvailable, verbose){
+misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.input, dir.output, raceAvailable, verbose){
 
   clinicalChar <- read.delim('inst/extdata/clinicalCharacteristics.txt')
   total_n_patients <- length(unique(complete_df$patient_num))
