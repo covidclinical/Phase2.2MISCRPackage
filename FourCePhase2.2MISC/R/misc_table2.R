@@ -190,7 +190,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   output_table2_with_stats <- left_join( output_table2, stats_kurskal, by=c("variableName", "time_point"))
 
 
-  write.csv(output_table2_with_stats, paste0(dir.output, currSiteId, '_table2.csv'), quote = FALSE, row.names = FALSE)
+  write.table(output_table2_with_stats, paste0(dir.output, currSiteId, '_table2.txt'), sep="\t", quote = FALSE, row.names = FALSE)
 
   # return the final output table
   return( output_table2_with_stats )

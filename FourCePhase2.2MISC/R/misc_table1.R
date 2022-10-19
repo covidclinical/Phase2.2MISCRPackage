@@ -250,7 +250,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
   output_table1 <- rbind( continuous_summary, output_table1_cat_with_stats )
   # export table
-  write.csv(output_table1, paste0(dir.output, currSiteId, '_table1.csv'), quote = FALSE, row.names = FALSE)
+  write.table(output_table1, paste0(dir.output, currSiteId, '_table1.txt'), sep="\t", quote = FALSE, row.names = FALSE)
 
   # return the final output table
   return( mainTable )
