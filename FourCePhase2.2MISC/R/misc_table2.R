@@ -190,7 +190,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   output_table2_with_stats <- left_join( output_table2, stats_kurskal, by=c("variableName", "time_point"))
 
   ## add n to column names
-  colnames_df <- mainTable %>%
+  colnames_df <- complete_df %>%
     group_by(variant_misc) %>%
     summarise(N = n_distinct(patient_num)) %>%
     ungroup()

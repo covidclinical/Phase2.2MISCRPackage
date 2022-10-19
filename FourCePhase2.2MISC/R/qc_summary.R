@@ -21,7 +21,7 @@
 # testing code
 #complete_df <- misc_complete
 
-qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TRUE, dir.output.qc, site_id){
+qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TRUE, dir.output, site_id){
 
   if(during_misc_hosp){
     complete_df <- complete_df %>% filter(n_hospitalisation == 1)
