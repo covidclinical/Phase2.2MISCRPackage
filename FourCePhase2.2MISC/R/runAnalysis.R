@@ -26,8 +26,13 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
   if (! dir.output %in% list.dirs()) dir.create(dir.output)
 
+  dir.output.qc <- paste0(dir.output, "/QC/")
+  if (! dir.output.qc %in% list.dirs()) dir.create(dir.output.qc)
 
-  sink(paste0( dir.output, "MISC_logs_QC.txt"))
+  dir.output.figures <- paste0(dir.output, "/figures/")
+  if (! dir.output.figures %in% list.dirs()) dir.create(dir.output.figures)
+
+  sink(paste0( dir.output, "/QC/MISC_logs_QC.txt"))
 
 
   ## Read the 2.2 files
@@ -102,11 +107,11 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
 
   ## estimate the number of MISC patients per period
-  misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = TRUE, dir.output = dir.output, verbose = verbose)
+  misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = FALSE, dir.output = dir.output, verbose = verbose)
 
 
   ## sex and age distribution overview
-  misc_overview( integrated_df =  misc_complete, obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = TRUE, dir.output = dir.output,cbPalette = cbPalette, verbose= verbose )
+  misc_overview( integrated_df =  misc_complete, obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = FALSE, dir.output = dir.output,cbPalette = cbPalette, verbose= verbose )
 
   ## table 1
   t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)

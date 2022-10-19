@@ -92,36 +92,28 @@ misc_overview <- function( integrated_df, obfuscation_threshold, dir.output, out
   print("#### Length of the MISC hospitalization")
   print( hospitalization_length )
 
-  dir.output.qc <- paste0(dir.output, "/QC/")
-  if (! dir.output.qc %in% list.dirs()) dir.create(dir.output.qc)
-
-  dir.output.figures <- paste0(dir.output, "/figures/")
-  if (! dir.output.figures %in% list.dirs()) dir.create(dir.output.figures)
-
-
-
   if( output_df == TRUE ){
     ## Save the generated file with the counts as part of the outputs
     write.table( x         = misc_age_distribution,
-                 file      = file.path(dir.output.qc,paste0(currSiteId, "_MISCpatientAgeDistribution.txt")),
+                 file      = file.path(dir.output,paste0('/QC/', currSiteId, "_MISCpatientAgeDistribution.txt")),
                  col.names = TRUE,
                  row.names = FALSE,
                  quote     = FALSE,
                  sep       = "\t" )
     write.table( x         = misc_sex_ratio,
-                 file      = file.path(dir.output.qc,paste0(currSiteId, "_MISCpatientSexRatio.txt")),
+                 file      = file.path(dir.output,paste0('/QC/', currSiteId, "_MISCpatientSexRatio.txt")),
                  col.names = TRUE,
                  row.names = FALSE,
                  quote     = FALSE,
                  sep       = "\t" )
     write.table( x         = misc_icu,
-                 file      = file.path(dir.output.qc,paste0(currSiteId, "_MISCpatientICU.txt")),
+                 file      = file.path(dir.output,paste0('/QC/', currSiteId, "_MISCpatientICU.txt")),
                  col.names = TRUE,
                  row.names = FALSE,
                  quote     = FALSE,
                  sep       = "\t" )
     write.table( x         = hospitalization_length,
-                 file      = file.path(dir.output.qc,paste0(currSiteId, "_MISChospitalization_length.txt")),
+                 file      = file.path(dir.output,paste0('/QC/', currSiteId, "_MISChospitalization_length.txt")),
                  col.names = TRUE,
                  row.names = FALSE,
                  quote     = FALSE,
@@ -152,7 +144,7 @@ misc_overview <- function( integrated_df, obfuscation_threshold, dir.output, out
       xlab("Variant") + ylab("Age") +
       theme_bw() +
       theme(plot.title = element_text(hjust = 0.5))
-    ggplot2::ggsave(filename=file.path(dir.output.figures,paste0(currSiteId, "_misc_age_dsitribution_plot.png")),plot=print(misc_age_dsitribution_plot))
+    ggplot2::ggsave(filename=file.path(dir.output,paste0('/figures/', currSiteId, "_misc_age_dsitribution_plot.png")),plot=print(misc_age_dsitribution_plot))
 
     ## icu cases plot
     misc_icu_plot <- ggplot(misc_icu, aes(fill=variant_misc, y=icu_patients, x=var)) +
@@ -162,7 +154,7 @@ misc_overview <- function( integrated_df, obfuscation_threshold, dir.output, out
       xlab("") + ylab("Number of MISC patients") +
       theme_bw() +
       theme(plot.title = element_text(hjust = 0.5))
-    ggplot2::ggsave(filename=file.path(dir.output.figures,paste0(currSiteId, "_misc_icu_plot.png")),plot=print(misc_icu_plot))
+    ggplot2::ggsave(filename=file.path(dir.output,paste0('/figures/',currSiteId, "_misc_icu_plot.png")),plot=print(misc_icu_plot))
 
     ## length of hospitalization distribution plot
     misc_hosp_length_dsitribution_plot <- first_hospitalization %>%
@@ -174,7 +166,7 @@ misc_overview <- function( integrated_df, obfuscation_threshold, dir.output, out
       xlab("Variant") + ylab("Days hospitalized") +
       theme_bw() +
       theme(plot.title = element_text(hjust = 0.5))
-    ggplot2::ggsave(filename=file.path(dir.output.figures,paste0(currSiteId, "_misc_hosp_length_dsitribution_plot.png")),plot=print(misc_hosp_length_dsitribution_plot))
+    ggplot2::ggsave(filename=file.path(dir.output,paste0('/figures/',currSiteId, "_misc_hosp_length_dsitribution_plot.png")),plot=print(misc_hosp_length_dsitribution_plot))
   }
 }
 
