@@ -153,6 +153,16 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   output_table3_with_stats[ is.na( output_table3_with_stats$Omicron ), ]$Omicron <- "0 (0%)"
   output_table3_with_stats[ is.na( output_table3_with_stats$total ), ]$total <- "0 (0%)"
 
+  # add n to column names
+  colnames_df <- mainTable %>%
+    group_by(variant_misc) %>%
+    summarise(N = n_distinct(patient_num)) %>%
+    ungroup()
+  colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Total', 'N' = sum(colnames_df$N)))
+  colnames_df <- colnames_df %>%
+    mutate(pasted_names = paste0(variant_misc, ' (n = ', N, ')'))
+
+  colnames(output_table3_with_stats)[c(2,3,4,5)] <- colnames_df$pasted_names
 
   # export table
   write.table(output_table3_with_stats, paste0(dir.output, currSiteId, '_table3.txt'), sep = "\t", quote = FALSE, row.names = FALSE)

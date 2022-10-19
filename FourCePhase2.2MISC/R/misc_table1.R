@@ -248,7 +248,19 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
   continuous_summary <- left_join( continuous_summary, stats_kruskal )
 
-  output_table1 <- rbind( continuous_summary, output_table1_cat_with_stats )
+  output_table1 <- rbind( continuous_summary, output_table1_cat_with_stats ) %>%
+    select(categories, Alpha, Delta, Omicron, 'Total' = 'total', p.value)
+
+  colnames_df <- mainTable %>%
+    group_by(variant_misc) %>%
+    summarise(N = n_distinct(patient_num)) %>%
+    ungroup()
+  colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Total', 'N' = sum(colnames_df$N)))
+  colnames_df <- colnames_df %>%
+    mutate(pasted_names = paste0(variant_misc, ' (n = ', N, ')'))
+
+  colnames(output_table1)[c(2,3,4,5)] <- colnames_df$pasted_names
+
   # export table
   write.table(output_table1, paste0(dir.output, currSiteId, '_table1.txt'), sep="\t", quote = FALSE, row.names = FALSE)
 

@@ -189,6 +189,16 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
 
   output_table2_with_stats <- left_join( output_table2, stats_kurskal, by=c("variableName", "time_point"))
 
+  ## add n to column names
+  colnames_df <- mainTable %>%
+    group_by(variant_misc) %>%
+    summarise(N = n_distinct(patient_num)) %>%
+    ungroup()
+  colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Total', 'N' = sum(colnames_df$N)))
+  colnames_df <- colnames_df %>%
+    mutate(pasted_names = paste0(variant_misc, ' (n = ', N, ')'))
+
+  colnames(output_table2_with_stats)[c(3,4,5,6)] <- colnames_df$pasted_names
 
   write.table(output_table2_with_stats, paste0(dir.output, currSiteId, '_table2.txt'), sep="\t", quote = FALSE, row.names = FALSE)
 
