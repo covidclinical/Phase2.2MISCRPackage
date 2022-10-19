@@ -248,7 +248,56 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
   continuous_summary <- left_join( continuous_summary, stats_kruskal )
 
-  output_table1 <- rbind( continuous_summary, output_table1_cat_with_stats ) %>%
+
+  ##### add the race if available
+  if( raceAvailable == TRUE ){
+
+    # estimate p values
+    race_fisher_df <- mainTable %>%
+      select(race_4ce, variant_misc, patient_num) %>%
+      unique() %>%
+      mutate(value = 1) %>%
+      pivot_wider(id_cols = c(patient_num, variant_misc), names_from = race_4ce, values_fill = 0) %>%
+      pivot_longer(cols = c('white', 'other', 'black', 'asian', 'no_information', 'american_indian'), names_to = 'categories') %>%
+      group_by(categories) %>%
+      mutate( n_distinct_values = length(unique( value )),
+              p.value = ifelse( n_distinct_values > 1, round( fisher.test( value, variant_misc )$p.value, 3), NA))%>%
+      select( categories, p.value ) %>%
+      unique()
+
+    # get counts and percentages
+    race_counts <- mainTable %>%
+      select(race_4ce, variant_misc, patient_num) %>%
+      unique() %>%
+      group_by(race_4ce, variant_misc) %>%
+      mutate(N = n_distinct(patient_num),
+             n_obfuscated = ifelse( N > obfuscation_threshold | isFALSE( obfuscation_threshold), N, 0.5),
+             perc = round((n_obfuscated / total_n_patients) * 100, digits = 2),
+             value = paste0(n_obfuscated, ' (', perc, '%)')) %>%
+      ungroup() %>%
+      select(-patient_num) %>%
+      unique() %>%
+      group_by(race_4ce) %>%
+      mutate(total = paste0(sum(n_obfuscated), ' (', round((sum(n_obfuscated) / total_n_patients) * 100, digits = 2), '%)')) %>%
+      select('categories' = race_4ce, variant_misc, total, value) %>%
+      pivot_wider(id_cols = c(categories, total), names_from = variant_misc)
+
+    # merge
+    racedf <- race_counts %>% left_join(race_fisher_df)
+
+
+  } else {
+    racedf <- data.frame('categories' = NA,
+                         'Alpha' = NA,
+                         'Delta' = NA,
+                         'Omicron' = NA,
+                         'total' = NA,
+                         'p.value' = NA)
+    racedf <- racedf[-1,]
+  }
+
+  # combine all summaries
+  output_table1 <- rbind( continuous_summary, racedf, output_table1_cat_with_stats ) %>%
     select(categories, Alpha, Delta, Omicron, 'Total' = 'total', p.value)
 
   colnames_df <- mainTable %>%
