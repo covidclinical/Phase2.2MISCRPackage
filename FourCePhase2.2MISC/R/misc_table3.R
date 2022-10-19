@@ -98,7 +98,8 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   ## estimate the p-value (fisher test)
   fisherTest <- long_table %>%
     group_by( categories ) %>%
-    mutate( p.value =round( fisher.test( value, variant_misc )$p.value, 3) ) %>%
+    mutate( n_distinct_values = length(unique( value )),
+            p.value =ifelse( n_distinct_values > 1, round( fisher.test( value, variant_misc )$p.value, 3), NA)) %>%
     select( categories, p.value ) %>%
     unique()
 
