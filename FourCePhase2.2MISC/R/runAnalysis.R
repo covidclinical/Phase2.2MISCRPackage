@@ -21,6 +21,15 @@
 
 runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"), verbose ) {
 
+  ## Create the output folder if it doesn't exist
+  if(verbose == TRUE){ print("Creating the output folder if it doesn't exist")}
+
+  if (! dir.output %in% list.dirs()) dir.create(dir.output)
+
+
+  sink(paste0( dir.output, "MISC_logs_QC.txt"))
+
+
   ## Read the 2.2 files
   if(verbose == TRUE){ print("Reading input files")}
 
@@ -29,10 +38,6 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
                                       skip      = 0,
                                       verbose   = verbose )
 
-  ## Create the output folder if it doesn't exist
-  if(verbose == TRUE){ print("Creating the output folder if it doesn't exist")}
-
-  if (! dir.output %in% list.dirs()) dir.create(dir.output)
 
   ### Extract the patient summary and observation information.
   demo_raw <- files[["patientSummary"]]
@@ -93,7 +98,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
 
   ### QC
-  qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation, during_misc_hosp = TRUE, output_path=dir.output, site_id = site)
+  qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation, during_misc_hosp = TRUE, dir.output=dir.output, site_id = site)
 
 
   ## estimate the number of MISC patients per period
@@ -103,12 +108,9 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## sex and age distribution overview
   misc_overview( integrated_df =  misc_complete, obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = TRUE, dir.output = dir.output,cbPalette = cbPalette, verbose= verbose )
 
-  ## format the table for the statistical analysis
-  #misc_formated <- format_data_for_stats( integrated_df = misc_complete, dir.input = dir.input, raceAvailable, verbose )
-
   ## table 1
-  #t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
-  #print("Table 1 successfully generated")
+  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
+  print("Table 1 successfully generated")
 
   # table 2
   t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, dir.output = dir.output, verbose )
@@ -118,13 +120,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   t3_misc <- misc_table3( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
   print("Table 3 successfully generated")
 
-  ## table 1 categorical with p-value
-  t1_misc_categorical <- misc_table1_cat( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
-  print("Table 1 categorical successfully generated")
-
-  #tableForModelAnalysis <- merge( t1_misc_categorical, t3_misc,
-  #                                by = c("patient_num","variant_misc", "len_hospitalisation", "age", "sex","in_icu","dead"))
-
+  sink()
 
 }
 

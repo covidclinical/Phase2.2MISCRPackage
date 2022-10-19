@@ -50,6 +50,13 @@ misc_cases_perTimePeriod <- function( integrated_df, period = "month", output_pl
   }
   colnames(misc_cases)[1] <- 'period'
 
+  dir.output.qc <- paste0(dir.output, "/QC/")
+  if (! dir.output.qc %in% list.dirs()) dir.create(dir.output.qc)
+
+  dir.output.figures <- paste0(dir.output, "/figures/")
+  if (! dir.output.figures %in% list.dirs()) dir.create(dir.output.figures)
+
+
   if( output_plot == TRUE ){
     ### plot barplot
     misc_counts_plot <- ggplot2::ggplot(data=misc_cases, aes(x=period, y=distinct_patients)) +
@@ -59,19 +66,22 @@ misc_cases_perTimePeriod <- function( integrated_df, period = "month", output_pl
       theme_bw() +
       theme(plot.title = element_text(hjust = 0.5))
 
-    ggplot2::ggsave(filename=file.path(dir.output,paste0(currSiteId, "_MISCpatientCounts_per", period, ".png")),plot=print(misc_counts_plot))
+    ggplot2::ggsave(filename=file.path(dir.output.figures,paste0(currSiteId, "_MISCpatientCounts_per", period, ".png")),plot=print(misc_counts_plot))
 
   }
 
-  if( output_df == TRUE ){
-    ## Save the generated file with the counts as part of the outputs
-    write.table( x         = misc_cases,
-                 file      = file.path(dir.output,paste0(currSiteId, "_MISCpatientCounts_per", period, ".txt")),
-                 col.names = TRUE,
-                 row.names = FALSE,
-                 quote     = FALSE,
-                 sep       = "\t" )
-  }
+  print( misc_cases )
+
+
+  # if( output_df == TRUE ){
+  #   ## Save the generated file with the counts as part of the outputs
+  #   write.table( x         = misc_cases,
+  #                file      = file.path(dir.output.qc,paste0(currSiteId, "_MISCpatientCounts_per", period, ".txt")),
+  #                col.names = TRUE,
+  #                row.names = FALSE,
+  #                quote     = FALSE,
+  #                sep       = "\t" )
+  # }
 
   ## as sanity check and for reference generate table with number of patients per variant
   total_misc_per_variant <- integrated_df %>%
@@ -80,10 +90,10 @@ misc_cases_perTimePeriod <- function( integrated_df, period = "month", output_pl
 
   print( total_misc_per_variant )
 
-  write.table( x         = total_misc_per_variant,
-               file      = file.path(dir.output,paste0(currSiteId, "_total_misc_per_variant.txt")),
-               col.names = TRUE,
-               row.names = FALSE,
-               quote     = FALSE,
-               sep       = "\t" )
+  # write.table( x         = total_misc_per_variant,
+  #              file      = file.path(dir.output.qc,paste0(currSiteId, "_total_misc_per_variant.txt")),
+  #              col.names = TRUE,
+  #              row.names = FALSE,
+  #              quote     = FALSE,
+  #              sep       = "\t" )
 }

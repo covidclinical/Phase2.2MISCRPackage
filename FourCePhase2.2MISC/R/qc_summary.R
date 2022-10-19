@@ -21,7 +21,7 @@
 # testing code
 #complete_df <- misc_complete
 
-qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TRUE, output_path, site_id){
+qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TRUE, dir.output.qc, site_id){
 
   if(during_misc_hosp){
     complete_df <- complete_df %>% filter(n_hospitalisation == 1)
@@ -57,7 +57,10 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
           perc_patients = (n_patients / total_n) * 100,
           siteid = site_id)
 
-  write.table(lab_sum, paste0(output_path, site_id, '_MISC', 'lab_summary.txt'), quote = FALSE, row.names = FALSE)
+  dir.output.qc <- paste0(dir.output, "/QC/")
+  if (! dir.output.qc %in% list.dirs()) dir.create(dir.output.qc)
+
+  write.table(lab_sum, paste0(dir.output.qc, site_id, '_MISC', 'lab_summary.txt'), quote = FALSE, row.names = FALSE)
 
   ### create medication value summary
   # include: number of patients and %
@@ -74,7 +77,7 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
            perc_patients = (n_patients / total_n) * 100,
            siteid = site_id)
 
-   write.table(med_sum, paste0(output_path, site_id, '_MISC', 'medication_summary.txt'), quote = FALSE, row.names = FALSE)
+   write.table(med_sum, paste0(dir.output.qc, site_id, '_MISC', 'medication_summary.txt'), quote = FALSE, row.names = FALSE)
 
 
   ### create procedures value summary
@@ -89,7 +92,7 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
 
   proc_sum
 
-  write.table(proc_sum, paste0(output_path, site_id, '_MISC', 'procedure_summary.txt'), quote = FALSE, row.names = FALSE)
+  write.table(proc_sum, paste0(dir.output.qc, site_id, '_MISC', 'procedure_summary.txt'), quote = FALSE, row.names = FALSE)
 
   print(lab_sum)
   print(med_sum)
