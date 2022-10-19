@@ -187,9 +187,70 @@ misc_table1_cat <- function(complete_df, obfuscation_threshold, currSiteId, dir.
 
 
   ##### add the continuous variables estimation
+  # add in continuous variables
+  continuous_summary <- mainTable %>%
+    select(patient_num, age, len_hospitalisation, variant_misc) %>%
+    rename(orig_age = age,
+           orig_len_hosp = len_hospitalisation) %>%
+    group_by(variant_misc) %>%
+    unique() %>%
+    summarise(age = paste0('median: ', median(orig_age),
+                           ', IQR: (', round(IQR(orig_age), digits = 2),
+                           '), min,max: [', min(orig_age), ',', max(orig_age),
+                           '], mean= ', round(mean(orig_age), digits = 2),
+                           ', SD=', round(sd(orig_age), digits = 2)),
+              length_hospitalization = paste0('median: ', median(orig_len_hosp),
+                                              ', IQR: (', round(IQR(orig_len_hosp), digits = 2),
+                                              '), min,max: [', min(orig_len_hosp), ',', max(orig_len_hosp),
+                                              '], mean= ', round(mean(orig_len_hosp), digits = 2),
+                                              ', SD=', round(sd(orig_len_hosp), digits = 2))) %>%
+    t() %>%
+    as.data.frame()
+  colnames(continuous_summary) <- continuous_summary[1,]
+  continuous_summary$variableName <- rownames(continuous_summary)
+  rownames(continuous_summary) <- NULL
+  continuous_summary <- continuous_summary[-1,]
 
+  # find totals of the continuous variables
+  continuous_total_summary <- mainTable %>%
+    select(patient_num, age, len_hospitalisation) %>%
+    rename(orig_age = age,
+           orig_len_hosp = len_hospitalisation) %>%
+    unique() %>%
+    summarise(age = paste0('median: ', median(orig_age),
+                           ', IQR: (', round(IQR(orig_age), digits = 2),
+                           '), min,max: [', min(orig_age), ',', max(orig_age),
+                           '], mean= ', round(mean(orig_age), digits = 2),
+                           ', SD=', round(sd(orig_age), digits = 2)),
+              length_hospitalization = paste0('median: ', median(orig_len_hosp),
+                                              ', IQR: (', round(IQR(orig_len_hosp), digits = 2),
+                                              '), min,max: [', min(orig_len_hosp), ',', max(orig_len_hosp),
+                                              '], mean= ', round(mean(orig_len_hosp), digits = 2),
+                                              ', SD=', round(sd(orig_len_hosp), digits = 2))) %>%
+    t() %>%
+    as.data.frame()
+  colnames(continuous_total_summary) <- 'total'
+  continuous_total_summary$variableName <- rownames(continuous_total_summary)
+  rownames(continuous_total_summary) <- NULL
+
+  continuous_summary <- left_join(continuous_summary, continuous_total_summary) %>%
+    rename( 'categories' = 'variableName')
+
+  ## add the kruskal p.value
+  stats_kruskal <- mainTable %>%
+    dplyr::select( age, length_hospitalization = len_hospitalisation, variant_misc ) %>%
+    unique() %>%
+    tidyr::pivot_longer( cols = c(age, length_hospitalization), names_to = 'categories') %>%
+    dplyr::group_by( categories ) %>%
+    do(tidy(kruskal.test(x = .$value, g = .$variant_misc))) %>%
+    dplyr::mutate( p.value = round( p.value, 3)) %>%
+    select( categories, p.value )
+
+  continuous_summary <- left_join( continuous_summary, stats_kruskal )
+
+  output_table1 <- rbind( continuous_summary, output_table1_cat_with_stats )
   # export table
-  write.csv(output_table1_cat_with_stats, paste0(dir.output, currSiteId, '_table1_cat.csv'), quote = FALSE, row.names = FALSE)
+  write.csv(output_table1, paste0(dir.output, currSiteId, '_table1.csv'), quote = FALSE, row.names = FALSE)
 
   # return the final output table
   return( mainTable )

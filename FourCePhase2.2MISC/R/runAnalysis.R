@@ -107,8 +107,8 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   #misc_formated <- format_data_for_stats( integrated_df = misc_complete, dir.input = dir.input, raceAvailable, verbose )
 
   ## table 1
-  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
-  print("Table 1 successfully generated")
+  #t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
+  #print("Table 1 successfully generated")
 
   # table 2
   t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, dir.output = dir.output, verbose )
@@ -122,8 +122,8 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   t1_misc_categorical <- misc_table1_cat( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
   print("Table 1 categorical successfully generated")
 
-  tableForModelAnalysis <- merge( t1_misc_categorical, t3_misc,
-                                  by = c("patient_num","variant_misc", "len_hospitalisation", "age", "sex","in_icu","dead", "race_4ce"))
+  #tableForModelAnalysis <- merge( t1_misc_categorical, t3_misc,
+  #                                by = c("patient_num","variant_misc", "len_hospitalisation", "age", "sex","in_icu","dead"))
 
 
 }
