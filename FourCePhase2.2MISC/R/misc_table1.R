@@ -181,9 +181,12 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
                     'NEUROLOGIC SYMPTOMS', 'headache', 'confusion', 'irritability', 'seizures', 'muscle weakness', 'encephalopathy_meningoencephalitis', 'lethargy', 'stroke',
                     'RENAL INVOLVEMENT', 'kidney dysfunction', 'acute renal failure',
                     'LIVER INVOLVEMENT', 'hepatitis or liver dysfunction', 'hepatic failure',
-                    'Kawasaki', "caca")
+                    'Kawasaki')
 
   # reorder combined df
+  print(paste0("output_table1_cat_with_stats has ", nrow(output_table1_cat_with_stats), " number of rows"))
+  print(paste0("the categories present in this table are: ", paste( output_table1_cat_with_stats$categories, collapse = "; ")))
+
   output_table1_cat_with_stats <- output_table1_cat_with_stats %>%
     filter( categories %in% ordered_rows ) %>%
     mutate(categories =  factor(categories, levels = ordered_rows)) %>%
@@ -331,7 +334,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   write.table(output_table1, paste0(dir.output, currSiteId, '_table1.txt'), sep="\t", quote = FALSE, row.names = FALSE)
 
   # return the final output table
-  return( mainTable )
+  return( output_table1 )
 
 
 }

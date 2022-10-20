@@ -124,7 +124,6 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## table 1
   t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
   print("Table 1 successfully generated")
-
   sink()
 
 }

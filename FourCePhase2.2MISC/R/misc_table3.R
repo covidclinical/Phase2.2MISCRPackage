@@ -170,7 +170,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   write.table(output_table3_with_stats, paste0(dir.output, currSiteId, '_table3.txt'), sep = "\t", quote = FALSE, row.names = FALSE)
 
   # return the final output table
-  return( mainTable )
+  return( output_table3_with_stats )
 
 
 }
