@@ -27,6 +27,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
                                                     "clinicalCharacteristics.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
 
   total_n_patients <- length(unique(complete_df$patient_num))
+  print(paste0("Total MISC patients used as denominator for table 1: ", total_n_patients))
 
   mainTable <- complete_df %>%
     filter( n_hospitalisation == 1 ) %>%
@@ -180,7 +181,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
                     'NEUROLOGIC SYMPTOMS', 'headache', 'confusion', 'irritability', 'seizures', 'muscle weakness', 'encephalopathy_meningoencephalitis', 'lethargy', 'stroke',
                     'RENAL INVOLVEMENT', 'kidney dysfunction', 'acute renal failure',
                     'LIVER INVOLVEMENT', 'hepatitis or liver dysfunction', 'hepatic failure',
-                    'Kawasaki')
+                    'Kawasaki', "caca")
 
   # reorder combined df
   output_table1_cat_with_stats <- output_table1_cat_with_stats %>%

@@ -113,10 +113,6 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## sex and age distribution overview
   misc_overview( integrated_df =  misc_complete, obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = FALSE, dir.output = dir.output,cbPalette = cbPalette, verbose= verbose )
 
-  ## table 1
-  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
-  print("Table 1 successfully generated")
-
   # table 2
   t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, dir.output = dir.output, verbose )
   print("Table 2 successfully generated")
@@ -124,6 +120,10 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   ## table 3
   t3_misc <- misc_table3( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
   print("Table 3 successfully generated")
+
+  ## table 1
+  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
+  print("Table 1 successfully generated")
 
   sink()
 
