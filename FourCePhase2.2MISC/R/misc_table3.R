@@ -23,7 +23,9 @@
 #'
 misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.input, dir.output, raceAvailable, verbose){
 
-  outcomeVar <- read.delim('inst/extdata/outcomeVariables.txt')
+  outcomeVar <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
+                                                    "outcomeVariables.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
+
   total_n_patients <- length(unique(complete_df$patient_num))
 
   mainTable <- complete_df %>%

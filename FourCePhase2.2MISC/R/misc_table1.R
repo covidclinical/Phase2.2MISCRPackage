@@ -23,7 +23,9 @@
 #'
 misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.input, dir.output, raceAvailable, verbose){
 
-  clinicalChar <- read.delim('inst/extdata/clinicalCharacteristics.txt')
+  clinicalChar <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
+                                                    "clinicalCharacteristics.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
+
   total_n_patients <- length(unique(complete_df$patient_num))
 
   mainTable <- complete_df %>%

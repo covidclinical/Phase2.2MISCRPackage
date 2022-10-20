@@ -23,7 +23,8 @@
 
 misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.output, verbose){
 
-  labs_of_interest <- read.delim('inst/extdata/laboratoryCharacteristics.txt', header = TRUE)
+  labs_of_interest <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
+                                                    "laboratoryCharacteristics.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
 
   atAdmission_per_variant <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 & days_since_admission == 0 ) %>%
