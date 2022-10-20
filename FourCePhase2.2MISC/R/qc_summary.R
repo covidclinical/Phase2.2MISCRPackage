@@ -29,8 +29,13 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
 
   total_n <- length(unique(complete_df$patient_num))
 
-  labs_of_interest <- read.delim('inst/extdata/laboratoryCharacteristics.txt', header = TRUE)
-  meds_of_interest <-  read.table('inst/extdata/medicationCharacteristics.txt', header = TRUE, colClasses = 'character')
+  #labs_of_interest <- read.delim('inst/extdata/laboratoryCharacteristics.txt', header = TRUE)
+  labs_of_interest <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
+                                "laboratoryCharacteristics.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
+  #meds_of_interest <-  read.table('inst/extdata/medicationCharacteristics.txt', header = TRUE, colClasses = 'character')
+  meds_of_interest <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
+                                                    "medicationCharacteristics.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
+
   procs_of_interest <- c()
   diag_of_interest <- c()
 
