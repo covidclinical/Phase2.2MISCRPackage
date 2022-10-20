@@ -26,6 +26,9 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   outcomeVar <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
                                                     "outcomeVariables.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
 
+  # remove dots from ICD codes to make sure if matches with all the sites
+  outcomeVar$concept_code <- gsub("[.]", "", outcomeVar$concept_code)
+
   total_n_patients <- length(unique(complete_df$patient_num))
 
   mainTable <- complete_df %>%
@@ -44,6 +47,9 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     race_raw <- read.delim(file.path(dir.input, "/LocalPatientRace.csv"), sep = ",", skip = 0)
     mainTable <- left_join( mainTable, race_raw %>% select( patient_num, race_4ce), by="patient_num")
   }
+
+  # remove dots from ICD codes to make sure if matches with all the sites
+  complete_df$concept_code <- gsub("[.]", "", complete_df$concept_code )
 
   clin_var <- complete_df %>%
     filter( concept_code %in% outcomeVar$concept_code ) %>%
