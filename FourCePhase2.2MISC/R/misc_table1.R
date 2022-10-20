@@ -39,6 +39,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     select( patient_num, variant_misc, len_hospitalisation, age, sex, in_icu, dead ) %>%
     unique()
 
+  print("main table created")
+
   #add race if available
   if( raceAvailable == TRUE ){
     race_raw <- read.delim(file.path(dir.input, "/LocalPatientRace.csv"), sep = ",", skip = 0)
@@ -58,6 +60,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     summarise(across(everything(), sum)) %>%
     unique()
 
+  print("clin_var_category created")
+
   #at variable name level
   clin_var_variable_name <- complete_df %>%
     filter( concept_code %in% clinicalChar$concept_code ) %>%
@@ -70,6 +74,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     group_by( patient_num ) %>%
     summarise(across(everything(), sum)) %>%
     unique()
+  print("clin_var_variable_name created")
 
   # merge both
   clin_var <- merge( clin_var_category, clin_var_variable_name)
@@ -121,6 +126,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
       names_to = "categories",
       values_to = "value")
 
+  print("long_table created")
 
 
   ## estimate the p-value (fisher test)
@@ -164,6 +170,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     tidyr::pivot_wider(names_from = variant_misc, values_from = n_perc, values_fill = '0 (0%)') %>%
     right_join( fisherTest )
 
+  print("output_table1_cat_with_stats created")
   # order rows
   ordered_rows <- c('overweight', 'obesity',
                     'fatigue_asthenia', 'rash_erythema',
@@ -238,6 +245,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   continuous_summary <- left_join(continuous_summary, continuous_total_summary) %>%
     rename( 'categories' = 'variableName')
 
+  print("continuous_total_summary created")
   ## add the kruskal p.value
   stats_kruskal <- mainTable %>%
     dplyr::select( age, length_hospitalization = len_hospitalisation, variant_misc ) %>%
@@ -299,8 +307,14 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   }
 
   # combine all summaries
-  output_table1 <- rbind( continuous_summary, racedf, output_table1_cat_with_stats ) %>%
-    select(categories, Alpha, Delta, Omicron, 'Total' = 'total', p.value)
+  if( raceAvailable == TRUE ){
+    output_table1 <- rbind( continuous_summary, racedf, output_table1_cat_with_stats ) %>%
+      select(categories, Alpha, Delta, Omicron, 'Total' = 'total', p.value)
+  }else{
+    output_table1 <- rbind( continuous_summary, output_table1_cat_with_stats ) %>%
+      select(categories, Alpha, Delta, Omicron, 'Total' = 'total', p.value)
+  }
+
 
   colnames_df <- mainTable %>%
     group_by(variant_misc) %>%
