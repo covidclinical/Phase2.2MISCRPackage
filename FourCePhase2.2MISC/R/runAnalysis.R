@@ -107,7 +107,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
 
   ## estimate the number of MISC patients per period
-  misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", output_plot = TRUE, output_df = FALSE, dir.output = dir.output, verbose = verbose)
+  misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = FALSE, dir.output = dir.output, verbose = verbose)
 
 
   ## sex and age distribution overview
