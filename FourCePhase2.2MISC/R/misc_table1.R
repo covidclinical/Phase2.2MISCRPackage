@@ -26,6 +26,9 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   clinicalChar <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
                                                     "clinicalCharacteristics.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
 
+  # remove dots from ICD codes to make sure if matches with all the sites
+  clinicalChar$concept_code <- gsub("[.]", "", clinicalChar$concept_code)
+
   total_n_patients <- length(unique(complete_df$patient_num))
   print(paste0("Total MISC patients used as denominator for table 1: ", total_n_patients))
 
@@ -48,6 +51,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     mainTable <- left_join( mainTable, race_raw %>% select( patient_num, race_4ce), by="patient_num")
   }
 
+  # remove dots from ICD codes in complete_df if any
+  complete_df$concept_code <- gsub( "[.]", "", complete_df$concept_code )
   # at category level
   clin_var_category <- complete_df %>%
     filter( concept_code %in% clinicalChar$concept_code ) %>%
