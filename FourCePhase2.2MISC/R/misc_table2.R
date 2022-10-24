@@ -166,9 +166,21 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::group_by( variableName, variant_misc, patient_num ) %>%
     dplyr::mutate( selected_value = ifelse( worstValue == "lowest", min( value), max(value ))) %>%
     dplyr::ungroup( ) %>%
-    dplyr::group_by( variableName ) %>%
+    dplyr::group_by( variableName )
+
+  # only estimate the p-value if all 3 variant groups are present.
+  if(n_distinct(complete_df$variant_misc) == 3){
+    stats_kruskal_atAdmission <- stats_kruskal_atAdmission %>%
     do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
-  stats_kruskal_atAdmission$time_point <- "At admission day 0"
+    stats_kruskal_atAdmission$time_point <- "At admission day 0"
+
+
+  }else{
+    stats_kruskal_atAdmission$p.value <- NA
+    stats_kruskal_atAdmission$time_point <- "At admission day 0"
+
+  }
+
 
   stats_kruskal_duringAdmission <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 ) %>%
@@ -179,16 +191,26 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
-    dplyr::group_by( variableName )%>%
-    do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
-  stats_kruskal_duringAdmission$time_point <- "During hospitalization"
+    dplyr::group_by( variableName )
 
-  stats_kurskal <- rbind( stats_kruskal_atAdmission, stats_kruskal_duringAdmission) %>%
+  # only estimate the p-value if all 3 variant groups are present.
+  if(n_distinct(complete_df$variant_misc) == 3){
+    stats_kruskal_duringAdmission <- stats_kruskal_duringAdmission %>%
+    do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
+    stats_kruskal_duringAdmission$time_point <- "During hospitalization"
+
+  }else{
+    stats_kruskal_duringAdmission$p.value <- NA
+    stats_kruskal_duringAdmission$time_point <- "During hospitalization"
+
+  }
+
+  stats_kruskal <- rbind( stats_kruskal_atAdmission, stats_kruskal_duringAdmission) %>%
     mutate( statistic = round( statistic, 3),
             p.value   = round( p.value, 3)) %>%
     select( variableName, statistic, p.value, time_point )
 
-  output_table2_with_stats <- left_join( output_table2, stats_kurskal, by=c("variableName", "time_point"))
+  output_table2_with_stats <- left_join( output_table2, stats_kruskal, by=c("variableName", "time_point"))
 
   ## add n to column names
   colnames_df <- complete_df %>%
