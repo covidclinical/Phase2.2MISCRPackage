@@ -95,9 +95,20 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
 
   #write.table(proc_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'procedure_summary.txt'), quote = FALSE, row.names = FALSE)
 
+  # add a summary of the ICD codes for QC
+  diag_sum <- complete_df %>%
+    filter( concept_type == 'DIAG-ICD10') %>%
+    group_by( concept_code ) %>%
+    summarise( n_patients = n_distinct( patient_num ) ) %>%
+    mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5)) %>%
+    arrange( desc(n_patients))
+
+  save( diag_sum, file=paste0( dir.output, "/QC/ICDdiagnosisCodes.RData"))
+
   print(lab_sum)
   print(med_sum)
   print(proc_sum)
+  print(diag_sum[1:10,])
 
 }
 
