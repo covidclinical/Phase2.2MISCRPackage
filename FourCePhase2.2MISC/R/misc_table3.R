@@ -92,7 +92,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   outcomes <- c("in_icu", "dead", "Anticoagulation therapy", "Cardiac arrest",
                 "Composite adverse cardiovascular outcome", "Coronary aneurysm","Diuretic therapy",
                 "ECMO","Inotropic support","Invasive monitoring (arterial line)",
-                "Oxygen supplementation","Sedation or muscle relaxant", "cardiovascular_outcome" )
+                "Oxygen supplementation","Sedation or muscle relaxant" )
 
   #re-pivot it
   long_table <- mainTable %>%
