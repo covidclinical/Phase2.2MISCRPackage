@@ -37,6 +37,7 @@ FourCePhase2.2MISC::runAnalysis( dir.input = "/path_input_2.2MISCdata/",
                                  dateFormat = "%Y-%m-%d",
                                  verbose = TRUE)
 ```
+Note that if you run the function multiple times you will get a warning saying that the output directory already exists. You can ignore the warning since the output files generated are overwritten each time. 
 
 ### 3. Submit
 Please share the results folder with us (@Simran Makwana, @Alba Gutierrez ) via the \#pediatrics Slack channel.
