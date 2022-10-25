@@ -87,7 +87,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   # logic to fill this new colum: it will be a 1 if the patient has
   # Cardiovascular outcome: Composite adverse cardiovascular outcome category or dead
   mainTable <- mainTable %>%
-    dplyr::mutate( cardiovascular_outcome = ifelse( "Composite adverse cardiovascular outcome" == 1 | dead == 1 , 1, 0))
+    dplyr::mutate( 'Composite adverse cardiovascular outcome' = ifelse( `Composite adverse cardiovascular outcome` == 1 | dead == 1 , 1, 0))
 
   outcomes <- c("in_icu", "dead", "Anticoagulation therapy", "Cardiac arrest",
                 "Composite adverse cardiovascular outcome", "Coronary aneurysm","Diuretic therapy",
