@@ -174,6 +174,9 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   #combine both
   counts_percentages_combined <- rbind(counts_percentages, counts_percentages_total )
 
+  # save the output as an RData file for meta-analysis before reformating
+  save(counts_percentages_combined, file = paste0(dir.output, "/table1Categorical.RData") )
+
   # pivot counts_percentages with combined n / percentage cells
   output_table1_cat_with_stats <- counts_percentages_combined %>%
     mutate(n_perc = paste0(n, ' (', round(perc, digits = 2), '%)')) %>%
@@ -241,6 +244,48 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   continuous_summary$variableName <- rownames(continuous_summary)
   rownames(continuous_summary) <- NULL
   continuous_summary <- continuous_summary[-1,]
+
+  ## create a simplified version for the meta-analysis
+  continuous_summary_for_meta_analysis <- mainTable %>%
+    select(patient_num, age, len_hospitalisation, variant_misc) %>%
+    rename(orig_age = age,
+           orig_len_hosp = len_hospitalisation) %>%
+    group_by(variant_misc) %>%
+    unique() %>%
+    summarise(age_median = median(orig_age),
+              age_iqr    = round(IQR(orig_age), digits = 2),
+              age_min = min(orig_age),
+              age_max = max(orig_age),
+              age_mean = round(mean(orig_age), digits = 2),
+              age_sd   = round(sd(orig_age), digits = 2),
+              length_hospitalization_median = median(orig_len_hosp),
+              length_hospitalization_iqr    = round(IQR(orig_len_hosp), digits = 2),
+              length_hospitalization_min = min(orig_len_hosp),
+              length_hospitalization_max = max(orig_len_hosp),
+              length_hospitalization_mean = round(mean(orig_len_hosp), digits = 2),
+              length_hospitalization_sd   = round(sd(orig_len_hosp), digits = 2))
+
+  continuous_summary_total_for_meta_analysis <- mainTable %>%
+    select(patient_num, age, len_hospitalisation, variant_misc) %>%
+    rename(orig_age = age,
+           orig_len_hosp = len_hospitalisation) %>%
+    unique() %>%
+    summarise(age_median = median(orig_age),
+              age_iqr    = round(IQR(orig_age), digits = 2),
+              age_min = min(orig_age),
+              age_max = max(orig_age),
+              age_mean = round(mean(orig_age), digits = 2),
+              age_sd   = round(sd(orig_age), digits = 2),
+              length_hospitalization_median = median(orig_len_hosp),
+              length_hospitalization_iqr    = round(IQR(orig_len_hosp), digits = 2),
+              length_hospitalization_min = min(orig_len_hosp),
+              length_hospitalization_max = max(orig_len_hosp),
+              length_hospitalization_mean = round(mean(orig_len_hosp), digits = 2),
+              length_hospitalization_sd   = round(sd(orig_len_hosp), digits = 2))
+  continuous_summary_total_for_meta_analysis$variant_misc <- "total"
+  continuous_summary_for_meta_analysis <- rbind( continuous_summary_for_meta_analysis, continuous_summary_total_for_meta_analysis)
+  save(continuous_summary_for_meta_analysis, file = paste0(dir.output, "/table1Continuous.RData") )
+
 
   # find totals of the continuous variables
   continuous_total_summary <- mainTable %>%
@@ -374,7 +419,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   }
 
   # reorder columns
-  output_table1 <- output_table1 %>% select(categories, Alpha, Delta, Omicron, total, p.value)
+  output_table1 <- output_table1 %>% select(categories, Alpha, Delta, Omicron, Total, p.value)
 
   # add n to column names
   colnames_df <- mainTable %>%
@@ -389,8 +434,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   colnames_df <- colnames_df %>%
     mutate(pasted_names = paste0(variant_misc, ' (n = ', N, ')'))
 
-  colnames(output_table3_with_stats)[c(2,3,4,5)] <- colnames_df$pasted_names
-
+  colnames(output_table1)[c(2,3,4,5)] <- colnames_df$pasted_names
 
   # export table
   write.table(output_table1, paste0(dir.output, currSiteId, '_table1.txt'), sep="\t", quote = FALSE, row.names = FALSE)
