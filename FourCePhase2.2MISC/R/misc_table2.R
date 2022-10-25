@@ -72,6 +72,9 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
 
   atAdmission <- rbind( atAdmission_per_variant, atAdmission_total )
 
+  #### save as RData for meta-analysis
+  save(atAdmission, file = paste0(dir.output, "/table2AtAdmission.RData") )
+
   #### during admission
   duringAdmission_per_variant <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 ) %>%
@@ -118,6 +121,9 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     unique()
 
   duringAdmission <- rbind( duringAdmission_per_variant, duringAdmission_total )
+
+  #### save as RData for meta-analysis
+  save(duringAdmission, file = paste0(dir.output, "/table2DuringAdmission.RData") )
 
   ### pivot it
   atAdmission_output <- atAdmission %>%
