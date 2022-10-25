@@ -1,5 +1,6 @@
 category	concept_code
 Oxygen supplementation	SupplementalOxygenSevere
+Oxygen supplementation	SupplementalOxygenOther
 Diuretic therapy	DIURETIC
 Anticoagulation therapy	COAGA
 Anticoagulation therapy	COAGB
