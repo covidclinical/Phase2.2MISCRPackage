@@ -143,6 +143,10 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   #combine both
   counts_percentages_combined <- rbind(counts_percentages, counts_percentages_total )
 
+  # save as Rdata file for meta-analysis
+  counts_percentages_combined_t3 = counts_percentages_combined
+  save(counts_percentages_combined_t3, file = paste0(dir.output, "/table3.RData") )
+
   # pivot counts_percentages with combined n / percentage cells
   output_table3_with_stats <- counts_percentages_combined %>%
     mutate(n_perc = paste0(n, ' (', round(perc, digits = 2), '%)')) %>%
