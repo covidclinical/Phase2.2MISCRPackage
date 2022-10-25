@@ -36,13 +36,14 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
+    dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName, variant_misc ) %>%
-    dplyr::mutate( median_value = round( median(selected_value), 2),
-                   iqr_value = round( IQR(selected_value), 2),
-                   mean_value =  round( mean(selected_value), 2),
-                   sd_value = round( sd(selected_value), 2),
-                   min_value = round( min( selected_value), 2),
-                   max_value = round( max( selected_value), 2),
+    dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
+                   iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
+                   mean_value =  round( mean(selected_value, na.rm = TRUE), 2),
+                   sd_value = round( sd(selected_value, na.rm = TRUE), 2),
+                   min_value = round( min( selected_value, na.rm = TRUE), 2),
+                   max_value = round( max( selected_value, na.rm = TRUE), 2),
                    n_patients = n_distinct(patient_num)) %>%
     dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
     unique()
@@ -58,14 +59,15 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
+    dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName) %>%
     dplyr::mutate( variant_misc = "total_n",
-                   median_value = round( median(selected_value), 2),
-                   iqr_value = round( IQR(selected_value), 2),
-                   mean_value =  round( mean(selected_value), 2),
-                   sd_value = round( sd(selected_value), 2),
-                   min_value = round( min( selected_value), 2),
-                   max_value = round( max( selected_value), 2),
+                   median_value = round( median(selected_value, na.rm = TRUE), 2),
+                   iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
+                   mean_value =  round( mean(selected_value, na.rm = TRUE), 2),
+                   sd_value = round( sd(selected_value, na.rm = TRUE), 2),
+                   min_value = round( min( selected_value, na.rm = TRUE), 2),
+                   max_value = round( max( selected_value, na.rm = TRUE), 2),
                    n_patients = n_distinct(patient_num)) %>%
     dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
     unique()
@@ -86,13 +88,14 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
+    dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName, variant_misc ) %>%
-    dplyr::mutate( median_value = round( median(selected_value), 2),
-                   iqr_value = round( IQR(selected_value), 2),
-                   mean_value =  round( mean(selected_value), 2),
-                   sd_value = round( sd(selected_value), 2),
-                   min_value = round( min( selected_value), 2),
-                   max_value = round( max( selected_value), 2),
+    dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
+                   iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
+                   mean_value =  round( mean(selected_value, na.rm = TRUE), 2),
+                   sd_value = round( sd(selected_value, na.rm = TRUE), 2),
+                   min_value = round( min( selected_value, na.rm = TRUE), 2),
+                   max_value = round( max( selected_value, na.rm = TRUE), 2),
                    n_patients = n_distinct(patient_num)) %>%
     dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
     unique()
@@ -108,14 +111,15 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
+    dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName ) %>%
     dplyr::mutate( variant_misc = "total_n",
-                   median_value = round( median(selected_value), 2),
-                   iqr_value = round( IQR(selected_value), 2),
-                   mean_value =  round( mean(selected_value), 2),
-                   sd_value = round( sd(selected_value), 2),
-                   min_value = round( min( selected_value), 2),
-                   max_value = round( max( selected_value), 2),
+                   median_value = round( median(selected_value, na.rm = TRUE), 2),
+                   iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
+                   mean_value =  round( mean(selected_value, na.rm = TRUE), 2),
+                   sd_value = round( sd(selected_value, na.rm = TRUE), 2),
+                   min_value = round( min( selected_value, na.rm = TRUE), 2),
+                   max_value = round( max( selected_value, na.rm = TRUE), 2),
                    n_patients = n_distinct(patient_num)) %>%
     dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
     unique()

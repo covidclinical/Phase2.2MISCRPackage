@@ -46,16 +46,18 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
   lab_sum <- complete_df %>%
     filter(concept_code %in% labs_of_interest$concept_code) %>%
     select(siteid, cohort, patient_num, concept_code, value) %>%
-    left_join(labs_of_interest, by = 'concept_code')
+    left_join(labs_of_interest, by = 'concept_code') %>%
+    mutate( value = ifelse( value == -999, NA, value ))
+
 
   # lab summary table
   lab_sum <- lab_sum %>%
     group_by(variableName) %>%
     summarise(units = first(units),
-              min_value = min(value),
-              max_value = max(value),
-              mean_value = mean(value),
-              sd_value = sd(value),
+              min_value = min(value, na.rm = TRUE),
+              max_value = max(value, na.rm = TRUE),
+              mean_value = mean(value, na.rm = TRUE),
+              sd_value = sd(value, na.rm = TRUE),
               n_patients = n_distinct(patient_num)) %>%
   mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
           perc_patients = (n_patients / total_n) * 100,
