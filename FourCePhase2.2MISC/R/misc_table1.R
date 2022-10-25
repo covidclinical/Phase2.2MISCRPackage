@@ -347,6 +347,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   ##### add the race if available
   if( raceAvailable == TRUE ){
 
+    raceValuesPresent <- unique( mainTable$race_4ce)
+
     ## estimate the p-value (fisher test) if:
     ### - at least one value for the variant / race (n_distinct_subgroup)
     ### - all 3 variants are present (all_variants_present)
@@ -356,7 +358,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
       unique() %>%
       mutate(value = 1) %>%
       pivot_wider(id_cols = c(patient_num, variant_misc), names_from = race_4ce, values_fill = 0) %>%
-      pivot_longer(cols = c('white', 'other', 'black', 'asian', 'no_information', 'american_indian'), names_to = 'categories') %>%
+      pivot_longer(cols = all_of( raceValuesPresent ), names_to = 'categories') %>%
       group_by(categories, variant_misc) %>%
       mutate(n_distinct_subgroup = length(unique(patient_num))) %>%
       ungroup() %>%
@@ -365,6 +367,21 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
               p.value = ifelse( n_distinct_subgroup > 1 & n_distinct_values > 1 & all_variants_present, round( fisher.test( value, variant_misc )$p.value, 3), NA))%>%
       select( categories, p.value ) %>%
       unique()
+
+    allRaces <- c('white', 'other', 'black', 'asian', 'no_information', 'american_indian')
+    ### to test
+    ## allRaces <- c('white', 'other', 'black', 'asian', 'no_information', 'american_indian', "test")
+
+    missingRaces <- allRaces[! allRaces %in% raceValuesPresent ]
+
+    if(length( missingRaces) != 0){
+      for( i in 1:length( missingRaces) ){
+        categories <- c(missingRaces[i])
+        p.value <- NA
+        new_row <- data.frame(categories, p.value)
+        race_fisher_df <- rbind( race_fisher_df, new_row)
+      }
+    }
 
     # get counts and percentages
     race_counts <- mainTable %>%
@@ -382,6 +399,18 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
       mutate(total = paste0(sum(n_obfuscated), ' (', round((sum(n_obfuscated) / total_n_patients) * 100, digits = 2), '%)')) %>%
       select('categories' = race_4ce, variant_misc, total, value) %>%
       pivot_wider(id_cols = c(categories, total), names_from = variant_misc)
+
+    if(length( missingRaces) != 0){
+      for( i in 1:length( missingRaces) ){
+        categories <- c(missingRaces[i])
+        total <- "0 (0%)"
+        Alpha <- "0 (0%)"
+        Omicron <- "0 (0%)"
+        Delta <- "0 (0%)"
+        new_row <- data.frame(categories, total, Alpha, Omicron, Delta)
+        race_counts <- rbind( race_counts, new_row)
+      }
+    }
 
     # merge
     racedf <- race_counts %>% left_join(race_fisher_df)
