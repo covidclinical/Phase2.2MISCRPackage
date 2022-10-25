@@ -103,11 +103,18 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
 
 
-  ## estimate the p-value (fisher test)
+  ## estimate the p-value (fisher test) if:
+  ### - at least one value for the variant / category (n_distinct_subgroup)
+  ### - all 3 variants are present (all_variants_present)
+  ### - not all the values are the same (n_distinct_values)
+  all_variants_present <- n_distinct(complete_df$variant_misc) == 3
   fisherTest <- long_table %>%
+    group_by(categories, variant_misc) %>%
+    mutate(n_distinct_subgroup = length(unique(patient_num))) %>%
+    ungroup() %>%
     group_by( categories ) %>%
     mutate( n_distinct_values = length(unique( value )),
-            p.value =ifelse( n_distinct_values > 1, round( fisher.test( value, variant_misc )$p.value, 3), NA)) %>%
+            p.value =ifelse( n_distinct_subgroup > 1 & n_distinct_values > 1 & all_variants_present, round( fisher.test( value, variant_misc )$p.value, 3), NA)) %>%
     select( categories, p.value ) %>%
     unique()
 
@@ -155,17 +162,30 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     mutate(categories =  factor(categories, levels = ordered_rows)) %>%
     arrange(categories)
 
+
+  # if the data does not contain all variants, add in the columns here
+  if(!'Alpha' %in% colnames(output_table3_with_stats)){output_table3_with_stats$Alpha <- NA}
+  if(!'Delta' %in% colnames(output_table3_with_stats)){output_table3_with_stats$Delta <- NA}
+  if(!'Omicron' %in% colnames(output_table3_with_stats)){output_table3_with_stats$Omicron <- NA}
+
   # change NA by 0 (0%)
   output_table3_with_stats[ is.na( output_table3_with_stats$Alpha ), ]$Alpha <- "0 (0%)"
   output_table3_with_stats[ is.na( output_table3_with_stats$Delta ), ]$Delta <- "0 (0%)"
   output_table3_with_stats[ is.na( output_table3_with_stats$Omicron ), ]$Omicron <- "0 (0%)"
   output_table3_with_stats[ is.na( output_table3_with_stats$total ), ]$total <- "0 (0%)"
 
+  # reorder columns
+  output_table3_with_stats <- output_table3_with_stats %>% select(categories, Alpha, Delta, Omicron, total, p.value)
+
   # add n to column names
   colnames_df <- mainTable %>%
     group_by(variant_misc) %>%
     summarise(N = n_distinct(patient_num)) %>%
     ungroup()
+  if(!'Alpha' %in% colnames_df$variant_misc){colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Alpha', 'N' = 0))}
+  if(!'Delta' %in% colnames_df$variant_misc){colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Delta', 'N' = 0))}
+  if(!'Omicron' %in% colnames_df$variant_misc){colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Omicron', 'N' = 0))}
+
   colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Total', 'N' = sum(colnames_df$N)))
   colnames_df <- colnames_df %>%
     mutate(pasted_names = paste0(variant_misc, ' (n = ', N, ')'))
