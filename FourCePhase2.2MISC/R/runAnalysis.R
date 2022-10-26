@@ -9,7 +9,7 @@
 #' @param raceAvailable set as TRUE or FALSE depending on whether the variable is being collected at your site. By default \code{TRUE}
 #' @param dateFormat Specify the format of the date at your site (e.g., for "03-AUG-20", the format would be "%d-%b-%y", see documentation](https://www.stat.berkeley.edu/~s133/dates.html))
 #' @param data_update_date date at which the data has been updated in the local data warehouse. Used to estimate patient age at time of visit, since patients age in the 4CE demographic file is expected the age at data update.
-#' @param country Specify the country of origin or your data (e.g, US, France, London, Spain)
+#' @param country Specify the country of origin or your data (e.g, US, France, UK, Spain)
 #' @param cbPalette Color palette to use for the plots (set up by default)
 #' @param verbose By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.
 #' @return An object of class \code{list} with the \code{data.frames}.
@@ -62,7 +62,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
   if(verbose == TRUE){ print("Loading the internal file with the variant date")}
   if(verbose == TRUE){ print("Checking that the country is on the right format")}
 
-  if( tolower(country) %in% c("us", "france", "spain", "london")){
+  if( tolower(country) %in% c("us", "france", "spain", "uk")){
     variantsDates <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
                                           "variantsDates.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
     variantsDates <- variantsDates %>%

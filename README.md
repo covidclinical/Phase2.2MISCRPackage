@@ -22,7 +22,7 @@ Before running it update the arguments accordingly to your site.
 - dir.output will be the folder where the results will be saved. 
 - obfuscation: if you do not need to apply obfuscation to your site, leave it as FALSE, if not change it to the numeric value (e.g., 3)
 - raceAvailable: set it to FALSE if you do not have these information available.
-- country: set it to your country (e.g., "us", "france", "spain", "london")
+- country: set it to your country (e.g., "us", "france", "spain", "uk")
 - data_updated_date: change it to the date when your data was generated.
 - dateFormat: this is set to the dateFormat used in 4CE, change it if you have your dates in another format. 
 - verbose: leave it as TRUE to get the log file
