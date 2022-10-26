@@ -136,16 +136,16 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
   ## estimate the p-value (fisher test) if:
   ### - at least one value for the variant / category (n_distinct_subgroup)
-  ### - all 3 variants are present (all_variants_present)
+  ### - at least 2 variants are present (variants_present)
   ### - not all the values are the same (n_distinct_values)
-  all_variants_present <- n_distinct(long_table$variant_misc) == 3
+  variants_present <- n_distinct(long_table$variant_misc) >= 2
   fisherTest <- long_table %>%
     group_by(categories, variant_misc) %>%
     mutate(n_distinct_subgroup = length(unique(patient_num))) %>%
     ungroup() %>%
     group_by( categories ) %>%
     mutate( n_distinct_values = length(unique( value )),
-            p.value = ifelse(  n_distinct_subgroup > 1 & n_distinct_values > 1 & all_variants_present, round( fisher.test( value, variant_misc )$p.value, 3), NA))%>%
+            p.value = ifelse(  n_distinct_subgroup > 1 & n_distinct_values > 1 & variants_present, round( fisher.test( value, variant_misc )$p.value, 3), NA))%>%
     select( categories, p.value ) %>%
     unique()
 
@@ -325,8 +325,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     tidyr::pivot_longer( cols = c(age, length_hospitalization), names_to = 'categories') %>%
     dplyr::group_by( categories )
 
-  # only estimate the p-value if all 3 variant groups are present.
-  if(n_distinct(complete_df$variant_misc) == 3){
+  # only estimate the p-value if ar least 2 variant groups are present.
+  if(n_distinct(complete_df$variant_misc) >= 2){
     stats_kruskal <- stats_kruskal %>%
       do(tidy(kruskal.test(x = .$value, g = .$variant_misc))) %>%
       dplyr::mutate( p.value = round( p.value, 3)) %>%
@@ -351,7 +351,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
     ## estimate the p-value (fisher test) if:
     ### - at least one value for the variant / race (n_distinct_subgroup)
-    ### - all 3 variants are present (all_variants_present)
+    ### - at least 2 variants are present (variants_present)
     ### - not all the values are the same (n_distinct_values)
     race_fisher_df <- mainTable %>%
       select(race_4ce, variant_misc, patient_num) %>%
@@ -364,7 +364,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
       ungroup() %>%
       group_by(categories) %>%
       mutate( n_distinct_values = length(unique( value )),
-              p.value = ifelse( n_distinct_subgroup > 1 & n_distinct_values > 1 & all_variants_present, round( fisher.test( value, variant_misc )$p.value, 3), NA))%>%
+              p.value = ifelse( n_distinct_subgroup > 1 & n_distinct_values > 1 & variants_present, round( fisher.test( value, variant_misc )$p.value, 3), NA))%>%
       select( categories, p.value ) %>%
       unique()
 

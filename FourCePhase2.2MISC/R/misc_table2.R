@@ -167,6 +167,12 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     mutate(variableName =  factor(variableName, levels = ordered_rows)) %>%
     arrange(variableName)
 
+  # if the data does not contain all variants, add in the columns here
+  if(!'Alpha' %in% colnames(output_table2)){output_table2$Alpha <- NA}
+  if(!'Delta' %in% colnames(output_table2)){output_table2$Delta <- NA}
+  if(!'Omicron' %in% colnames(output_table2)){output_table2$Omicron <- NA}
+
+
   # estimate the p-value
   stats_kruskal_atAdmission <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 & days_since_admission == 0 ) %>%
@@ -178,8 +184,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::group_by( variableName )
 
-  # only estimate the p-value if all 3 variant groups are present.
-  if(n_distinct(complete_df$variant_misc) == 3){
+  # only estimate the p-value if at least 2 variant groups are present.
+  if(n_distinct(complete_df$variant_misc) >= 2){
     stats_kruskal_atAdmission <- stats_kruskal_atAdmission %>%
     do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
     stats_kruskal_atAdmission$time_point <- "At admission day 0"
@@ -203,8 +209,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     unique() %>%
     dplyr::group_by( variableName )
 
-  # only estimate the p-value if all 3 variant groups are present.
-  if(n_distinct(complete_df$variant_misc) == 3){
+  # only estimate the p-value if at least 2 variant groups are present.
+  if(n_distinct(complete_df$variant_misc) >= 2){
     stats_kruskal_duringAdmission <- stats_kruskal_duringAdmission %>%
     do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
     stats_kruskal_duringAdmission$time_point <- "During hospitalization"
@@ -227,9 +233,16 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     group_by(variant_misc) %>%
     summarise(N = n_distinct(patient_num)) %>%
     ungroup()
+  if(!'Alpha' %in% colnames_df$variant_misc){colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Alpha', 'N' = 0))}
+  if(!'Delta' %in% colnames_df$variant_misc){colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Delta', 'N' = 0))}
+  if(!'Omicron' %in% colnames_df$variant_misc){colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Omicron', 'N' = 0))}
   colnames_df <- rbind(colnames_df, data.frame('variant_misc' = 'Total', 'N' = sum(colnames_df$N)))
   colnames_df <- colnames_df %>%
     mutate(pasted_names = paste0(variant_misc, ' (n = ', N, ')'))
+
+  # reorder columns
+  output_table2_with_stats <- output_table2_with_stats %>%
+    select(variableName, units, Alpha, Delta, Omicron, total_n, time_point)
 
   colnames(output_table2_with_stats)[c(3,4,5,6)] <- colnames_df$pasted_names
 

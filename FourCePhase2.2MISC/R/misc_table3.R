@@ -105,16 +105,16 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
   ## estimate the p-value (fisher test) if:
   ### - at least one value for the variant / category (n_distinct_subgroup)
-  ### - all 3 variants are present (all_variants_present)
+  ### - at least 2 variants are present (variants_present)
   ### - not all the values are the same (n_distinct_values)
-  all_variants_present <- n_distinct(complete_df$variant_misc) == 3
+  variants_present <- n_distinct(complete_df$variant_misc) >= 2
   fisherTest <- long_table %>%
     group_by(categories, variant_misc) %>%
     mutate(n_distinct_subgroup = length(unique(patient_num))) %>%
     ungroup() %>%
     group_by( categories ) %>%
     mutate( n_distinct_values = length(unique( value )),
-            p.value =ifelse( n_distinct_subgroup > 1 & n_distinct_values > 1 & all_variants_present, round( fisher.test( value, variant_misc )$p.value, 3), NA)) %>%
+            p.value =ifelse( n_distinct_subgroup > 1 & n_distinct_values > 1 & variants_present, round( fisher.test( value, variant_misc )$p.value, 3), NA)) %>%
     select( categories, p.value ) %>%
     unique()
 
