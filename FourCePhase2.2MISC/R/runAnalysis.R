@@ -21,112 +21,143 @@
 
 runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"), verbose ) {
 
+  #sink(file = paste0( dir.output, "/QC/MISC_logs_QC.txt"))
+
+  sink(file = 'TESTSINK.txt')
+
+
   ## Create the output folder if it doesn't exist
-  if(verbose == TRUE){ print("Creating the output folder if it doesn't exist")}
+  tryCatch({
 
-  if (! dir.output %in% list.dirs()) dir.create(dir.output)
+    if(verbose == TRUE){ print("Creating the output folders if they don't exist")}
 
-  dir.output.qc <- paste0(dir.output, "/QC/")
-  if (! dir.output.qc %in% list.dirs()) dir.create(dir.output.qc)
+    if (! dir.output %in% list.dirs()) {dir.create(dir.output)}
 
-  dir.output.figures <- paste0(dir.output, "/figures/")
-  if (! dir.output.figures %in% list.dirs()) dir.create(dir.output.figures)
+    dir.output.qc <- paste0(dir.output, "/QC/")
+    if (! dir.output.qc %in% list.dirs()) {dir.create(dir.output.qc)}
 
-  sink(paste0( dir.output, "/QC/MISC_logs_QC.txt"))
+    dir.output.figures <- paste0(dir.output, "/figures/")
+    if (! dir.output.figures %in% list.dirs()) {dir.create(dir.output.figures)}
 
+    if(verbose == TRUE){ print("Output folders successfully created")}
+
+  }, error = function(e) sink())
 
   ## Read the 2.2 files
-  if(verbose == TRUE){ print("Reading input files")}
+  tryCatch({
+    if(verbose == TRUE){ print("Reading input files")}
 
-  files <- FourCePhase2.2MISC::readInputFiles( path = dir.input,
-                                      separator = ",",
-                                      skip      = 0,
-                                      verbose   = verbose )
+    files <- FourCePhase2.2MISC::readInputFiles( path = dir.input,
+                                        separator = ",",
+                                        skip      = 0,
+                                        verbose   = verbose )
 
 
-  ### Extract the patient summary and observation information.
-  demo_raw <- files[["patientSummary"]]
-  obs_raw <- files[["patientObservations"]]
-  clinical_raw <- files[["patientClinicalCourse"]] %>% filter(cohort == 'MISC')
+    ### Extract the patient summary and observation information.
+    demo_raw <- files[["patientSummary"]]
+    obs_raw <- files[["patientObservations"]]
+    clinical_raw <- files[["patientClinicalCourse"]] %>% filter(cohort == 'MISC')
+    if(verbose == TRUE){print('Input files successfully read, patient data extracted')}
+
+  }, error = function(e) sink())
 
   ### Read the file containing race information for those sites recording this variable
-  if(verbose == TRUE & raceAvailable == TRUE){ print("Reading the LocalPatientRace.csv")}
+  tryCatch({
+    if(verbose == TRUE & raceAvailable == TRUE){ print("Reading the LocalPatientRace.csv")}
 
-  if( raceAvailable == TRUE ){
-    race_raw <- read.delim(file.path(dir.input, "/LocalPatientRace.csv"), sep = ",", skip = 0)
-    raceCategories <- unique( race_raw$race_4ce )
-    print( paste0( "Race categories present in this dataset: ", paste( raceCategories, collapse = "; ")))
-  }
+    if( raceAvailable == TRUE ){
+      race_raw <- read.delim(file.path(dir.input, "/LocalPatientRace.csv"), sep = ",", skip = 0)
+      raceCategories <- unique( race_raw$race_4ce )
+      print( paste0( "Race categories present in this dataset: ", paste( raceCategories, collapse = "; ")))
+    }
+  }, error = function(e) sink())
 
   ### Read the file containing the variants dates per country
-  if(verbose == TRUE){ print("Loading the internal file with the variant date")}
-  if(verbose == TRUE){ print("Checking that the country is on the right format")}
+  tryCatch({
+    if(verbose == TRUE){ print("Loading the internal file with the variant date")}
+    if(verbose == TRUE){ print("Checking that the country is on the right format")}
 
-  if( tolower(country) %in% c("us", "france", "spain", "uk")){
-    variantsDates <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
-                                          "variantsDates.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
-    variantsDates <- variantsDates %>%
-      filter(  tolower( Country ) == tolower( country ) )
-  }
+    if( tolower(country) %in% c("us", "france", "spain", "uk")){
+      variantsDates <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
+                                            "variantsDates.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
+      variantsDates <- variantsDates %>%
+        filter(  tolower( Country ) == tolower( country ) )
+    }
+  }, error = function(e) sink())
+
 
   #### estimate hospitalization count and length
-  hospitalisations_seq_df <- clinical_raw %>%
-    distinct(patient_num, days_since_admission, in_hospital) %>%
-    group_by(patient_num) %>%
-    group_modify(count_sequences_hospitalisation)
+  tryCatch({
+    hospitalisations_seq_df <- clinical_raw %>%
+      distinct(patient_num, days_since_admission, in_hospital) %>%
+      group_by(patient_num) %>%
+      group_modify(count_sequences_hospitalisation)
 
-  clinical_raw <- left_join(clinical_raw,
-                            hospitalisations_seq_df,
-                            by = c("patient_num", "days_since_admission"))
+    clinical_raw <- left_join(clinical_raw,
+                              hospitalisations_seq_df,
+                              by = c("patient_num", "days_since_admission"))
 
-  #### Integrate it with the misc_complete df
-  ## merge all the files as one data frame for the analysis
-  misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw, variants_df = variantsDates, dateFormat = dateFormat, verbose = verbose )
-  site <- unique( misc_complete$siteid )
+    #### Integrate it with the misc_complete df
+    ## merge all the files as one data frame for the analysis
+    misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw, variants_df = variantsDates, dateFormat = dateFormat, verbose = verbose )
+    site <- unique( misc_complete$siteid )
 
-  ### check how many of the patients got hospitalized in day_since_admission = 0
-  ### filter
-  totalMISCpatients <- length( unique( misc_complete$patient_num ) )
-  print( paste0( "Total MISC patients: ", totalMISCpatients ))
+    ### check how many of the patients got hospitalized in day_since_admission = 0
+    ### filter
+    totalMISCpatients <- length( unique( misc_complete$patient_num ) )
+    print( paste0( "Total MISC patients: ", totalMISCpatients ))
 
-  misc_hospitalization_flag <- misc_complete %>%
-    dplyr::mutate( misc_hospitalized = ifelse( days_since_admission == 0 & in_hospital == 1, 1, 0)) %>%
-    dplyr::group_by( patient_num ) %>%
-    dplyr::summarise( misc_hospitalized = max( misc_hospitalized ))
+    misc_hospitalization_flag <- misc_complete %>%
+      dplyr::mutate( misc_hospitalized = ifelse( days_since_admission == 0 & in_hospital == 1, 1, 0)) %>%
+      dplyr::group_by( patient_num ) %>%
+      dplyr::summarise( misc_hospitalized = max( misc_hospitalized ))
 
-  misc_no_hosp <- misc_hospitalization_flag %>%
-    dplyr::filter( misc_hospitalized == 0 )
-  print( paste0( "MISC patients not hospitalized during the MISC admission date provided: ", length(unique( misc_no_hosp$patient_num)) ))
+    misc_no_hosp <- misc_hospitalization_flag %>%
+      dplyr::filter( misc_hospitalized == 0 )
+    print( paste0( "MISC patients not hospitalized during the MISC admission date provided: ", length(unique( misc_no_hosp$patient_num)) ))
 
-  misc_complete <- left_join( misc_complete, misc_hospitalization_flag )
+    misc_complete <- left_join( misc_complete, misc_hospitalization_flag )
 
-  ## filter to focus only on those that were hospitalized
-  misc_complete <- misc_complete %>% filter( misc_hospitalized == 1)
+    ## filter to focus only on those that were hospitalized
+    misc_complete <- misc_complete %>% filter( misc_hospitalized == 1)
+
+  }, error = function(e) sink())
+
 
 
   ### QC
-  qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation, during_misc_hosp = TRUE, dir.output=dir.output, site_id = site)
+  tryCatch({
+    qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation, during_misc_hosp = TRUE, dir.output=dir.output, site_id = site)
+  }, error = function(e) sink())
 
 
   ## estimate the number of MISC patients per period
-  misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = FALSE, dir.output = dir.output, verbose = verbose)
-
+  tryCatch({
+    misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = FALSE, dir.output = dir.output, verbose = verbose)
+  }, error = function(e) sink())
 
   ## sex and age distribution overview
-  misc_overview( integrated_df =  misc_complete, obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = FALSE, dir.output = dir.output,cbPalette = cbPalette, verbose= verbose )
+  tryCatch({
+    misc_overview( integrated_df =  misc_complete, obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = FALSE, dir.output = dir.output,cbPalette = cbPalette, verbose= verbose )
+  }, error = function(e) sink())
 
   ## table 1
-  t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
-  print("Table 1 successfully generated")
+  tryCatch({
+    t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
+    print("Table 1 successfully generated")
+  }, error = function(e) sink())
 
   # table 2
-  t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, dir.output = dir.output, verbose )
-  print("Table 2 successfully generated")
+  tryCatch({
+    t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, dir.output = dir.output, verbose )
+    print("Table 2 successfully generated")
+  }, error = function(e) sink())
 
   ## table 3
-  t3_misc <- misc_table3( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
-  print("Table 3 successfully generated")
-
+  tryCatch({
+    t3_misc <- misc_table3( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
+    print("Table 3 successfully generated")
+  }, error = function(e) sink())
 
   sink()
 
