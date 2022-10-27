@@ -21,10 +21,7 @@
 
 runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"), verbose ) {
 
-  #sink(file = paste0( dir.output, "/QC/MISC_logs_QC.txt"))
-
-  sink(file = 'TESTSINK.txt')
-
+  sink(file = paste0( dir.output, "/QC/MISC_logs_QC.txt"))
 
   ## Create the output folder if it doesn't exist
   tryCatch({
