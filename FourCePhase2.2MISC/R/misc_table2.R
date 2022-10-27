@@ -36,8 +36,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
-    dplyr::filter( ! is.na(value),
-                   value != -999 ) %>%
+    dplyr::filter( ! is.na(selected_value),
+                   selected_value != -999 ) %>%
     #dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName, variant_misc ) %>%
     dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
@@ -61,8 +61,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
-    dplyr::filter( ! is.na(value),
-                   value != -999 ) %>%
+    dplyr::filter( ! is.na(selected_value),
+                   selected_value != -999 ) %>%
     #dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName) %>%
     dplyr::mutate( variant_misc = "total_n",
@@ -79,7 +79,9 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   atAdmission <- rbind( atAdmission_per_variant, atAdmission_total )
 
   #### save as RData for meta-analysis
-  save(atAdmission, file = paste0(dir.output, "/table2AtAdmission.RData") )
+  atAdmission4meta <- atAdmission %>%
+    mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))
+  save(atAdmission4meta, file = paste0(dir.output, "/table2AtAdmission.RData") )
 
   #### during admission
   duringAdmission_per_variant <- complete_df %>%
@@ -92,8 +94,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
-    dplyr::filter( ! is.na(value),
-                   value != -999 ) %>%
+    dplyr::filter( ! is.na(selected_value),
+                   selected_value != -999 ) %>%
     #dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName, variant_misc ) %>%
     dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
@@ -117,8 +119,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
-    dplyr::filter( ! is.na(value),
-                   value != -999 ) %>%
+    dplyr::filter( ! is.na(selected_value),
+                   selected_value != -999 ) %>%
     #dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName ) %>%
     dplyr::mutate( variant_misc = "total_n",
@@ -135,7 +137,10 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   duringAdmission <- rbind( duringAdmission_per_variant, duringAdmission_total )
 
   #### save as RData for meta-analysis
-  save(duringAdmission, file = paste0(dir.output, "/table2DuringAdmission.RData") )
+  duringAdmission4meta <- duringAdmission %>%
+    mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))
+  save(duringAdmission4meta, file = paste0(dir.output, "/table2DuringAdmission.RData") )
+
 
   ### pivot it
   atAdmission_output <- atAdmission %>%
