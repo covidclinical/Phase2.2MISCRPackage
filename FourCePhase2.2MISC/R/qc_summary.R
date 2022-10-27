@@ -47,7 +47,8 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     filter(concept_code %in% labs_of_interest$concept_code) %>%
     select(siteid, cohort, patient_num, concept_code, value) %>%
     left_join(labs_of_interest, by = 'concept_code') %>%
-    mutate( value = ifelse( value == -999, NA, value ))
+    filter( value != -999,
+            ! is.na( value ))
 
 
   # lab summary table
