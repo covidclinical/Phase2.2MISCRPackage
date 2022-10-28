@@ -77,7 +77,7 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
   med_sum <- med_sum %>%
     group_by(variableName) %>%
     summarise( n_patients = n_distinct(patient_num)) %>%
-    mutate(n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),,
+    mutate(n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
            perc_patients = (n_patients / total_n) * 100,
            siteid = site_id)
 
