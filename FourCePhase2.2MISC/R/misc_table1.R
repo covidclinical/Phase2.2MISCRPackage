@@ -426,7 +426,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
                          'Omicron' = NA,
                          'total' = NA,
                          'p.value' = NA)
-    racedf <- racedf[-1,]
+    #racedf <- racedf[-1,]
   }
 
   # if the data does not contain all variants, add in the columns here
