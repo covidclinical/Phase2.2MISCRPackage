@@ -418,27 +418,17 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     # merge
     racedf <- race_counts %>% left_join(race_fisher_df)
 
+    # if the data does not contain all variants, add in the columns here
+    if(!'Alpha' %in% colnames(racedf)){racedf$Alpha <- NA}
+    if(!'Delta' %in% colnames(racedf)){racedf$Delta <- NA}
+    if(!'Omicron' %in% colnames(racedf)){racedf$Omicron <- NA}
 
-  } else {
-    racedf <- data.frame('categories' = NA,
-                         'Alpha' = NA,
-                         'Delta' = NA,
-                         'Omicron' = NA,
-                         'total' = NA,
-                         'p.value' = NA)
-    #racedf <- racedf[-1,]
+    # change NA by 0 (0%)
+    racedf[ is.na( racedf$Alpha ), ]$Alpha <- "0 (0%)"
+    racedf[ is.na( racedf$Delta ), ]$Delta <- "0 (0%)"
+    racedf[ is.na( racedf$Omicron ), ]$Omicron <- "0 (0%)"
+    racedf[ is.na( racedf$total ), ]$total <- "0 (0%)"
   }
-
-  # if the data does not contain all variants, add in the columns here
-  if(!'Alpha' %in% colnames(racedf)){racedf$Alpha <- NA}
-  if(!'Delta' %in% colnames(racedf)){racedf$Delta <- NA}
-  if(!'Omicron' %in% colnames(racedf)){racedf$Omicron <- NA}
-
-  # change NA by 0 (0%)
-  racedf[ is.na( racedf$Alpha ), ]$Alpha <- "0 (0%)"
-  racedf[ is.na( racedf$Delta ), ]$Delta <- "0 (0%)"
-  racedf[ is.na( racedf$Omicron ), ]$Omicron <- "0 (0%)"
-  racedf[ is.na( racedf$total ), ]$total <- "0 (0%)"
 
 
   # combine all summaries
