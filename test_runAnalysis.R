@@ -1,7 +1,7 @@
 dir.input = "/4ceData/Input/4CE_MISC_15SEP2022_V2/"
 dir.output = "/4ceData/outputMISC/"
-obfuscation = FALSE
-raceAvailable= TRUE
+obfuscation = 10
+raceAvailable= FALSE
 country = "US"
 verbose = TRUE
 dateFormat = "%Y-%m-%d"
@@ -11,8 +11,8 @@ cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", 
 # # comment to compile
 FourCePhase2.2MISC::runAnalysis( dir.input = "/4ceData/Input/4CE_MISC_15SEP2022_V2/",
                                  dir.output = "/4ceData/outputMISC/",
-                                 obfuscation = FALSE,
-                                 raceAvailable= TRUE,
+                                 obfuscation = 10,
+                                 raceAvailable= FALSE,
                                  country = "US",
                                  verbose = TRUE,
                                  dateFormat = "%Y-%m-%d",
