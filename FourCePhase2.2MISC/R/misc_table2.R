@@ -259,7 +259,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
 
   colnames(output_table2_with_stats)[c(3,4,5,6)] <- colnames_df$pasted_names
 
-  write.table(output_table2_with_stats, paste0(dir.output, currSiteId, '_table2.txt'), sep="\t", quote = FALSE, row.names = FALSE)
+  write.table(output_table2_with_stats, paste0(dir.output, '/',currSiteId, '_table2.txt'), sep="\t", quote = FALSE, row.names = FALSE)
 
   # return the final output table
   return( output_table2_with_stats )
