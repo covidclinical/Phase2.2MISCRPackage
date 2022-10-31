@@ -178,7 +178,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   counts_combined4meta = counts_percentages_combined %>%
     mutate( n = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n , 0.5)) %>%
     select( - perc )
-  save(counts_combined4meta, file = paste0(dir.output, "/table1Categorical.RData") )
+  table1_categorical <- table1_categorical
+  save(table1_continuous, file = paste0(dir.output, "/table1Categorical.RData") )
 
   # pivot counts_percentages with combined n / percentage cells
   output_table1_cat_with_stats <- counts_percentages_combined %>%
@@ -286,8 +287,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
               length_hospitalization_mean = round(mean(orig_len_hosp), digits = 2),
               length_hospitalization_sd   = round(sd(orig_len_hosp), digits = 2))
   continuous_summary_total_for_meta_analysis$variant_misc <- "total"
-  continuous_summary_for_meta_analysis <- rbind( continuous_summary_for_meta_analysis, continuous_summary_total_for_meta_analysis)
-  save(continuous_summary_for_meta_analysis, file = paste0(dir.output, "/table1Continuous.RData") )
+  table1_continuous <- rbind( continuous_summary_for_meta_analysis, continuous_summary_total_for_meta_analysis)
+  save(table1_continuous, file = paste0(dir.output, "/table1Continuous.RData") )
 
 
   # find totals of the continuous variables

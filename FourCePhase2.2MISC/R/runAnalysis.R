@@ -21,23 +21,18 @@
 
 runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"), verbose ) {
 
-  if (! dir.output %in% list.dirs()) {dir.create(dir.output)}
-  dir.output.qc <- paste0(dir.output, "/QC/")
-  if (! dir.output.qc %in% list.dirs()) {dir.create(dir.output.qc)}
-
-  sink(file = paste0( dir.output, "/QC/MISC_logs_QC.txt"))
-
-  ## Create the output folder if it doesn't exist
   tryCatch({
 
+    ## Create the output folder if it doesn't exist
+
     if(verbose == TRUE){ print("Creating the output folders if they don't exist")}
-
     if (! dir.output %in% list.dirs()) {dir.create(dir.output)}
-
-    dir.output.qc <- paste0(dir.output, "/QC/")
+    dir.output.qc <- paste0(dir.output, "/QC")
     if (! dir.output.qc %in% list.dirs()) {dir.create(dir.output.qc)}
 
-    dir.output.figures <- paste0(dir.output, "/figures/")
+    sink(file = paste0( dir.output, "/QC/MISC_logs_QC.txt"))
+
+    dir.output.figures <- paste0(dir.output, "/figures")
     if (! dir.output.figures %in% list.dirs()) {dir.create(dir.output.figures)}
 
     if(verbose == TRUE){ print("Output folders successfully created")}
@@ -71,7 +66,10 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
       raceCategories <- unique( race_raw$race_4ce )
       print( paste0( "Race categories present in this dataset: ", paste( raceCategories, collapse = "; ")))
     }
-  }, error = function(e) sink())
+  }, error = function(e) {
+    print('error reading race info')
+    sink()
+    })
 
   ### Read the file containing the variants dates per country
   tryCatch({
@@ -84,7 +82,10 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
       variantsDates <- variantsDates %>%
         filter(  tolower( Country ) == tolower( country ) )
     }
-  }, error = function(e) sink())
+  }, error = function(e) {
+    print('error reading files')
+    sink()
+  })
 
 
   #### estimate hospitalization count and length
@@ -122,45 +123,69 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
     ## filter to focus only on those that were hospitalized
     misc_complete <- misc_complete %>% filter( misc_hospitalized == 1)
 
-  }, error = function(e) sink())
+  }, error = function(e) {
+    print('error estimating hospitalization count and length')
+    sink()
+  })
 
 
 
   ### QC
   tryCatch({
     qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation, during_misc_hosp = TRUE, dir.output=dir.output, site_id = site)
-  }, error = function(e) sink())
+  }, error = function(e) {
+    print('error generating qc summary')
+    sink()
+  })
 
 
   ## estimate the number of MISC patients per period
   tryCatch({
     misc_cases_perTimePeriod(integrated_df =  misc_complete, period = "month", obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = FALSE, dir.output = dir.output, verbose = verbose)
-  }, error = function(e) sink())
+  }, error = function(e) {
+    print('error estimating number of MISC patients per period')
+    sink()
+  })
 
   ## sex and age distribution overview
   tryCatch({
     misc_overview( integrated_df =  misc_complete, obfuscation_threshold = obfuscation, output_plot = TRUE, output_df = FALSE, dir.output = dir.output,cbPalette = cbPalette, verbose= verbose )
-  }, error = function(e) sink())
+  }, error = function(e) {
+    print('error generating sex and age distribution overview')
+    sink()
+  })
 
   ## table 1
   tryCatch({
     t1_misc <- misc_table1( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
     print("Table 1 successfully generated")
-  }, error = function(e) sink())
+  }, error = function(e) {
+    print('error generating table 1')
+    sink()
+  })
 
   # table 2
   tryCatch({
     t2_misc <- misc_table2( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, dir.output = dir.output, verbose )
     print("Table 2 successfully generated")
-  }, error = function(e) sink())
+  }, error = function(e) {
+    print('error generating table 2')
+    sink()
+  })
 
   ## table 3
   tryCatch({
     t3_misc <- misc_table3( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output, verbose )
     print("Table 3 successfully generated")
-  }, error = function(e) sink())
+  }, error = function(e) {
+    print('error generating table 3')
+    sink()
+    }
+  )
 
+  print('done')
   sink()
+  print('sink closed')
 
 }
 

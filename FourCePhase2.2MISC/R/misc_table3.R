@@ -144,10 +144,10 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   counts_percentages_combined <- rbind(counts_percentages, counts_percentages_total )
 
   # save as Rdata file for meta-analysis
-  counts_combined4meta = counts_percentages_combined %>%
+  table3 = counts_percentages_combined %>%
     mutate( n = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n , 0.5)) %>%
     select( - perc )
-  save(counts_combined4meta, file = paste0(dir.output, "/table3.RData") )
+  save(table3, file = paste0(dir.output, "/table3.RData") )
 
   # pivot counts_percentages with combined n / percentage cells
   output_table3_with_stats <- counts_percentages_combined %>%

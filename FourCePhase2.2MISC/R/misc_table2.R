@@ -79,9 +79,9 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   atAdmission <- rbind( atAdmission_per_variant, atAdmission_total )
 
   #### save as RData for meta-analysis
-  atAdmission4meta <- atAdmission %>%
+  table2_admission <- atAdmission %>%
     mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))
-  save(atAdmission4meta, file = paste0(dir.output, "/table2AtAdmission.RData") )
+  save(table2_admission, file = paste0(dir.output, "/table2AtAdmission.RData") )
 
   #### during admission
   duringAdmission_per_variant <- complete_df %>%
@@ -137,9 +137,9 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   duringAdmission <- rbind( duringAdmission_per_variant, duringAdmission_total )
 
   #### save as RData for meta-analysis
-  duringAdmission4meta <- duringAdmission %>%
+  table2_during <- duringAdmission %>%
     mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))
-  save(duringAdmission4meta, file = paste0(dir.output, "/table2DuringAdmission.RData") )
+  save(table2_during, file = paste0(dir.output, "/table2DuringAdmission.RData") )
 
 
   ### pivot it
