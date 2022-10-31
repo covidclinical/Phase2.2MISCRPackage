@@ -459,7 +459,8 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   colnames(output_table1)[c(2,3,4,5)] <- colnames_df$pasted_names
 
   # export table
-  write.table(output_table1, paste0(dir.output, currSiteId, '_table1.txt'), sep="\t", quote = FALSE, row.names = FALSE)
+  write.table(x = output_table1, file = paste0(dir.output, currSiteId, '_table1.txt'), sep="\t", quote = FALSE, row.names = FALSE)
+  save(output_table1, file = paste0(dir.output, "/outputTest.RData") )
 
   # return the final output table
   return( output_table1 )
