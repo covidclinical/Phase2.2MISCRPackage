@@ -27,18 +27,18 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                                                     "laboratoryCharacteristics.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
 
   atAdmission_per_variant <- complete_df %>%
-    dplyr::filter( n_hospitalisation == 1 & days_since_admission == 0 ) %>%
+    dplyr::filter( n_hospitalisation == 1 & days_since_admission %in% c(0, 1) ) %>%
     dplyr::filter( concept_type == "LAB-LOINC" ) %>%
     dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( variableName, variant_misc, patient_num ) %>%
+    dplyr::filter(days_since_admission == min(days_since_admission)) %>%
     dplyr::mutate( selected_value = ifelse( worstValue == "lowest", min( value), max(value ))) %>%
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
     dplyr::filter( ! is.na(selected_value),
                    selected_value != -999 ) %>%
-    #dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName, variant_misc ) %>%
     dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
                    iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
@@ -53,11 +53,12 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   print(paste0("atAdmission_per_variant table generated. It contains :", nrow(atAdmission_per_variant), " rows"))
 
   atAdmission_total <- complete_df %>%
-    dplyr::filter( n_hospitalisation == 1 & days_since_admission == 0 ) %>%
+    dplyr::filter( n_hospitalisation == 1 & days_since_admission %in% c(0, 1) ) %>%
     dplyr::filter( concept_type == "LAB-LOINC" ) %>%
     dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( variableName, patient_num ) %>%
+    dplyr::filter(days_since_admission == min(days_since_admission)) %>%
     dplyr::mutate( selected_value = ifelse( worstValue == "lowest", min( value), max(value ))) %>%
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
