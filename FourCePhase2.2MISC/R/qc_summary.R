@@ -65,6 +65,7 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
           siteid = site_id)
 
   #write.table(lab_sum, paste0(dir.output,'/QC/', site_id, '_MISC', 'lab_summary.txt'), quote = FALSE, row.names = FALSE)
+  print(lab_sum)
 
   ### create medication value summary
   # include: number of patients and %
@@ -82,7 +83,7 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
            siteid = site_id)
 
    #write.table(med_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'medication_summary.txt'), quote = FALSE, row.names = FALSE)
-
+  print(med_sum)
 
   ### create procedures value summary
   # include: number of patients and %
@@ -94,7 +95,7 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
             perc_patients = (n_patients / total_n) * 100,
             siteid = site_id)
 
-  proc_sum
+  print(proc_sum)
 
   #write.table(proc_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'procedure_summary.txt'), quote = FALSE, row.names = FALSE)
 
@@ -108,9 +109,6 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
 
   save( diag_sum, file=paste0( dir.output, "/QC/ICDdiagnosisCodes.RData"))
 
-  print(lab_sum)
-  print(med_sum)
-  print(proc_sum)
   print(diag_sum[1:10,])
 
 }
