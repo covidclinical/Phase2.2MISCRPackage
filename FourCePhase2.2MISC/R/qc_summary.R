@@ -110,13 +110,6 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     print(med_sum)
   }
 
-  procs <- complete_df %>%
-    filter(concept_type == 'PROC-GROUP') %>%
-    pull(concept_code) %>%
-    unique()
-  print("These are the procedures that are present for MISC patients: ")
-  print(procs)
-
   if( 'PROC-GROUP' %in% complete_df$concept_type){
     ### create procedures value summary
     # include: number of patients and %
