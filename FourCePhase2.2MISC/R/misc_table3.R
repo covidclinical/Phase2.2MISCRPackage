@@ -30,6 +30,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   outcomeVar$concept_code <- gsub("[.]", "", outcomeVar$concept_code)
 
   total_n_patients <- length(unique(complete_df$patient_num))
+  print(paste0("The total number of patients that will be used as denominator is: ", total_n_patients ))
 
   mainTable <- complete_df %>%
     filter( n_hospitalisation == 1 ) %>%
@@ -41,15 +42,18 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     ungroup() %>%
     select( patient_num, variant_misc, len_hospitalisation, age, sex, in_icu, dead ) %>%
     unique()
+  print("mainTable generated")
 
   #add race if available
   if( raceAvailable == TRUE ){
     race_raw <- read.delim(file.path(dir.input, "/LocalPatientRace.csv"), sep = ",", skip = 0)
     mainTable <- left_join( mainTable, race_raw %>% select( patient_num, race_4ce), by="patient_num")
+    print("race available")
   }
 
   # remove dots from ICD codes to make sure if matches with all the sites
   complete_df$concept_code <- gsub("[.]", "", complete_df$concept_code )
+  print("remove the dots from the ICD codes")
 
   clin_var <- complete_df %>%
     filter( concept_code %in% outcomeVar$concept_code ) %>%
@@ -63,11 +67,15 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     summarise(across(everything(), sum)) %>%
     unique()
 
+  print(paste0("clin_var table generated, with ", nrow(clin_var), " rows"))
+
 
   ### add the new variables and
   mainTable <- mainTable %>%
     dplyr::left_join( clin_var, by = "patient_num") %>%
     replace(is.na(.), 0)
+
+  print("join the maintable with the clin_var table")
 
   # do not add in non-present variables, because you cannot run fisher test on these
   ## any non-present variable as empty column all with 0
@@ -89,6 +97,8 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   mainTable <- mainTable %>%
     dplyr::mutate( 'Composite adverse cardiovascular outcome' = ifelse( `Composite adverse cardiovascular outcome` == 1 | dead == 1 , 1, 0))
 
+  print("add a column called cardiovascular outcome")
+
   outcomes <- c("in_icu", "dead", "Anticoagulation therapy", "Cardiac arrest",
                 "Composite adverse cardiovascular outcome", "Coronary aneurysm","Diuretic therapy",
                 "ECMO","Inotropic support","Invasive monitoring (arterial line)",
@@ -100,8 +110,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
       cols = colnames(mainTable)[colnames(mainTable) %in% outcomes],
       names_to = "categories",
       values_to = "value")
-
-
+  print(paste0("re-pivot mainTable. long_table generated with ", nrow( long_table), " rows"))
 
   ## estimate the p-value (fisher test) if:
   ### - at least one value for the variant / category (n_distinct_subgroup)
@@ -117,6 +126,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
             p.value =ifelse( n_distinct_subgroup > 1 & n_distinct_values > 1 & variants_present, round( fisher.test( value, variant_misc )$p.value, 3), NA)) %>%
     select( categories, p.value ) %>%
     unique()
+  print("p-value estimated")
 
   ## estimate the N and percentage per category
   counts_percentages <- long_table %>%
@@ -142,12 +152,15 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
   #combine both
   counts_percentages_combined <- rbind(counts_percentages, counts_percentages_total )
+  print("percentage values estimated")
 
   # save as Rdata file for meta-analysis
   table3 = counts_percentages_combined %>%
     mutate( n = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n , 0.5)) %>%
     select( - perc )
   save(table3, file = paste0(dir.output, "/table3.RData") )
+
+  print("save table3 as an RData file")
 
   # pivot counts_percentages with combined n / percentage cells
   output_table3_with_stats <- counts_percentages_combined %>%
@@ -156,6 +169,8 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     unique() %>%
     tidyr::pivot_wider(names_from = variant_misc, values_from = n_perc, values_fill = '0 (0%)') %>%
     left_join( fisherTest )
+
+  print("pivot counts_percentages with combined n and percentage cells: completed")
 
   # order rows
   ordered_rows <- outcomes
@@ -167,6 +182,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     filter( categories %in% ordered_rows ) %>%
     mutate(categories =  factor(categories, levels = ordered_rows)) %>%
     arrange(categories)
+  print("re-order table")
 
 
   # if the data does not contain all variants, add in the columns here
@@ -180,8 +196,11 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   output_table3_with_stats[ is.na( output_table3_with_stats$Omicron ), ]$Omicron <- "0 (0%)"
   output_table3_with_stats[ is.na( output_table3_with_stats$total ), ]$total <- "0 (0%)"
 
+  print("fill with NAs and 0 (0%) the variables not present")
+
   # reorder columns
   output_table3_with_stats <- output_table3_with_stats %>% select(categories, Alpha, Delta, Omicron, total, p.value)
+  print("re-order columns")
 
   # add n to column names
   colnames_df <- mainTable %>%

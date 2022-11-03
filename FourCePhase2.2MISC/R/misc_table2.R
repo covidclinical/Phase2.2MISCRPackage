@@ -50,6 +50,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
     unique()
 
+  print(paste0("atAdmission_per_variant table generated. It contains :", nrow(atAdmission_per_variant), " rows"))
 
   atAdmission_total <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 & days_since_admission == 0 ) %>%
@@ -75,6 +76,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                    n_patients = n_distinct(patient_num)) %>%
     dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
     unique()
+  print(paste0("atAdmission_total table generated. It contains :", nrow(atAdmission_total), " rows"))
 
   atAdmission <- rbind( atAdmission_per_variant, atAdmission_total )
 
@@ -82,6 +84,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   table2_admission <- atAdmission %>%
     mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))
   save(table2_admission, file = paste0(dir.output, "/table2AtAdmission.RData") )
+  print("Saving the atAdmission data in an RData file")
 
   #### during admission
   duringAdmission_per_variant <- complete_df %>%
@@ -107,6 +110,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                    n_patients = n_distinct(patient_num)) %>%
     dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
     unique()
+  print(paste0("duringAdmission_per_variant table generated. It contains :", nrow(duringAdmission_per_variant), " rows"))
 
 
   duringAdmission_total <- complete_df %>%
@@ -134,13 +138,15 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
     unique()
 
+  print( paste0("duringAdmission_total table generated. It contains :", nrow(duringAdmission_total), " rows"))
+
   duringAdmission <- rbind( duringAdmission_per_variant, duringAdmission_total )
 
   #### save as RData for meta-analysis
   table2_during <- duringAdmission %>%
     mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))
   save(table2_during, file = paste0(dir.output, "/table2DuringAdmission.RData") )
-
+  print("Saving the duringAdmission data in an RData file")
 
   ### pivot it
   atAdmission_output <- atAdmission %>%
@@ -153,6 +159,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                         values_from = output_value)
 
   atAdmission_output$time_point <- "At admission day 0"
+  print("Pivoting the atAdmission table: completed")
 
 
   duringAdmission_output <- duringAdmission %>%
@@ -165,6 +172,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                         values_from = output_value)
 
   duringAdmission_output$time_point <- "During hospitalization"
+  print("Pivoting the duringAdmission table: completed")
 
   output_table2 <- rbind( atAdmission_output, duringAdmission_output )
 
@@ -180,13 +188,17 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     mutate(variableName =  factor(variableName, levels = ordered_rows)) %>%
     arrange(variableName)
 
+  print("ordering the rows")
+
   # if the data does not contain all variants, add in the columns here
   if(!'Alpha' %in% colnames(output_table2)){output_table2$Alpha <- NA}
   if(!'Delta' %in% colnames(output_table2)){output_table2$Delta <- NA}
   if(!'Omicron' %in% colnames(output_table2)){output_table2$Omicron <- NA}
 
+  print("For potential empty columns fill it with NAs")
 
   # estimate the p-value
+  print("p-value estimation for at admission")
   stats_kruskal_atAdmission <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 & days_since_admission == 0 ) %>%
     dplyr::filter( concept_type == "LAB-LOINC" ) %>%
@@ -210,6 +222,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
 
   }
 
+  print("p-value estimation for at during admission")
 
   stats_kruskal_duringAdmission <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 ) %>%
@@ -240,6 +253,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     select( variableName, statistic, p.value, time_point )
 
   output_table2_with_stats <- left_join( output_table2, stats_kruskal, by=c("variableName", "time_point"))
+  print( "Join the p-value tables with the output_table2")
 
   ## add n to column names
   colnames_df <- complete_df %>%
@@ -258,6 +272,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     select(variableName, units, Alpha, Delta, Omicron, total_n, time_point)
 
   colnames(output_table2_with_stats)[c(3,4,5,6)] <- colnames_df$pasted_names
+
+  print("Reorder columns")
 
   write.table(output_table2_with_stats, paste0(dir.output, '/',currSiteId, '_table2.txt'), sep="\t", quote = FALSE, row.names = FALSE)
 
