@@ -53,7 +53,6 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
   # include: max, min, and mean values
   # include: number of patients and %
   # calculate neutrophil ratio?
-
   lab_sum <- complete_df %>%
     filter(concept_code %in% labs_of_interest$concept_code) %>%
     select(siteid, cohort, patient_num, concept_code, value) %>%
@@ -64,20 +63,23 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
 
 
   # lab summary table
-  lab_sum <- lab_sum %>%
-    group_by(variableName) %>%
-    summarise(units = first(units),
-              min_value = min(value, na.rm = TRUE),
-              max_value = max(value, na.rm = TRUE),
-              mean_value = mean(value, na.rm = TRUE),
-              sd_value = sd(value, na.rm = TRUE),
-              n_patients = n_distinct(patient_num)) %>%
-  mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
-          perc_patients = (n_patients / total_n) * 100,
-          siteid = site_id)
+  if(n_distinct(lab_sum$concept_code) != 0 ){
+    lab_sum <- lab_sum %>%
+      group_by(variableName) %>%
+      summarise(units = first(units),
+                min_value = min(value, na.rm = TRUE),
+                max_value = max(value, na.rm = TRUE),
+                mean_value = mean(value, na.rm = TRUE),
+                sd_value = sd(value, na.rm = TRUE),
+                n_patients = n_distinct(patient_num)) %>%
+      mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
+              perc_patients = (n_patients / total_n) * 100,
+              siteid = site_id)
 
-  #write.table(lab_sum, paste0(dir.output,'/QC/', site_id, '_MISC', 'lab_summary.txt'), quote = FALSE, row.names = FALSE)
-  print(lab_sum)
+    #write.table(lab_sum, paste0(dir.output,'/QC/', site_id, '_MISC', 'lab_summary.txt'), quote = FALSE, row.names = FALSE)
+    print(lab_sum)
+  }
+
 
   ### create medication value summary
   # include: number of patients and %
@@ -87,45 +89,50 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     left_join(meds_of_interest, by = 'concept_code')
   print(paste0("There are ", n_distinct(med_sum$concept_code), " medication codes reported in the data"))
 
+  if( n_distinct(med_sum$concept_code) != 0){
+    # medication summary table
+    med_sum <- med_sum %>%
+      group_by(variableName) %>%
+      summarise( n_patients = n_distinct(patient_num)) %>%
+      mutate(n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
+             perc_patients = (n_patients / total_n) * 100,
+             siteid = site_id)
 
-  # medication summary table
-  med_sum <- med_sum %>%
-    group_by(variableName) %>%
-    summarise( n_patients = n_distinct(patient_num)) %>%
-    mutate(n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
-           perc_patients = (n_patients / total_n) * 100,
-           siteid = site_id)
+    #write.table(med_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'medication_summary.txt'), quote = FALSE, row.names = FALSE)
+    print(med_sum)
+  }
 
-   #write.table(med_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'medication_summary.txt'), quote = FALSE, row.names = FALSE)
-  print(med_sum)
-
-  ### create procedures value summary
-  # include: number of patients and %
-  proc_sum <- complete_df %>%
-    filter(concept_type == 'PROC-GROUP') %>%
-    group_by(concept_code) %>%
-    summarise(n_patients = n_distinct(patient_num)) %>%
-    mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
-            perc_patients = (n_patients / total_n) * 100,
-            siteid = site_id)
-  print(paste0("There are ", n_distinct(proc_sum$concept_code), " procedural codes reported in the data"))
+  if( 'PROC-GROUP' %in% complete_df$concept_type){
+    ### create procedures value summary
+    # include: number of patients and %
+    proc_sum <- complete_df %>%
+      filter(concept_type == 'PROC-GROUP') %>%
+      group_by(concept_code) %>%
+      summarise(n_patients = n_distinct(patient_num)) %>%
+      mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
+              perc_patients = (n_patients / total_n) * 100,
+              siteid = site_id)
+    print(paste0("There are ", n_distinct(proc_sum$concept_code), " procedural codes reported in the data"))
 
 
-  print(proc_sum)
+    print(proc_sum)
 
-  #write.table(proc_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'procedure_summary.txt'), quote = FALSE, row.names = FALSE)
+    #write.table(proc_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'procedure_summary.txt'), quote = FALSE, row.names = FALSE)
+  }
 
-  # add a summary of the ICD codes for QC
-  diag_sum <- complete_df %>%
-    filter( concept_type == 'DIAG-ICD10') %>%
-    group_by( concept_code ) %>%
-    summarise( n_patients = n_distinct( patient_num ) ) %>%
-    mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5)) %>%
-    arrange( desc(n_patients))
+  if( 'DIAG-ICD10' %in% complete_df$concept_type){
+    # add a summary of the ICD codes for QC
+    diag_sum <- complete_df %>%
+      filter( concept_type == 'DIAG-ICD10') %>%
+      group_by( concept_code ) %>%
+      summarise( n_patients = n_distinct( patient_num ) ) %>%
+      mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5)) %>%
+      arrange( desc(n_patients))
 
-  save( diag_sum, file=paste0( dir.output, "/QC/ICDdiagnosisCodes.RData"))
+    save( diag_sum, file=paste0( dir.output, "/QC/ICDdiagnosisCodes.RData"))
 
-  print(diag_sum[1:10,])
+    print(diag_sum[1:10,])
+  }
 
 }
 
