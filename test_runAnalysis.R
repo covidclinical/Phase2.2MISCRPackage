@@ -1,7 +1,7 @@
 dir.input = "/4ceData/Input/4CE_MISC_15SEP2022_V2"
 dir.output = "/4ceData/outputMISC"
-obfuscation = 10
-raceAvailable= FALSE
+obfuscation = 3
+raceAvailable= TRUE
 country = "US"
 verbose = TRUE
 dateFormat = "%Y-%m-%d"

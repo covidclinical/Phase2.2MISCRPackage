@@ -88,7 +88,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   #### save as RData for meta-analysis
   table2_admission <- atAdmission %>%
     mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))
-  save(table2_admission, file = paste0(dir.output, "/table2AtAdmission.RData") )
+  save(table2_admission, file = paste0(dir.output,"/", currSiteId, "_table2AtAdmission.RData") )
   print("Saving the atAdmission data in an RData file")
 
   #### during admission
@@ -154,7 +154,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   #### save as RData for meta-analysis
   table2_during <- duringAdmission %>%
     mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))
-  save(table2_during, file = paste0(dir.output, "/table2DuringAdmission.RData") )
+  save(table2_during, file = paste0(dir.output,"/", currSiteId, "_table2DuringAdmission.RData") )
   print("Saving the duringAdmission data in an RData file")
 
   ### pivot it

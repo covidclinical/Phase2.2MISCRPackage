@@ -21,7 +21,7 @@
 # testing code
 #complete_df <- misc_complete
 
-qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TRUE, dir.output, site_id){
+qc_summary <- function(complete_df, obfuscation_threshold, currSiteId, during_misc_hosp = TRUE, dir.output, site_id){
 
   if(during_misc_hosp){
     complete_df <- complete_df %>% filter(n_hospitalisation == 1)
@@ -137,7 +137,7 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
       mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5)) %>%
       arrange( desc(n_patients))
 
-    save( diag_sum, file=paste0( dir.output, "/QC/ICDdiagnosisCodes.RData"))
+    save( diag_sum, file=paste0( dir.output, "/QC/", currSiteId, "_ICDdiagnosisCodes.RData"))
 
     print(diag_sum[1:10,])
   }

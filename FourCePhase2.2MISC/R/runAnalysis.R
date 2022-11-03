@@ -132,7 +132,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
   ### QC
   tryCatch({
-    qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation, during_misc_hosp = TRUE, dir.output=dir.output, site_id = site)
+    qc_summary( complete_df =  misc_complete, obfuscation_threshold = obfuscation,  currSiteId = site,during_misc_hosp = TRUE, dir.output=dir.output, site_id = site)
   }, error = function(e) {
     print('error generating qc summary')
     sink()

@@ -158,7 +158,7 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   table3 = counts_percentages_combined %>%
     mutate( n = ifelse( n > obfuscation_threshold | isFALSE( obfuscation_threshold), n , 0.5)) %>%
     select( - perc )
-  save(table3, file = paste0(dir.output, "/table3.RData") )
+  save(table3, file = paste0(dir.output, "/", currSiteId, "_table3.RData") )
 
   print("save table3 as an RData file")
 
