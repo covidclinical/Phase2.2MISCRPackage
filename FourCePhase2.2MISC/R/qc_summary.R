@@ -53,13 +53,14 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
   # include: max, min, and mean values
   # include: number of patients and %
   # calculate neutrophil ratio?
+
   lab_sum <- complete_df %>%
     filter(concept_code %in% labs_of_interest$concept_code) %>%
     select(siteid, cohort, patient_num, concept_code, value) %>%
     left_join(labs_of_interest, by = 'concept_code') %>%
     filter( value != -999,
             ! is.na( value ))
-  print(paste0("There are ", n_distinct(lab_sum$concept_code), " lab codes reported in the data"))
+  print(paste0("There are ", n_distinct(lab_sum$concept_code), " lab codes of interest reported in the data"))
 
 
   # lab summary table
@@ -83,11 +84,18 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
 
   ### create medication value summary
   # include: number of patients and %
+  meds <- complete_df %>%
+    filter(concept_type == 'MED-CLASS') %>%
+    pull(concept_code) %>%
+    unique()
+  print("These are the meds that are present for MISC patients: ")
+  print(meds)
+
   med_sum <- complete_df %>%
     filter(concept_code %in% meds_of_interest$concept_code) %>%
     select(siteid, cohort, patient_num, concept_code, value) %>%
     left_join(meds_of_interest, by = 'concept_code')
-  print(paste0("There are ", n_distinct(med_sum$concept_code), " medication codes reported in the data"))
+  print(paste0("There are ", n_distinct(med_sum$concept_code), " medication codes of interest reported in the data"))
 
   if( n_distinct(med_sum$concept_code) != 0){
     # medication summary table
@@ -101,6 +109,13 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     #write.table(med_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'medication_summary.txt'), quote = FALSE, row.names = FALSE)
     print(med_sum)
   }
+
+  procs <- complete_df %>%
+    filter(concept_type == 'PROC-GROUP') %>%
+    pull(concept_code) %>%
+    unique()
+  print("These are the procedures that are present for MISC patients: ")
+  print(procs)
 
   if( 'PROC-GROUP' %in% complete_df$concept_type){
     ### create procedures value summary
