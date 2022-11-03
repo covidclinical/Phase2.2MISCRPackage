@@ -27,6 +27,17 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     complete_df <- complete_df %>% filter(n_hospitalisation == 1)
   }
 
+  outcome_summary <- complete_df %>%
+    group_by(patient_num) %>%
+    summarise(ever_in_hospital = max(in_hospital),
+              ever_severe = max(severe),
+              ever_in_icu = max(in_icu),
+              ever_dead = max(dead))
+  print(paste0("Total number of patients ever hospitalized: ", sum(outcome_summary$ever_in_hospital)))
+  print(paste0("Total number of patients ever severe: ", sum(outcome_summary$ever_severe)))
+  print(paste0("Total number of patients ever in icu: ", sum(outcome_summary$ever_in_icu)))
+  print(paste0("Total number of patients ever dead: ", sum(outcome_summary$ever_dead)))
+
   total_n <- length(unique(complete_df$patient_num))
 
   labs_of_interest <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
@@ -49,6 +60,7 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     left_join(labs_of_interest, by = 'concept_code') %>%
     filter( value != -999,
             ! is.na( value ))
+  print(paste0("There are ", n_distinct(lab_sum$concept_code), " lab codes reported in the data"))
 
 
   # lab summary table
@@ -73,6 +85,8 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     filter(concept_code %in% meds_of_interest$concept_code) %>%
     select(siteid, cohort, patient_num, concept_code, value) %>%
     left_join(meds_of_interest, by = 'concept_code')
+  print(paste0("There are ", n_distinct(med_sum$concept_code), " medication codes reported in the data"))
+
 
   # medication summary table
   med_sum <- med_sum %>%
@@ -94,6 +108,8 @@ qc_summary <- function(complete_df, obfuscation_threshold, during_misc_hosp = TR
     mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
             perc_patients = (n_patients / total_n) * 100,
             siteid = site_id)
+  print(paste0("There are ", n_distinct(proc_sum$concept_code), " procedural codes reported in the data"))
+
 
   print(proc_sum)
 
