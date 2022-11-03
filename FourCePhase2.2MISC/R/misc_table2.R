@@ -46,8 +46,10 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                    sd_value = round( sd(selected_value, na.rm = TRUE), 2),
                    min_value = round( min( selected_value, na.rm = TRUE), 2),
                    max_value = round( max( selected_value, na.rm = TRUE), 2),
+                   q25_value = round( quantile( selected_value, 0.25, na.rm = TRUE), 2),
+                   q75_value = round( quantile( selected_value, 0.75, na.rm = TRUE), 2),
                    n_patients = n_distinct(patient_num)) %>%
-    dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
+    dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, q25_value, q75_value, n_patients) %>%
     unique()
 
   print(paste0("atAdmission_per_variant table generated. It contains :", nrow(atAdmission_per_variant), " rows"))
@@ -74,8 +76,10 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                    sd_value = round( sd(selected_value, na.rm = TRUE), 2),
                    min_value = round( min( selected_value, na.rm = TRUE), 2),
                    max_value = round( max( selected_value, na.rm = TRUE), 2),
+                   q25_value = round( quantile( selected_value, 0.25, na.rm = TRUE), 2),
+                   q75_value = round( quantile( selected_value, 0.75, na.rm = TRUE), 2),
                    n_patients = n_distinct(patient_num)) %>%
-    dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
+    dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, q25_value, q75_value, n_patients) %>%
     unique()
   print(paste0("atAdmission_total table generated. It contains :", nrow(atAdmission_total), " rows"))
 
@@ -108,8 +112,10 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                    sd_value = round( sd(selected_value, na.rm = TRUE), 2),
                    min_value = round( min( selected_value, na.rm = TRUE), 2),
                    max_value = round( max( selected_value, na.rm = TRUE), 2),
+                   q25_value = round( quantile( selected_value, 0.25, na.rm = TRUE), 2),
+                   q75_value = round( quantile( selected_value, 0.75, na.rm = TRUE), 2),
                    n_patients = n_distinct(patient_num)) %>%
-    dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
+    dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, q25_value, q75_value, n_patients) %>%
     unique()
   print(paste0("duringAdmission_per_variant table generated. It contains :", nrow(duringAdmission_per_variant), " rows"))
 
@@ -135,8 +141,10 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                    sd_value = round( sd(selected_value, na.rm = TRUE), 2),
                    min_value = round( min( selected_value, na.rm = TRUE), 2),
                    max_value = round( max( selected_value, na.rm = TRUE), 2),
+                   q25_value = round( quantile( selected_value, 0.25, na.rm = TRUE), 2),
+                   q75_value = round( quantile( selected_value, 0.75, na.rm = TRUE), 2),
                    n_patients = n_distinct(patient_num)) %>%
-    dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, n_patients) %>%
+    dplyr::select( variant_misc, variableName,  units, median_value, iqr_value, mean_value, sd_value, min_value, max_value, q25_value, q75_value, n_patients) %>%
     unique()
 
   print( paste0("duringAdmission_total table generated. It contains :", nrow(duringAdmission_total), " rows"))
@@ -155,7 +163,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                                   'mean: ', mean_value, ' SD(', sd_value, ')',
                                   '[', min_value, ' , ', max_value, ']',
                                   ' patients: ', ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))) %>%
-    select(-median_value, -iqr_value, -mean_value, -sd_value, -min_value, -max_value, -n_patients )%>%
+    select(-median_value, -iqr_value, -mean_value, -sd_value, -min_value, -max_value, -n_patients, -q25_value, -q75_value )%>%
     tidyr::pivot_wider( names_from = variant_misc,
                         values_from = output_value)
 
@@ -168,7 +176,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
                              'mean: ', mean_value, ' SD(', sd_value, ')',
                              '[', min_value, ' , ', max_value, ']',
                              ' patients: ', ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5))) %>%
-    select(-median_value, -iqr_value, -mean_value, -sd_value, -min_value, -max_value, -n_patients )%>%
+    select(-median_value, -iqr_value, -mean_value, -sd_value, -min_value, -max_value, -n_patients, -q25_value, -q75_value )%>%
     tidyr::pivot_wider( names_from = variant_misc,
                         values_from = output_value)
 
