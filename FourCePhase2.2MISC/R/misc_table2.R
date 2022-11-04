@@ -29,6 +29,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   atAdmission_per_variant <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 & days_since_admission %in% c(0, 1) ) %>%
     dplyr::filter( concept_type == "LAB-LOINC" ) %>%
+    dplyr::filter( ! is.na(selected_value),
+                   selected_value != -999 ) %>%
     dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( variableName, variant_misc, patient_num ) %>%
@@ -37,8 +39,6 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
-    dplyr::filter( ! is.na(selected_value),
-                   selected_value != -999 ) %>%
     dplyr::group_by( variableName, variant_misc ) %>%
     dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
                    iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
@@ -57,6 +57,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   atAdmission_total <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 & days_since_admission %in% c(0, 1) ) %>%
     dplyr::filter( concept_type == "LAB-LOINC" ) %>%
+    dplyr::filter( ! is.na(selected_value),
+                   selected_value != -999 ) %>%
     dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( variableName, patient_num ) %>%
@@ -65,8 +67,6 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
-    dplyr::filter( ! is.na(selected_value),
-                   selected_value != -999 ) %>%
     #dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName) %>%
     dplyr::mutate( variant_misc = "total_n",
@@ -95,15 +95,15 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   duringAdmission_per_variant <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 ) %>%
     dplyr::filter( concept_type == "LAB-LOINC" ) %>%
+    dplyr::filter( ! is.na(selected_value),
+                   selected_value != -999 ) %>%
     dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
     dplyr::filter( ! is.na( variableName )) %>%
-    dplyr::group_by( patient_num, variableName ) %>%
+    dplyr::group_by( patient_num, variableName, variant_misc ) %>%
     dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
-    dplyr::filter( ! is.na(selected_value),
-                   selected_value != -999 ) %>%
     #dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName, variant_misc ) %>%
     dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
@@ -123,6 +123,8 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   duringAdmission_total <- complete_df %>%
     dplyr::filter( n_hospitalisation == 1 ) %>%
     dplyr::filter( concept_type == "LAB-LOINC" ) %>%
+    dplyr::filter( ! is.na(selected_value),
+                   selected_value != -999 ) %>%
     dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
     dplyr::filter( ! is.na( variableName )) %>%
     dplyr::group_by( patient_num, variableName ) %>%
@@ -130,8 +132,6 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
-    dplyr::filter( ! is.na(selected_value),
-                   selected_value != -999 ) %>%
     #dplyr::mutate( selected_value = ifelse( selected_value == -999, NA, selected_value )) %>%
     dplyr::group_by( variableName ) %>%
     dplyr::mutate( variant_misc = "total_n",
