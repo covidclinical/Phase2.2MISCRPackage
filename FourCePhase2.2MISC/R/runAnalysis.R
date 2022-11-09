@@ -31,6 +31,9 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
     if (! dir.output.qc %in% list.dirs()) {dir.create(dir.output.qc)}
 
     sink(file = paste0( dir.output, "/QC/MISC_logs_QC.txt"))
+    print('##########')
+    print(timestamp())
+    print('##########')
 
     dir.output.figures <- paste0(dir.output, "/figures")
     if (! dir.output.figures %in% list.dirs()) {dir.create(dir.output.figures)}

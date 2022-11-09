@@ -39,8 +39,29 @@ FourCePhase2.2MISC::runAnalysis( dir.input = "/path_input_2.2MISCdata/",
 ```
 Note that if you run the function multiple times you will get a warning saying that the output directory already exists. You can ignore the warning since the output files generated are overwritten each time. 
 
+#### Outputs
+What outputs are generated?
+- figures folder: contains visual summaries of the cohort counts
+  - Age distribution
+  - Hospitalization length distribution
+  - Number of patients in ICU per variant
+  - Patient counts per month
+  
+- QC folder: 
+  - SITEID_ICDdiagnosisCodes.RData: contains the ICD codes available in the patient population
+  - MISC_logs_QC.txt: contains the runtime logs and warnings from running the package
+
+- SITEID_table1.txt: human readable Table 1 (demographics & comorbidities)
+- SITEID_table2.txt: human readable Table 2 (lab values)
+- SITEID_table3.txt: human readable Table 3 (diagnoses)
+- SITEID_table1Categorical.RData: raw, obfuscated, aggregate counts for Table 1 categorical variables (demographics & comorbidities)
+- SITEID_table1Continuous.RData: raw, obfuscated, aggregate counts for Table 1 continuous variables (demographics & comorbidities)
+- SITEID_table2AtAdmission.RData: raw, obfuscated, aggregate counts for Table 2 laboratory values at admission
+- SITEID_table2DuringAdmission.RData: raw, obfuscated, aggregate counts for Table 2 laboratory values during admission
+- SITEID_table3.RData: raw, obfuscated, aggregate counts for Table 3 (diagnoses)
+
 ### 3. Submit
-Please share the results folder with us (@Simran Makwana, @Alba Gutierrez ) via the \#pediatrics Slack channel.
+Please share the generated output folder with us (@Simran Makwana, @Alba Gutierrez ) via the \#pediatrics Slack channel.
 If you run into any problem adapting this code to your data, let us know via Slack.
 
 Thank you very much for your contribution!
