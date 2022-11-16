@@ -23,6 +23,8 @@
 
 qc_summary <- function(complete_df, obfuscation_threshold, currSiteId, during_misc_hosp = TRUE, dir.output, site_id){
 
+  print("Starting QC summary")
+
   if(during_misc_hosp){
     complete_df <- complete_df %>% filter(n_hospitalisation == 1)
   }
