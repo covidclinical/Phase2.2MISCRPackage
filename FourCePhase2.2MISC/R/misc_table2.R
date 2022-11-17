@@ -43,7 +43,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
 
 
   ### calculate the neutrophil / lymphocyte ratio and rbind it back to the atAdmission_per_variant df
-  nlr_df <- atAdmission_per_variant %>%
+  nlr_df1 <- atAdmission_per_variant %>%
     filter(variableName %in% c('neutrophil', 'lymphocyte')) %>%
     group_by(patient_num) %>%
     arrange(patient_num, variableName) %>%
@@ -53,7 +53,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     mutate(variableName = 'nlr_ratio') %>%
     unique()
 
-  atAdmission_per_variant <- rbind(atAdmission_per_variant, nlr_df)
+  atAdmission_per_variant <- rbind(atAdmission_per_variant, nlr_df1)
 
   # summarise
   atAdmission_per_variant <- atAdmission_per_variant %>%
@@ -87,7 +87,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     unique()
 
   ### calculate the neutrophil / lymphocyte ratio and rbind it back to the atAdmission_total df
-  nlr_df <- atAdmission_total %>%
+  nlr_df2 <- atAdmission_total %>%
     filter(variableName %in% c('neutrophil', 'lymphocyte')) %>%
     group_by(patient_num) %>%
     arrange(patient_num, variableName) %>%
@@ -97,7 +97,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     mutate(variableName = 'nlr_ratio') %>%
     unique()
 
-  atAdmission_total <- rbind(atAdmission_total, nlr_df)
+  atAdmission_total <- rbind(atAdmission_total, nlr_df2)
 
   atAdmission_total <- atAdmission_total %>%
     dplyr::group_by( variableName) %>%
@@ -130,28 +130,35 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::filter( ! is.na(value),
                    value != -999 ) %>%
     dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
-    dplyr::filter( ! is.na( variableName )) %>%
-    dplyr::group_by( patient_num, variableName, variant_misc ) %>%
-    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
-    dplyr::ungroup( ) %>%
-    dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
-    unique()
-
+    dplyr::filter( ! is.na( variableName ))
 
   ### calculate the neutrophil / lymphocyte ratio and rbind it back to the duringAdmission_per_variant df
-  nlr_df <- duringAdmission_per_variant %>%
+  nlr_df3 <- duringAdmission_per_variant %>%
+    # isolate only neutrophils and lymphocytes
     filter(variableName %in% c('neutrophil', 'lymphocyte')) %>%
-    group_by(patient_num) %>%
+    group_by(patient_num, days_since_admission) %>%
     arrange(patient_num, variableName) %>%
+    # if there are multiple neutrophil or lymphocyte values in a day, select the worst ones for the calculation
+    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
+    # calculate nlr
     mutate(ratio = selected_value[2] / selected_value[1]) %>%
     select(-selected_value, -variableName) %>%
     rename('selected_value' = 'ratio') %>%
+    ungroup() %>%
+    # ungroup, regroup by patient num and select the worst ratio from the entire hospitalization
+    group_by(patient_num) %>%
+    dplyr::mutate(  selected_value =  max( selected_value ) ) %>%
     mutate(variableName = 'nlr_ratio') %>%
     unique()
 
-  duringAdmission_per_variant <- rbind(duringAdmission_per_variant, nlr_df)
 
   duringAdmission_per_variant <- duringAdmission_per_variant %>%
+    dplyr::group_by( patient_num, variableName, variant_misc ) %>%
+    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
+    dplyr::ungroup( ) %>%
+    rbind(nlr_df3) %>%
+    dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
+    unique() %>%
     dplyr::group_by( variableName, variant_misc ) %>%
     dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
                    iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
@@ -173,27 +180,34 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::filter( ! is.na(value),
                    value != -999 ) %>%
     dplyr::left_join(labs_of_interest, by = 'concept_code') %>%
-    dplyr::filter( ! is.na( variableName )) %>%
-    dplyr::group_by( patient_num, variableName ) %>%
-    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
-    dplyr::ungroup( ) %>%
-    dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
-    unique()
+    dplyr::filter( ! is.na( variableName ))
 
-  ### calculate the neutrophil / lymphocyte ratio and rbind it back to the duringAdmission_total df
-  nlr_df <- duringAdmission_total %>%
+  ### calculate the neutrophil / lymphocyte ratio and rbind it back to the duringAdmission_per_variant df
+  nlr_df4 <- duringAdmission_total %>%
+    # isolate only neutrophils and lymphocytes
     filter(variableName %in% c('neutrophil', 'lymphocyte')) %>%
-    group_by(patient_num) %>%
+    group_by(patient_num, days_since_admission) %>%
     arrange(patient_num, variableName) %>%
+    # if there are multiple neutrophil or lymphocyte values in a day, select the worst ones for the calculation
+    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
+    # calculate nlr
     mutate(ratio = selected_value[2] / selected_value[1]) %>%
     select(-selected_value, -variableName) %>%
     rename('selected_value' = 'ratio') %>%
+    ungroup() %>%
+    # ungroup, regroup by patient num and select the worst ratio from the entire hospitalization
+    group_by(patient_num) %>%
+    dplyr::mutate(  selected_value =  max( selected_value ) ) %>%
     mutate(variableName = 'nlr_ratio') %>%
     unique()
 
-  duringAdmission_total <- rbind(duringAdmission_total, nlr_df)
-
   duringAdmission_total <- duringAdmission_total %>%
+    dplyr::group_by( patient_num, variableName ) %>%
+    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
+    dplyr::ungroup( ) %>%
+    rbind(nlr_df4) %>%
+    dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
+    unique() %>%
     dplyr::group_by( variableName ) %>%
     dplyr::mutate( variant_misc = "total_n",
                    median_value = round( median(selected_value, na.rm = TRUE), 2),
@@ -247,11 +261,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   output_table2 <- rbind( atAdmission_output, duringAdmission_output )
 
   ### sort it as the word table 2
-  ordered_rows <- c( "white blood cell count (Leukocytes)", "lymphocyte",
-                     "neutrophil","platelets","albumin","d_dimer","prothrombin time (PT)",
-                     "fibrinogen", "ferritin","alanine aminotransferase (ALT)",
-                     "aspartate aminotransferase (AST)", "creatinine","troponin",
-                     "CRP")
+  ordered_rows <- c(labs_of_interest$variableName %>% unique(), 'nlr_ratio')
 
   # reorder combined df
   output_table2 <- output_table2 %>%
