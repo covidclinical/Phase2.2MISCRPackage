@@ -115,10 +115,10 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
   vars_of_interest <- c('in_icu', 'dead')
 
-  for(i in 1:nrow(test)) {
+  for(i in 1:nrow(clinicalChar)) {
 
-    if (!test$category[i] %in% vars_of_interest) {vars_of_interest <- c(vars_of_interest, test$category[i])}
-    if (!test$variableName[i] %in% vars_of_interest) {vars_of_interest <- c(vars_of_interest, test$variableName[i])}
+    if (!clinicalChar$category[i] %in% vars_of_interest) {vars_of_interest <- c(vars_of_interest, clinicalChar$category[i])}
+    if (!clinicalChar$variableName[i] %in% vars_of_interest) {vars_of_interest <- c(vars_of_interest, clinicalChar$variableName[i])}
   }
 
 
