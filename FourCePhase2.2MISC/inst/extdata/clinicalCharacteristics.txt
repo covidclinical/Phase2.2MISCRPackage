@@ -340,3 +340,40 @@ COVID-19	covid19 history of	U099
 unvaccinated	unvaccinated	Z28.310
 partially vaccinated	partially vaccinated	Z28.311
 Kawasaki	kawasaki	M30.3
+LABORATORY PROFILE  Elevated WBC  D72829
+LABORATORY PROFILE  Decreased WBC D72819
+LABORATORY PROFILE  Lymphocytopenia D72810
+LABORATORY PROFILE  Other abnormal WBC  D728
+LABORATORY PROFILE  Other abnormal WBC  D7289
+LABORATORY PROFILE  Anemia  D508
+LABORATORY PROFILE  Anemia  D509
+LABORATORY PROFILE  Anemia  D649
+LABORATORY PROFILE  Thrombocytopenia  D696
+LABORATORY PROFILE  Coagulation abnormalities D89
+LABORATORY PROFILE  Coagulation abnormalities D688
+LABORATORY PROFILE  Coagulation abnormalities R791
+LABORATORY PROFILE  Electrolytes abnormalities  E833
+LABORATORY PROFILE  Electrolytes abnormalities  E8330
+LABORATORY PROFILE  Electrolytes abnormalities  E8339
+LABORATORY PROFILE  Electrolytes abnormalities  E834
+LABORATORY PROFILE  Electrolytes abnormalities  E8341
+LABORATORY PROFILE  Electrolytes abnormalities  E8342
+LABORATORY PROFILE  Electrolytes abnormalities  E835
+LABORATORY PROFILE  Electrolytes abnormalities  E8351
+LABORATORY PROFILE  Electrolytes abnormalities  E8358
+LABORATORY PROFILE  Electrolytes abnormalities  E870
+LABORATORY PROFILE  Electrolytes abnormalities  E871
+LABORATORY PROFILE  Electrolytes abnormalities  E875
+LABORATORY PROFILE  Electrolytes abnormalities  E8758
+LABORATORY PROFILE  Electrolytes abnormalities  E876
+LABORATORY PROFILE  Electrolytes abnormalities  E8760
+LABORATORY PROFILE  Electrolytes abnormalities  E8768
+LABORATORY PROFILE  Hyponatremia  E871
+LABORATORY PROFILE  Hyponatremia  E8718
+LABORATORY PROFILE  Hypokalemia E876
+LABORATORY PROFILE  Hypokalemia E8760
+LABORATORY PROFILE  Hypokalemia E8768
+LABORATORY PROFILE  Acidosis  E872
+LABORATORY PROFILE  Alkalosis E873
+LABORATORY PROFILE  Elevated LDH R740
+
