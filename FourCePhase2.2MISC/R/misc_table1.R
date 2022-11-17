@@ -113,16 +113,13 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
     }
   }
 
+  vars_of_interest <- c('in_icu', 'dead')
 
-  vars_of_interest <- c("in_icu","dead",'overweight', 'obesity',
-                    'fatigue_asthenia', 'rash_erythema',
-                    'GI SYMPTOMS', 'abdominal pain', 'nausea_vomiting', 'diarrhea_enteritis_ileitis', 'apendicitis_peritonitis',
-                    'RESPIRATORY SYMPTOMS', 'cough', 'rhinitis rhinorrhea', 'sore throat', 'tachypnea', 'dyspnea_shortness of breath',
-                    'CARDIOVASCULAR SYMPTOMS', 'chest pain', 'palpitations', 'peripheral edema','hypotension', 'pre-syncope_syncope','ventricular dysfunction', 'heart failure', 'shock',
-                    'NEUROLOGIC SYMPTOMS', 'headache', 'confusion', 'irritability', 'seizures', 'muscle weakness', 'encephalopathy_meningoencephalitis', 'lethargy', 'stroke',
-                    'RENAL INVOLVEMENT', 'kidney dysfunction', 'acute renal failure',
-                    'LIVER INVOLVEMENT', 'hepatitis or liver dysfunction', 'hepatic failure',
-                    'Kawasaki')
+  for(i in 1:nrow(test)) {
+
+    if (!test$category[i] %in% vars_of_interest) {vars_of_interest <- c(vars_of_interest, test$category[i])}
+    if (!test$variableName[i] %in% vars_of_interest) {vars_of_interest <- c(vars_of_interest, test$variableName[i])}
+  }
 
 
   #re-pivot it
@@ -191,15 +188,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
   print("output_table1_cat_with_stats created")
   # order rows
-  ordered_rows <- c('overweight', 'obesity',
-                    'fatigue_asthenia', 'rash_erythema',
-                    'GI SYMPTOMS', 'abdominal pain', 'nausea_vomiting', 'diarrhea_enteritis_ileitis', 'apendicitis_peritonitis',
-                    'RESPIRATORY SYMPTOMS', 'cough', 'rhinitis rhinorrhea', 'sore throat', 'tachypnea', 'dyspnea_shortness of breath',
-                    'CARDIOVASCULAR SYMPTOMS', 'chest pain', 'palpitations', 'peripheral edema','hypotension', 'pre-syncope_syncope','ventricular dysfunction', 'heart failure', 'shock',
-                    'NEUROLOGIC SYMPTOMS', 'headache', 'confusion', 'irritability', 'seizures', 'muscle weakness', 'encephalopathy_meningoencephalitis', 'lethargy', 'stroke',
-                    'RENAL INVOLVEMENT', 'kidney dysfunction', 'acute renal failure',
-                    'LIVER INVOLVEMENT', 'hepatitis or liver dysfunction', 'hepatic failure',
-                    'Kawasaki')
+  ordered_rows <- vars_of_interest[-c(1,2)]
 
   # reorder combined df
   print(paste0("output_table1_cat_with_stats has ", nrow(output_table1_cat_with_stats), " number of rows"))
