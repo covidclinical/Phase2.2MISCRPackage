@@ -21,7 +21,7 @@
 # testing code
 #complete_df <- misc_complete
 
-qc_summary <- function(complete_df, obfuscation_threshold, currSiteId, during_misc_hosp = TRUE, dir.output, site_id){
+qc_summary <- function(complete_df, obfuscation_threshold, currSiteId, during_misc_hosp = TRUE, dir.output){
 
   print("Starting QC summary")
 
@@ -77,9 +77,9 @@ qc_summary <- function(complete_df, obfuscation_threshold, currSiteId, during_mi
                 n_patients = n_distinct(patient_num)) %>%
       mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
               perc_patients = (n_patients / total_n) * 100,
-              siteid = site_id)
+              siteid = currSiteId)
 
-    #write.table(lab_sum, paste0(dir.output,'/QC/', site_id, '_MISC', 'lab_summary.txt'), quote = FALSE, row.names = FALSE)
+    #write.table(lab_sum, paste0(dir.output,'/QC/', currSiteId, '_MISC', 'lab_summary.txt'), quote = FALSE, row.names = FALSE)
     print(lab_sum)
   }
 
@@ -106,9 +106,9 @@ qc_summary <- function(complete_df, obfuscation_threshold, currSiteId, during_mi
       summarise( n_patients = n_distinct(patient_num)) %>%
       mutate(n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
              perc_patients = (n_patients / total_n) * 100,
-             siteid = site_id)
+             siteid = currSiteId)
 
-    #write.table(med_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'medication_summary.txt'), quote = FALSE, row.names = FALSE)
+    #write.table(med_sum, paste0(dir.output, '/QC/', currSiteId, '_MISC', 'medication_summary.txt'), quote = FALSE, row.names = FALSE)
     print(med_sum)
   }
 
@@ -121,13 +121,13 @@ qc_summary <- function(complete_df, obfuscation_threshold, currSiteId, during_mi
       summarise(n_patients = n_distinct(patient_num)) %>%
       mutate( n_patients = ifelse( n_patients > obfuscation_threshold | isFALSE( obfuscation_threshold), n_patients, 0.5),
               perc_patients = (n_patients / total_n) * 100,
-              siteid = site_id)
+              siteid = currSiteId)
     print(paste0("There are ", n_distinct(proc_sum$concept_code), " procedural codes reported in the data"))
 
 
     print(proc_sum)
 
-    #write.table(proc_sum, paste0(dir.output, '/QC/', site_id, '_MISC', 'procedure_summary.txt'), quote = FALSE, row.names = FALSE)
+    #write.table(proc_sum, paste0(dir.output, '/QC/', currSiteId, '_MISC', 'procedure_summary.txt'), quote = FALSE, row.names = FALSE)
   }
 
   if( 'DIAG-ICD10' %in% complete_df$concept_type){
