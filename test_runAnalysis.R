@@ -11,13 +11,16 @@ washout_days = 14
 
 # # comment to compile
 FourCePhase2.2MISC::runAnalysis( dir.input = "/4ceData/Input/4CE_MISC_15SEP2022_V2",
-                                 dir.output = "/4ceData/outputMISC_washout14",
+                                 dir.output = "/4ceData/outputMISC_washout_replaceLater14",
                                  obfuscation = 0,
                                  raceAvailable= TRUE,
                                  country = "US",
                                  verbose = TRUE,
                                  dateFormat = "%Y-%m-%d",
                                  washout_days = 14,
+                                 #washout_opt = "remove",
+                                 #washout_opt = "replace_earlier",
+                                 washout_opt = "replace_later",
                                  data_update_date = "2022-06-01")
 
 ###

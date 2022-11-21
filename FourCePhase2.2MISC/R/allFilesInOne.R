@@ -25,7 +25,7 @@
 #'              )
 #' @export allFilesInOne
 
-allFilesInOne <- function(obs_df, demo_df, clinical_df, variants_df, dateFormat, washout_days = 0, verbose = FALSE ){
+allFilesInOne <- function(obs_df, demo_df, clinical_df, variants_df, dateFormat, washout_days = 0, washout_opt, verbose = FALSE ){
 
   if(verbose == TRUE){
     print("merging observation data with clinical data by patient_num and days_since_admission")
@@ -54,17 +54,33 @@ allFilesInOne <- function(obs_df, demo_df, clinical_df, variants_df, dateFormat,
 
   print( paste0("Number of MISC patients after left join misc_all and demo_df ", length(unique( misc_all$patient_num ))))
 
-  print(paste0("Removing patients in ", washout_days, " days before and after the cut-off date of each variant"))
   variants_df$a <- as.Date( variants_df$Alpha ) - washout_days
   variants_df$b <- as.Date( variants_df$Alpha ) + washout_days
 
   variants_df$c <- as.Date( variants_df$Omicron ) - washout_days
   variants_df$d <- as.Date( variants_df$Omicron ) + washout_days
 
-  misc_all <- misc_all %>%
-    mutate( variant_misc = ifelse( date <= variants_df$a, "Alpha",
-                                   ifelse( date >= variants_df$b & date <= variants_df$c, "Delta",
-                                           ifelse( date >= variants_df$d, "Omicron", "washout"))) )
+  if( washout_opt == "remove"){
+    print(paste0("Removing patients in ", washout_days, " days before and after the cut-off date of each variant"))
+    print("Washout option is: remove")
+    misc_all <- misc_all %>%
+      mutate( variant_misc = ifelse( date <= variants_df$a, "Alpha",
+                                     ifelse( date >= variants_df$b & date <= variants_df$c, "Delta",
+                                             ifelse( date >= variants_df$d, "Omicron", "washout"))) )
+  }else if( washout_opt == "replace_earlier"){
+    print("Washout option is: replace assuming the variant arrived earlier than expected")
+    misc_all <- misc_all %>%
+      mutate( variant_misc = ifelse( date <= variants_df$a, "Alpha",
+                                     ifelse( date > variants_df$a & date <= variants_df$c, "Delta",
+                                             ifelse( date > variants_df$c, "Omicron", "uncategorized"))) )
+  }else if( washout_opt == "replace_late"){
+    print("Washout option is: replace assuming the variant arrived later than expected")
+    misc_all <- misc_all %>%
+      mutate( variant_misc = ifelse( date <= variants_df$b, "Alpha",
+                                     ifelse( date > variants_df$b & date <= variants_df$d, "Delta",
+                                             ifelse( date > variants_df$d, "Omicron", "uncategorized"))) )
+
+  }
 
   toCheck <- misc_all %>% filter( n_hospitalisation == 1 ) %>%
     select( patient_num, date, variant_misc  ) %>%
@@ -77,7 +93,7 @@ allFilesInOne <- function(obs_df, demo_df, clinical_df, variants_df, dateFormat,
   }
   output <- misc_all %>%
     filter( !is.na( calendar_date )) %>%
-    filter( variant_misc != "washout") %>%
+    filter( ! variant_misc %in% c( "washout", "uncategorized") ) %>%
     dplyr::mutate( weeks = as.Date(cut( date, breaks = "week")),
                    month = as.Date(cut( date, breaks = "month")),
                    year = format( date, "%Y"))

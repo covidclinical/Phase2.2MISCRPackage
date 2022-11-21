@@ -10,6 +10,7 @@
 #' @param dateFormat Specify the format of the date at your site (e.g., for "03-AUG-20", the format would be "%d-%b-%y", see documentation](https://www.stat.berkeley.edu/~s133/dates.html))
 #' @param data_update_date date at which the data has been updated in the local data warehouse. Used to estimate patient age at time of visit, since patients age in the 4CE demographic file is expected the age at data update.
 #' @param country Specify the country of origin or your data (e.g, US, France, UK, Spain)
+#' @param washout_opt Specify the option for the washout. Values: remove or replace_earlier or replace_late
 #' @param cbPalette Color palette to use for the plots (set up by default)
 #' @param verbose By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.
 #' @return An object of class \code{list} with the \code{data.frames}.
@@ -19,7 +20,7 @@
 #' @export runAnalysis
 
 
-runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, washout_days, cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"), verbose ) {
+runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, washout_days, washout_opt, cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"), verbose ) {
 
   tryCatch({
 
@@ -106,7 +107,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
     #### Integrate it with the misc_complete df
     ## merge all the files as one data frame for the analysis
-    misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw, variants_df = variantsDates, dateFormat = dateFormat, washout_days = washout_days, verbose = verbose )
+    misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw, variants_df = variantsDates, dateFormat = dateFormat, washout_days = washout_days, washout_opt = washout_opt, verbose = verbose )
     site <- unique( misc_complete$siteid )
     if( is.null( site)){
       print("siteid column missing. A temporary site id, 'TBD' will be used")
