@@ -67,7 +67,7 @@ allFilesInOne <- function(obs_df, demo_df, clinical_df, variants_df, dateFormat,
     print( "entries to review")
 
     to_review <- misc_all %>%
-      filter( is.na( calendar_date )) %>%
+      filter( is.na( calendar_date ) & days_since_admission > 0) %>%
       select(-patient_num)
     print( to_review )
   }
