@@ -80,6 +80,10 @@ allFilesInOne <- function(obs_df, demo_df, clinical_df, variants_df, dateFormat,
                                      ifelse( date > variants_df$b & date <= variants_df$d, "Delta",
                                              ifelse( date > variants_df$d, "Omicron", "uncategorized"))) )
 
+  }else if( washout_opt == "none"){
+    misc_all <- misc_all %>%
+      mutate( variant_misc = ifelse( date >= variants_df$Omicron, "Omicron", ifelse( date <= variants_df$Alpha, "Alpha", "Delta")))
+
   }
 
   toCheck <- misc_all %>% filter( n_hospitalisation == 1 ) %>%

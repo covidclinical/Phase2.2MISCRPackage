@@ -44,11 +44,17 @@ misc_cases_perTimePeriod <- function( integrated_df, period = "month", obfuscati
     misc_cases <- integrated_df %>%
       dplyr::group_by( year ) %>%
       dplyr::summarise( distinct_patients = ifelse( length(unique(patient_num)) > obfuscation_threshold | isFALSE( obfuscation_threshold), length(unique(patient_num)), 0.5))
-  }else if( period == "week"){
+  }else if( period == "weeks"){
     misc_cases <- integrated_df %>%
       dplyr::group_by( weeks ) %>%
       dplyr::summarise( distinct_patients = ifelse( length(unique(patient_num)) > obfuscation_threshold | isFALSE( obfuscation_threshold), length(unique(patient_num)), 0.5))
+  }else if( period == "days"){
+    misc_cases <- integrated_df %>%
+      dplyr::group_by( date ) %>%
+      dplyr::summarise( distinct_patients = ifelse( length(unique(patient_num)) > obfuscation_threshold | isFALSE( obfuscation_threshold), length(unique(patient_num)), 0.5))
   }
+
+
   colnames(misc_cases)[1] <- 'period'
 
 
