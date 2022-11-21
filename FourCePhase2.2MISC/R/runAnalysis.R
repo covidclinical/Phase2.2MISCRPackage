@@ -34,6 +34,8 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
     print('##########')
     print(timestamp())
     print('##########')
+    print(paste0( 'FourCePhase2.2MISC Package version: ', packageVersion("FourCePhase2.2MISC")))
+    print('##########')
 
     dir.output.figures <- paste0(dir.output, "/figures")
     if (! dir.output.figures %in% list.dirs()) {dir.create(dir.output.figures)}
