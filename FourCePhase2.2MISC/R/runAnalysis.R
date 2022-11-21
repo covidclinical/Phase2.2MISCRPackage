@@ -19,7 +19,7 @@
 #' @export runAnalysis
 
 
-runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"), verbose ) {
+runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, dateFormat, data_update_date, country, washout_days, cbPalette = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"), verbose ) {
 
   tryCatch({
 
@@ -106,7 +106,7 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
 
     #### Integrate it with the misc_complete df
     ## merge all the files as one data frame for the analysis
-    misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw, variants_df = variantsDates, dateFormat = dateFormat, verbose = verbose )
+    misc_complete <- allFilesInOne(obs_df = obs_raw, demo_df = demo_raw, clinical_df = clinical_raw, variants_df = variantsDates, dateFormat = dateFormat, washout_days = washout_days, verbose = verbose )
     site <- unique( misc_complete$siteid )
     if( is.null( site)){
       print("siteid column missing. A temporary site id, 'TBD' will be used")
