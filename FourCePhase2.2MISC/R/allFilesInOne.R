@@ -31,9 +31,15 @@ allFilesInOne <- function(obs_df, demo_df, clinical_df, variants_df, dateFormat,
     print("merging observation data with clinical data by patient_num and days_since_admission")
   }
 
+  print( paste0("Number of MISC patients in obs_df: ", length(unique( obs_df$patient_num ))))
+  print( paste0("Number of MISC patients in clinical_df: ", length(unique( clinical_df$patient_num ))))
+  print( paste0("Number of MISC patients in demo_df: ", length(unique( demo_df$patient_num ))))
+
   misc_all <- left_join( obs_df,
                          clinical_df[, c("patient_num", "days_since_admission", "calendar_date", "in_hospital", "severe", "in_icu", "dead", "n_hospitalisation", "len_hospitalisation")],
                          by=c("patient_num", "days_since_admission"))
+
+  print( paste0("Number of MISC patients after left join obs_df and clinical_df ", length(unique( misc_all$patient_num ))))
 
   if(verbose == TRUE){
     print("merging it with the demographic data by patient_num")
@@ -43,6 +49,8 @@ allFilesInOne <- function(obs_df, demo_df, clinical_df, variants_df, dateFormat,
     mutate( date = as.Date( admission_date, format = dateFormat ),
             variant_misc = ifelse( date >= variants_df$Omicron, "Omicron", ifelse( date <= variants_df$Alpha, "Alpha", "Delta")))
 
+  print( paste0("Number of MISC patients after left join misc_all and demo_df ", length(unique( misc_all$patient_num ))))
+
   if(verbose == TRUE){
     print("Add 3 columns, with the week, month and year of each admission_date")
   }
@@ -51,6 +59,20 @@ allFilesInOne <- function(obs_df, demo_df, clinical_df, variants_df, dateFormat,
     dplyr::mutate( weeks = as.Date(cut( date, breaks = "week")),
                    month = as.Date(cut( date, breaks = "month")),
                    year = format( date, "%Y"))
+
+  print( paste0("Number of MISC patients after filter by !is.na(calendar_date) ", length(unique( output$patient_num ))))
+
+  if( length( unique( output$patient_num)) != length( unique(misc_all$patient_num))){
+
+    print( "entries to review")
+
+    to_review <- misc_all %>%
+      filter( is.na( calendar_date )) %>%
+      select(-patient_num)
+    print( to_review )
+  }
+
+
   return( output )
 
 }
