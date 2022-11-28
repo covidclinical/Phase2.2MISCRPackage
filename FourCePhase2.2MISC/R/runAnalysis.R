@@ -199,6 +199,15 @@ runAnalysis <- function( dir.input, dir.output, obfuscation, raceAvailable, date
     }
   )
 
+  ## extra table
+  tryCatch({
+    t_extra <- misc_extraTable( complete_df = misc_complete, currSiteId = site, obfuscation_threshold = obfuscation, raceAvailable, dir.input = dir.input, dir.output = dir.output,verbose)
+    print("Extra table successfully generated")
+  }, error = function(e) {
+    print('error generating extra table')
+    sink()
+  })
+
   print('done')
   sink()
   print('sink closed')
