@@ -1,0 +1,40 @@
+category	variableName	concept_code
+HEART FAILURE	systolic heart failure	I50.20
+HEART FAILURE	systolic heart failure	I50.21
+HEART FAILURE	systolic heart failure	I50.23
+HEART FAILURE	diastolic heart failure	I50.30
+HEART FAILURE	diastolic heart failure	I50.31
+HEART FAILURE	diastolic heart failure	I50.33
+HEART FAILURE	unspecified or combined heart failure	I50.40
+HEART FAILURE	unspecified or combined heart failure	I50.41
+HEART FAILURE	unspecified or combined heart failure	I50.43
+HEART FAILURE	systolic heart failure	I50.82
+HEART FAILURE	unspecified or combined heart failure	I500
+HEART FAILURE	unspecified or combined heart failure	I5000
+HEART FAILURE	right hf heart failure	I50.810
+HEART FAILURE	right hf heart failure	I50.811
+HEART FAILURE	right hf heart failure	I50.813
+HEART FAILURE	right hf heart failure	I50.814
+HEART FAILURE	systolic heart failure	I50.9
+HEART FAILURE	heart failure	I50.89
+HEART FAILURE	heart failure	I50.9
+ARRYTHMIAS	Ventricular arrhythmias	I47.0
+ARRYTHMIAS	Supraventricular tachycardia arrhythmias	I47.1
+ARRYTHMIAS	Ventricular arrhythmias	I47.2
+ARRYTHMIAS	arrhythmias	I49.5
+ARRYTHMIAS	other arrhythmias	I49.8
+ARRYTHMIAS	other arrhythmias	I49.9
+ARRYTHMIAS	AV block, first degree arrhythmias	I440
+ARRYTHMIAS	AV block, second degree arrhythmias	I440
+ARRYTHMIAS	AV block, complete arrhythmias	I442
+ARRYTHMIAS	Other conduction disorders arrhythmias	I4589
+ARRYTHMIAS	Other conduction disorders arrhythmias	I459
+ARRYTHMIAS	Long QT arrhythmias	 I4581
+ARRYTHMIAS	Atrial fibrillation / flutter arrhythmias	 I48
+SHOCK	cardiogenic shock	R57.0
+SHOCK	cardiogenic shock	R57.9
+SHOCK	hypovolemic shock	R571
+SHOCK	septic shock	R572
+SHOCK	septic shock	R6521
+SHOCK	unspecified / other shock	R578
+SHOCK	unspecified / other shock	R579

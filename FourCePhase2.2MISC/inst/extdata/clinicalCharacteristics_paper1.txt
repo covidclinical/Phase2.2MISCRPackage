@@ -1,0 +1,378 @@
+category	variableName	concept_code
+obesity_overweight	obesity	E23.6
+obesity_overweight	obesity	E.27.8
+obesity_overweight	obesity	E66.01
+obesity_overweight	obesity	E66.2
+obesity_overweight	obesity	E66.09
+obesity_overweight	obesity	E66.1
+obesity_overweight	obesity	E66.8
+obesity_overweight	obesity	E66.9
+obesity_overweight	obesity	E68
+obesity_overweight	obesity	Z68.3
+obesity_overweight	obesity	Z68.30
+obesity_overweight	obesity	Z68.31
+obesity_overweight	obesity	Z68.32
+obesity_overweight	obesity	Z68.33
+obesity_overweight	obesity	Z68.34
+obesity_overweight	obesity	Z68.35
+obesity_overweight	obesity	Z68.36
+obesity_overweight	obesity	Z68.37
+obesity_overweight	obesity	Z68.38
+obesity_overweight	obesity	Z68.39
+obesity_overweight	obesity	Z68.4
+obesity_overweight	obesity	Z68.41
+obesity_overweight	obesity	Z68.42
+obesity_overweight	obesity	Z68.43
+obesity_overweight	obesity	Z68.44
+obesity_overweight	obesity	Z68.45
+obesity_overweight	obesity	Z68.5
+obesity_overweight	obesity	Z68.54
+obesity_overweight	overweight	E66.3
+obesity_overweight	overweight	Z68.25
+obesity_overweight	overweight	Z68.26
+obesity_overweight	overweight	Z68.27
+obesity_overweight	overweight	Z68.28
+obesity_overweight	overweight	Z68.29
+obesity_overweight	overweight	Z68.53
+asthma	asthma	J45.909
+asthma	asthma	J45.901
+asthma	asthma	J45.902
+asthma	asthma	J46
+generalized symptoms	fatigue_asthenia	R53.1
+generalized symptoms	fatigue_asthenia	R53.83
+generalized symptoms	fatigue_asthenia	R53
+generalized symptoms	fatigue_asthenia	R53+2
+generalized symptoms	fatigue_asthenia	R53.82
+generalized symptoms	rash_erythema	R21
+generalized symptoms	rash_erythema	L53.9
+generalized symptoms	rash_erythema	L51.9
+generalized symptoms	rash_erythema	L53.8
+generalized symptoms	rash_erythema	L50.9
+generalized symptoms	lymphadenitis_lymphadenopathy	L04.0
+generalized symptoms	lymphadenitis_lymphadenopathy	L04.8
+generalized symptoms	lymphadenitis_lymphadenopathy	L04.9
+generalized symptoms	lymphadenitis_lymphadenopathy	R59.0
+generalized symptoms	lymphadenitis_lymphadenopathy	R59.1
+generalized symptoms	lymphadenitis_lymphadenopathy	R59.9
+generalized symptoms	dehydration	E86.0
+generalized symptoms	dehydration	E86
+generalized symptoms	dehydration	E86.1
+generalized symptoms	fluid_overload_generalized_edema	E87.7
+generalized symptoms	fluid_overload_generalized_edema	E87.70
+generalized symptoms	fluid_overload_generalized_edema	R60.1
+generalized symptoms	fluid_overload_generalized_edema	R60.9
+GI SYMPTOMS	abdominal pain	R10.0
+GI SYMPTOMS	abdominal pain	R10.2
+GI SYMPTOMS	abdominal pain	R10.9
+GI SYMPTOMS	abdominal pain	R10.10
+GI SYMPTOMS	abdominal pain	R10.11
+GI SYMPTOMS	abdominal pain	R10.12
+GI SYMPTOMS	abdominal pain	R10.13
+GI SYMPTOMS	abdominal pain	R10.30
+GI SYMPTOMS	abdominal pain	R10.31
+GI SYMPTOMS	abdominal pain	R10.32
+GI SYMPTOMS	abdominal pain	R10.33
+GI SYMPTOMS	abdominal pain	R10.83
+GI SYMPTOMS	abdominal pain	R10.84
+GI SYMPTOMS	abdominal pain	R10.1
+GI SYMPTOMS	abdominal pain	R10.3
+GI SYMPTOMS	abdominal pain	R10.4
+GI SYMPTOMS	abdominal pain	R10812
+GI SYMPTOMS	abdominal pain	R10813
+GI SYMPTOMS	abdominal pain	R10814
+GI SYMPTOMS	abdominal pain	R10817
+GI SYMPTOMS	abdominal pain	R10819
+GI SYMPTOMS	abdominal pain	R10823
+GI SYMPTOMS	nausea_vomiting	R11.0
+GI SYMPTOMS	nausea_vomiting	R11.2
+GI SYMPTOMS	nausea_vomiting	R11.10
+GI SYMPTOMS	nausea_vomiting	R11.11
+GI SYMPTOMS	nausea_vomiting	R11.12
+GI SYMPTOMS	nausea_vomiting	R11.14
+GI SYMPTOMS	nausea_vomiting	R11.2
+GI SYMPTOMS	nausea_vomiting	R11
+GI SYMPTOMS	diarrhea_enteritis_ileitis	K58.0
+GI SYMPTOMS	diarrhea_enteritis_ileitis	K58.9
+GI SYMPTOMS	diarrhea_enteritis_ileitis	P78.3
+GI SYMPTOMS	diarrhea_enteritis_ileitis	K52.9
+GI SYMPTOMS	diarrhea_enteritis_ileitis	K58.9
+GI SYMPTOMS	diarrhea_enteritis_ileitis	R197
+GI SYMPTOMS	diarrhea_enteritis_ileitis	K582
+GI SYMPTOMS	diarrhea_enteritis_ileitis	A099
+GI SYMPTOMS	apendicitis_peritonitis	K35.30
+GI SYMPTOMS	apendicitis_peritonitis	K35.31
+GI SYMPTOMS	apendicitis_peritonitis	K35.33
+GI SYMPTOMS	apendicitis_peritonitis	K35.80
+GI SYMPTOMS	apendicitis_peritonitis	K36
+GI SYMPTOMS	apendicitis_peritonitis	K37
+GI SYMPTOMS	apendicitis_peritonitis	K65.9
+GI SYMPTOMS	hepato_splenomegaly	R160
+GI SYMPTOMS	hepato_splenomegaly	R161
+GI SYMPTOMS	hepato_splenomegaly	R162
+GI SYMPTOMS	ascites	R18
+GI SYMPTOMS	ascites	R188
+RESPIRATORY SYMPTOMS	mucositis	K123
+RESPIRATORY SYMPTOMS	mucositis	K1230
+RESPIRATORY SYMPTOMS	mucositis	K1239
+RESPIRATORY SYMPTOMS	mucositis	K130
+RESPIRATORY SYMPTOMS	mucositis	K137
+RESPIRATORY SYMPTOMS	cough	R05
+RESPIRATORY SYMPTOMS	cough	R05.1
+RESPIRATORY SYMPTOMS	cough	R05.2
+RESPIRATORY SYMPTOMS	cough	R05.3
+RESPIRATORY SYMPTOMS	cough	R05.8
+RESPIRATORY SYMPTOMS	cough	R05.9
+RESPIRATORY SYMPTOMS	rhinitis_rhinorrhea_upper_resp_infection	J00
+RESPIRATORY SYMPTOMS	rhinitis_rhinorrhea_upper_resp_infection	J069
+RESPIRATORY SYMPTOMS	rhinitis_rhinorrhea_upper_resp_infection	R0981
+RESPIRATORY SYMPTOMS	rhinitis_rhinorrhea_upper_resp_infection	R0982
+RESPIRATORY SYMPTOMS	sore throat	R070
+RESPIRATORY SYMPTOMS	sore throat	J02.9
+RESPIRATORY SYMPTOMS	conjunctivitis	H10.9
+RESPIRATORY SYMPTOMS	conjunctivitis	H103
+RESPIRATORY SYMPTOMS	conjunctivitis	H1030
+RESPIRATORY SYMPTOMS	conjunctivitis	H1031
+RESPIRATORY SYMPTOMS	conjunctivitis	H1033
+RESPIRATORY SYMPTOMS	conjunctivitis	H1089
+RESPIRATORY SYMPTOMS	conjunctivitis	H108
+RESPIRATORY SYMPTOMS	conjunctivitis	H118
+RESPIRATORY SYMPTOMS	pneumonia_bronchitis_lower_resp_infection	J1281
+RESPIRATORY SYMPTOMS	pneumonia_bronchitis_lower_resp_infection	J1289
+RESPIRATORY SYMPTOMS	pneumonia_bronchitis_lower_resp_infection	J181
+RESPIRATORY SYMPTOMS	pneumonia_bronchitis_lower_resp_infection	J189
+RESPIRATORY SYMPTOMS	pneumonia_bronchitis_lower_resp_infection	J208
+RESPIRATORY SYMPTOMS	pneumonia_bronchitis_lower_resp_infection	J22
+RESPIRATORY SYMPTOMS	tachypnea	R06.82
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	R060
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	R06.00
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	R06.01
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	R06.02
+RESPIRATORY SYMPTOMS	dyspnea_shortness of breath	R0603
+RESPIRATORY SYMPTOMS	respiratory failure	J96.00
+RESPIRATORY SYMPTOMS	respiratory failure	J96.01
+RESPIRATORY SYMPTOMS	respiratory failure	J96.02
+RESPIRATORY SYMPTOMS	respiratory failure	J96.20
+RESPIRATORY SYMPTOMS	respiratory failure	J96.21
+RESPIRATORY SYMPTOMS	respiratory failure	J96.22
+RESPIRATORY SYMPTOMS	respiratory failure	J96.91
+RESPIRATORY SYMPTOMS	respiratory failure	J96.92
+RESPIRATORY SYMPTOMS	respiratory failure	J96.90
+RESPIRATORY SYMPTOMS	ards	J80
+RESPIRATORY SYMPTOMS	pulmonary edema	J81
+RESPIRATORY SYMPTOMS	pulmonary edema	J810
+RESPIRATORY SYMPTOMS	atelectasis	J9811
+RESPIRATORY SYMPTOMS	atelectasis	J981
+RESPIRATORY SYMPTOMS	pleural effusion	J90
+RESPIRATORY SYMPTOMS	pleural effusion	J91
+NEUROLOGIC SYMPTOMS	headache	R51.9
+NEUROLOGIC SYMPTOMS	headache	R51
+NEUROLOGIC SYMPTOMS	headache	G439
+NEUROLOGIC SYMPTOMS	headache	G43.909
+NEUROLOGIC SYMPTOMS	headache	G44.009
+NEUROLOGIC SYMPTOMS	headache	G44.209
+NEUROLOGIC SYMPTOMS	headache	G44.219
+NEUROLOGIC SYMPTOMS	headache	G44.53
+NEUROLOGIC SYMPTOMS	headache	G44.84
+NEUROLOGIC SYMPTOMS	headache	G44.85
+NEUROLOGIC SYMPTOMS	headache	G43.909
+NEUROLOGIC SYMPTOMS	disorientation / confusion	R41.0
+NEUROLOGIC SYMPTOMS	disorientation / confusion	R418
+NEUROLOGIC SYMPTOMS	disorientation / confusion	R4182
+NEUROLOGIC SYMPTOMS	dizziness	R42
+NEUROLOGIC SYMPTOMS	irritability	R45.4
+NEUROLOGIC SYMPTOMS	irritability	R6812
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G934
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G9340
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G048
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G049
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G0490
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G9349
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G96.9
+NEUROLOGIC SYMPTOMS	seizures	R56.9
+NEUROLOGIC SYMPTOMS	seizures	G40.909
+NEUROLOGIC SYMPTOMS	seizures	G40419
+NEUROLOGIC SYMPTOMS	seizures	G40802
+NEUROLOGIC SYMPTOMS	seizures	G40804
+NEUROLOGIC SYMPTOMS	seizures	G4089
+NEUROLOGIC SYMPTOMS	seizures	G40909
+NEUROLOGIC SYMPTOMS	seizures	G40919
+NEUROLOGIC SYMPTOMS	stroke (ischemic) / transient cerebral ischemic attack	I63.9
+NEUROLOGIC SYMPTOMS	stroke (ischemic) / transient cerebral ischemic attack	I6340
+NEUROLOGIC SYMPTOMS	stroke (ischemic) / transient cerebral ischemic attack	I63412
+NEUROLOGIC SYMPTOMS	stroke (ischemic) / transient cerebral ischemic attack	I6349
+NEUROLOGIC SYMPTOMS	stroke (ischemic) / transient cerebral ischemic attack	I6350
+NEUROLOGIC SYMPTOMS	stroke (ischemic) / transient cerebral ischemic attack	I6359
+NEUROLOGIC SYMPTOMS	stroke (ischemic) / transient cerebral ischemic attack	I6782
+NEUROLOGIC SYMPTOMS	stroke (ischemic) / transient cerebral ischemic attack	G459
+NEUROLOGIC SYMPTOMS	cerebral hemorrhages	I619
+NEUROLOGIC SYMPTOMS	cerebral hemorrhages	I62.9
+NEUROLOGIC SYMPTOMS	muscle weakness / myalgia / myositis	M62.81
+NEUROLOGIC SYMPTOMS	muscle weakness / myalgia / myositis	M609
+NEUROLOGIC SYMPTOMS	muscle weakness / myalgia / myositis	M628
+NEUROLOGIC SYMPTOMS	muscle weakness / myalgia / myositis	M6280
+NEUROLOGIC SYMPTOMS	muscle weakness / myalgia / myositis	M6282
+NEUROLOGIC SYMPTOMS	muscle weakness / myalgia / myositis	M791
+NEUROLOGIC SYMPTOMS	muscle weakness / myalgia / myositis	M7910
+NEUROLOGIC SYMPTOMS	muscle weakness / myalgia / myositis	M7916
+NEUROLOGIC SYMPTOMS	muscle weakness / myalgia / myositis	M7919
+NEUROLOGIC SYMPTOMS	ataxia / gait and mobility abnormalities	R27.0
+NEUROLOGIC SYMPTOMS	ataxia / gait and mobility abnormalities	R268
+NEUROLOGIC SYMPTOMS	ataxia / gait and mobility abnormalities	R2689
+NEUROLOGIC SYMPTOMS	ataxia / gait and mobility abnormalities	R278
+NEUROLOGIC SYMPTOMS	polyneuropathy	G629
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.1
+CARDIOVASCULAR SYMPTOMS	chest pain	R703
+CARDIOVASCULAR SYMPTOMS	chest pain	R704
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.2
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.81
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.89
+CARDIOVASCULAR SYMPTOMS	chest pain	R07.9
+CARDIOVASCULAR SYMPTOMS	palpitations	R002
+CARDIOVASCULAR SYMPTOMS	peripheral edema	R60.0
+CARDIOVASCULAR SYMPTOMS	hypotension	I95.9
+CARDIOVASCULAR SYMPTOMS	hypotension	I958
+CARDIOVASCULAR SYMPTOMS	hypotension	I9589
+CARDIOVASCULAR SYMPTOMS	pre-syncope_syncope	R00.1
+CARDIOVASCULAR SYMPTOMS	pre-syncope_syncope	R55
+CARDIOVASCULAR SYMPTOMS	pre-syncope_syncope	R05.4
+CARDIOVASCULAR SYMPTOMS	left ventricular dysfunction	I5010	
+CARDIOVASCULAR SYMPTOMS	left ventricular dysfunction	I5011
+CARDIOVASCULAR SYMPTOMS	left ventricular dysfunction	I5012
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.20
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.21
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.23
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.30
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.31
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.33
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.40
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.41
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.43
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.82
+CARDIOVASCULAR SYMPTOMS	heart failure	I500
+CARDIOVASCULAR SYMPTOMS	heart failure	I5000
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.810
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.811
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.813
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.814
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.9
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.89
+CARDIOVASCULAR SYMPTOMS	heart failure	I50.9
+CARDIOVASCULAR SYMPTOMS	MV regurgitation	I340
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I47.0
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I47.1
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I47.2
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I49.5
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I49.8
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I49.9
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I440
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I440
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I442
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I4589
+CARDIOVASCULAR SYMPTOMS	arrhythmias	I459
+CARDIOVASCULAR SYMPTOMS	arrhythmias	 I4581
+CARDIOVASCULAR SYMPTOMS	arrhythmias	 I48
+Cardiac arrest	cardiac arrest	I46.2
+Cardiac arrest	cardiac arrest	I46.9
+Cardiac arrest	cardiac arrest	I460
+CARDIOVASCULAR SYMPTOMS	pulmonary embolism	I26.99
+CARDIOVASCULAR SYMPTOMS	coronary aneurysm	I25.41
+CARDIOVASCULAR SYMPTOMS	coronary aneurysm	I254
+CARDIOVASCULAR SYMPTOMS	coronary thrombosis or myocardial infarction	I209
+CARDIOVASCULAR SYMPTOMS	coronary thrombosis or myocardial infarction	I219
+CARDIOVASCULAR SYMPTOMS	coronary thrombosis or myocardial infarction	I240
+CARDIOVASCULAR SYMPTOMS	coronary thrombosis or myocardial infarction	I249
+CARDIOVASCULAR SYMPTOMS	shock	R57.0
+CARDIOVASCULAR SYMPTOMS	shock	R57.9
+CARDIOVASCULAR SYMPTOMS	shock	R571
+CARDIOVASCULAR SYMPTOMS	shock	R572
+CARDIOVASCULAR SYMPTOMS	shock	R6521
+CARDIOVASCULAR SYMPTOMS	shock	R578
+CARDIOVASCULAR SYMPTOMS	shock	R579
+CARDIOVASCULAR SYMPTOMS	SIRS	R650
+CARDIOVASCULAR SYMPTOMS	SIRS	R651
+CARDIOVASCULAR SYMPTOMS	SIRS	R6510
+CARDIOVASCULAR SYMPTOMS	SIRS	R6511
+CARDIOVASCULAR SYMPTOMS	SIRS	R652
+CARDIOVASCULAR SYMPTOMS	SIRS	R653
+CARDIOVASCULAR SYMPTOMS	SIRS	R659
+CARDIOVASCULAR SYMPTOMS	pericarditis, pericardial effusion	I300
+CARDIOVASCULAR SYMPTOMS	pericarditis, pericardial effusion	I308
+CARDIOVASCULAR SYMPTOMS	pericarditis, pericardial effusion	I309
+CARDIOVASCULAR SYMPTOMS	pericarditis, pericardial effusion	I313
+CARDIOVASCULAR SYMPTOMS	myocarditis	I400
+CARDIOVASCULAR SYMPTOMS	myocarditis	I408
+CARDIOVASCULAR SYMPTOMS	myocarditis	I409
+CARDIOVASCULAR SYMPTOMS	myocarditis	I41
+CARDIOVASCULAR SYMPTOMS	myocarditis	I411
+CARDIOVASCULAR SYMPTOMS	myocarditis	I418
+CARDIOVASCULAR SYMPTOMS	myocarditis	I514
+RENAL INVOLVEMENT	RENAL INVOLVEMENT	N170
+RENAL INVOLVEMENT	RENAL INVOLVEMENT	N171
+RENAL INVOLVEMENT	RENAL INVOLVEMENT	N172
+RENAL INVOLVEMENT	RENAL INVOLVEMENT	N179
+RENAL INVOLVEMENT	RENAL INVOLVEMENT	N178
+RENAL INVOLVEMENT	RENAL INVOLVEMENT	N19
+RENAL INVOLVEMENT	RENAL INVOLVEMENT	R944
+LIVER INVOLVEMENT	LIVER INVOLVEMENT	K7689
+LIVER INVOLVEMENT	LIVER INVOLVEMENT	R7401
+LIVER INVOLVEMENT	LIVER INVOLVEMENT	K769
+LIVER INVOLVEMENT	LIVER INVOLVEMENT	K72.00
+LIVER INVOLVEMENT	LIVER INVOLVEMENT	K72.90
+LIVER INVOLVEMENT	LIVER INVOLVEMENT	K72.9
+LIVER INVOLVEMENT	LIVER INVOLVEMENT	R945
+COVID-19	covid19 exposure (contact)	Z20.822
+COVID-19	covid19 exposure (contact)	Z208
+COVID-19	covid19 exposure (contact)	Z20.828
+COVID-19	covid19 exposure (contact)	U0713
+COVID-19	covid19 infection	U07.1
+COVID-19	covid19 infection	U0710
+COVID-19	covid19 infection	U0714
+COVID-19	covid19 infection	B342
+COVID-19	covid19 infection	B9729
+COVID-19	covid19 history of	Z86.16
+COVID-19	covid19 history of	U0715
+COVID-19	covid19 history of	U072
+COVID-19	covid19 history of	U073
+COVID-19	covid19 history of	U074
+COVID-19	covid19 history of	U075
+COVID-19	covid19 history of	U089
+COVID-19	covid19 history of	U099
+unvaccinated	unvaccinated	Z28.310
+partially vaccinated	partially vaccinated	Z28.311
+Kawasaki	Kawasaki	M30.3
+Abnormal WBC	Elevated WBC	D72829
+Abnormal WBC	Decreased WBC	D72819
+Abnormal WBC	Lymphocytopenia	D72810
+Abnormal WBC	Other abnormal WBC	D728
+Abnormal WBC	Other abnormal WBC	D7289
+Anemia	Anemia	D508
+Anemia	Anemia	D509
+Anemia	Anemia	D649
+Thrombocytopenia	Thrombocytopenia	D696
+Coagulation abnormalities	Coagulation abnormalities	D89
+Coagulation abnormalities	Coagulation abnormalities	D688
+Coagulation abnormalities	Coagulation abnormalities	R791
+Electrolytes abnormalities	Electrolytes abnormalities	E833
+Electrolytes abnormalities	Electrolytes abnormalities	E8330
+Electrolytes abnormalities	Electrolytes abnormalities	E8339
+Electrolytes abnormalities	Electrolytes abnormalities	E834
+Electrolytes abnormalities	Electrolytes abnormalities	E8341
+Electrolytes abnormalities	Electrolytes abnormalities	E8342
+Electrolytes abnormalities	Electrolytes abnormalities	E835
+Electrolytes abnormalities	Electrolytes abnormalities	E8351
+Electrolytes abnormalities	Electrolytes abnormalities	E8358
+Electrolytes abnormalities	Electrolytes abnormalities	E870
+Electrolytes abnormalities	Electrolytes abnormalities	E871
+Electrolytes abnormalities	Electrolytes abnormalities	E875
+Electrolytes abnormalities	Electrolytes abnormalities	E8758
+Electrolytes abnormalities	Electrolytes abnormalities	E876
+Electrolytes abnormalities	Electrolytes abnormalities	E8760
+Electrolytes abnormalities	Electrolytes abnormalities	E8768
+Electrolytes abnormalities	Hyponatremia	E871
+Electrolytes abnormalities	Hyponatremia	E8718
+Electrolytes abnormalities	Hypokalemia	E876
+Electrolytes abnormalities	Hypokalemia	E8760
+Electrolytes abnormalities	Hypokalemia	E8768
+Acidosis	Acidosis	E872
+Alkalosis	Alkalosis	E873
+Elevated LDH	Elevated LDH	R740
