@@ -10,26 +10,24 @@ ECMO	ECMO
 Invasive monitoring (arterial line)	ArterialCatheter
 Coronary aneurysm	I25.41
 Cardiac arrest	CPR
+Cardiac arrest	I46.0
 Cardiac arrest	I46.2
 Cardiac arrest	I46.9
-Cardiac arrest	I97.12
-Cardiac arrest	I97.71
 Composite adverse cardiovascular outcome	SICARDIAC
 Composite adverse cardiovascular outcome	CPR
+Composite adverse cardiovascular outcome	I46.0
 Composite adverse cardiovascular outcome	I46.2
 Composite adverse cardiovascular outcome	I46.9
-Composite adverse cardiovascular outcome	I97.12
-Composite adverse cardiovascular outcome	I97.71
-Composite adverse cardiovascular outcome	I51.9
 Composite adverse cardiovascular outcome	I50.20
 Composite adverse cardiovascular outcome	I50.21
 Composite adverse cardiovascular outcome	I50.23
 Composite adverse cardiovascular outcome	I50.30
 Composite adverse cardiovascular outcome	I50.31
 Composite adverse cardiovascular outcome	I50.33
+Composite adverse cardiovascular outcome	I50.0
+Composite adverse cardiovascular outcome	I50.00
 Composite adverse cardiovascular outcome	I50.40
 Composite adverse cardiovascular outcome	I50.41
-Composite adverse cardiovascular outcome	I50.42
 Composite adverse cardiovascular outcome	I50.43
 Composite adverse cardiovascular outcome	I50.82
 Composite adverse cardiovascular outcome	I50.810
@@ -37,15 +35,22 @@ Composite adverse cardiovascular outcome	I50.811
 Composite adverse cardiovascular outcome	I50.813
 Composite adverse cardiovascular outcome	I50.814
 Composite adverse cardiovascular outcome	I50.9
-Composite adverse cardiovascular outcome	R09.2
+Composite adverse cardiovascular outcome	I44.1
+Composite adverse cardiovascular outcome	I44.2
 Composite adverse cardiovascular outcome	I45.89
 Composite adverse cardiovascular outcome	I45.9
+Composite adverse cardiovascular outcome	I48
 Composite adverse cardiovascular outcome	I47.0
 Composite adverse cardiovascular outcome	I47.1
 Composite adverse cardiovascular outcome	I47.2
-Composite adverse cardiovascular outcome	I47.9
-Composite adverse cardiovascular outcome	I49.5
 Composite adverse cardiovascular outcome	I49.8
 Composite adverse cardiovascular outcome	I49.9
 Composite adverse cardiovascular outcome	I25.41
+Composite adverse cardiovascular outcome	I25.4
 Composite adverse cardiovascular outcome	ECMO
+Composite adverse cardiovascular outcome	I20.9
+Composite adverse cardiovascular outcome	I21.9
+Composite adverse cardiovascular outcome	I24.0
+Composite adverse cardiovascular outcome	I24.9
+Composite adverse cardiovascular outcome	R57.0
+Composite adverse cardiovascular outcome	R57.9
