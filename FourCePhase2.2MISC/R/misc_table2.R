@@ -23,6 +23,8 @@
 
 misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.output, verbose){
 
+  complete_df <- complete_df %>% filter(n_hospitalisation == 1 )
+
   labs_of_interest <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
                                                     "laboratoryCharacteristics.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
 

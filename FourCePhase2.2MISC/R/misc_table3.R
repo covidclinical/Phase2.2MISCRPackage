@@ -23,6 +23,8 @@
 #'
 misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.input, dir.output, raceAvailable, verbose){
 
+  complete_df <- complete_df %>% filter(n_hospitalisation == 1 )
+
   outcomeVar <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
                                                     "outcomeVariables.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
 
@@ -56,7 +58,8 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   print("remove the dots from the ICD codes")
 
   clin_var <- complete_df %>%
-    filter( concept_code %in% outcomeVar$concept_code ) %>%
+    filter( n_hospitalisation == 1,
+            concept_code %in% outcomeVar$concept_code ) %>%
     left_join( outcomeVar, by = "concept_code") %>%
     mutate( value = 1 ) %>%
     select( patient_num,category, value) %>%
