@@ -12,16 +12,12 @@ washout_opt = "none"
 
 # # comment to compile
 FourCePhase2.2MISC::runAnalysis( dir.input = "/4ceData/Input/4CE_MISC_15SEP2022_V2",
-                                 dir.output = "/4ceData/outputMISC_basic",
+                                 dir.output = "/4ceData/test_all4_methods",
                                  obfuscation = 0,
                                  raceAvailable= TRUE,
                                  country = "US",
                                  verbose = TRUE,
                                  dateFormat = "%Y-%m-%d",
-                                 washout_days = 0,
-                                 #washout_opt = "remove",
-                                 #washout_opt = "replace_earlier",
-                                 washout_opt = "none",
                                  data_update_date = "2022-06-01")
 
 ###
