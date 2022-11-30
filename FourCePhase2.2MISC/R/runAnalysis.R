@@ -60,7 +60,4 @@ runAnalysis <- function( dir.input,
                obfuscation = obfuscation, raceAvailable= raceAvailable, country = country,
                verbose = verbose, dateFormat = dateFormat, data_update_date = data_update_date, cbPalette = cbPalette,
                washout_days = 14, washout_opt = "replace_late")
-
-
 }
-

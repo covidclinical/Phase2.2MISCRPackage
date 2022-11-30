@@ -24,7 +24,7 @@
 misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.input, dir.output, raceAvailable, verbose){
 
   clinicalChar <- read.delim(system.file(paste0("extdata", .Platform$file.sep,
-                                                    "clinicalCharacteristics.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
+                                                    "clinicalCharacteristics_paper1.txt"), package = "FourCePhase2.2MISC"), stringsAsFactors = FALSE)
 
   # remove dots from ICD codes to make sure if matches with all the sites
   clinicalChar$concept_code <- gsub("[.]", "", clinicalChar$concept_code)
