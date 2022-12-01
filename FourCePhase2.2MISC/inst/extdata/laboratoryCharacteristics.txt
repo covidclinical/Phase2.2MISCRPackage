@@ -12,5 +12,6 @@ ferritin	ng/mL	2276-4	highest
 alanine aminotransferase (ALT)	U/L	1742-6	highest
 aspartate aminotransferase (AST)	U/L	1920-8	highest
 creatinine	mg/dL	2160-0	highest
-troponin	ng/mL	6598-7	highest
+troponin normal sensitivity	ng/mL	6598-7	highest
+troponin high sensitivity	ng/mL	49563-0	highest
 CRP	mg/L	1988-5	highest
