@@ -88,7 +88,7 @@ misc_table1 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   clin_var <- merge( clin_var_category, clin_var_variable_name)
 
   # note that we cannot replace the NA race values (if any) with 0, replace them with no_information here
-  mainTable$race4ce[is.na(mainTable$race4ce)] <- 'no_information'
+  mainTable$race_4ce[is.na(mainTable$race_4ce)] <- 'no_information'
 
   ### add the new variables and
   mainTable <- mainTable %>%
