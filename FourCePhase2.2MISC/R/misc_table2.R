@@ -273,9 +273,18 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   print("ordering the rows")
 
   # if the data does not contain all variants, add in the columns here
-  if(!'Alpha' %in% colnames(output_table2)){output_table2$Alpha <- NA}
-  if(!'Delta' %in% colnames(output_table2)){output_table2$Delta <- NA}
-  if(!'Omicron' %in% colnames(output_table2)){output_table2$Omicron <- NA}
+  if(!'Alpha' %in% colnames(output_table2)){
+    output_table2$Alpha <- NA
+    output_table2$Alpha <- as.character(output_table2$Alpha)
+  }
+  if(!'Delta' %in% colnames(output_table2)){
+    output_table2$Delta <- NA
+    output_table2$Delta <- as.character(output_table2$Delta)
+  }
+  if(!'Omicron' %in% colnames(output_table2)){
+    output_table2$Omicron <- NA
+    output_table2$Omicron <- as.character(output_table2$Omicron)
+  }
 
   print("For potential empty columns fill it with NAs")
 
@@ -291,9 +300,15 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     dplyr::ungroup( ) %>%
     dplyr::group_by( variableName )
 
+  check_pval_n <- stats_kruskal_atAdmission %>%
+    group_by(variableName) %>%
+    summarise(n_eras = n_distinct(variant_misc)) %>%
+    filter(n_eras > 1)
+
   # only estimate the p-value if at least 2 variant groups are present.
   if(n_distinct(complete_df$variant_misc) >= 2){
     stats_kruskal_atAdmission <- stats_kruskal_atAdmission %>%
+      filter(variableName %in% check_pval_n$variableName) %>%
     do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
     stats_kruskal_atAdmission$time_point <- "At admission day 0"
 
@@ -317,9 +332,17 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
     unique() %>%
     dplyr::group_by( variableName )
 
+
+  check_pval_n <- stats_kruskal_duringAdmission %>%
+    group_by(variableName) %>%
+    summarise(n_eras = n_distinct(variant_misc)) %>%
+    filter(n_eras > 1)
+
+
   # only estimate the p-value if at least 2 variant groups are present.
   if(n_distinct(complete_df$variant_misc) >= 2){
     stats_kruskal_duringAdmission <- stats_kruskal_duringAdmission %>%
+      filter(variableName %in% check_pval_n$variableName) %>%
     do(tidy(kruskal.test(x = .$selected_value, g = .$variant_misc)))
     stats_kruskal_duringAdmission$time_point <- "During hospitalization"
 

@@ -72,6 +72,8 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
   print(paste0("clin_var table generated, with ", nrow(clin_var), " rows"))
 
+  # note that we cannot replace the NA race values (if any) with 0, replace them with no_information here
+  mainTable$race4ce[is.na(mainTable$race4ce)] <- 'no_information'
 
   ### add the new variables and
   mainTable <- mainTable %>%
@@ -189,9 +191,18 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
 
 
   # if the data does not contain all variants, add in the columns here
-  if(!'Alpha' %in% colnames(output_table3_with_stats)){output_table3_with_stats$Alpha <- NA}
-  if(!'Delta' %in% colnames(output_table3_with_stats)){output_table3_with_stats$Delta <- NA}
-  if(!'Omicron' %in% colnames(output_table3_with_stats)){output_table3_with_stats$Omicron <- NA}
+  if(!'Alpha' %in% colnames(output_table3_with_stats)){
+    output_table3_with_stats$Alpha <- NA
+    output_table3_with_stats$Alpha <- as.character(output_table3_with_stats$Alpha)
+    }
+  if(!'Delta' %in% colnames(output_table3_with_stats)){
+    output_table3_with_stats$Delta <- NA
+    output_table3_with_stats$Delta <- as.character(output_table3_with_stats$Delta)
+    }
+  if(!'Omicron' %in% colnames(output_table3_with_stats)){
+    output_table3_with_stats$Omicron <- NA
+    output_table3_with_stats$Omicron <- as.character(output_table3_with_stats$Omicron)
+    }
 
   # change NA by 0 (0%)
   output_table3_with_stats[ is.na( output_table3_with_stats$Alpha ), ]$Alpha <- "0 (0%)"
