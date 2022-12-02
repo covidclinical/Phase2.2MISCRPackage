@@ -17,13 +17,10 @@ Depends:
     ggplot2,
     RColorBrewer,
     knitr,
-    kableExtra,
-    tableone,
     gridExtra,
     dplyr,
     lubridate,
     MatchIt,
-    table1,
     broom
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
