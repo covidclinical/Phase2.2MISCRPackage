@@ -142,7 +142,55 @@ ui <- fluidPage(
                             ))
                         )
                ), 
-               tabPanel("Washout vs. non-washout: table 1 & 3",
+               tabPanel("Labs meta-analysis",
+                        fluidRow(p(
+                            "Meta-analysis per labs"
+                        ),
+                        br(),
+                        sidebarLayout(
+                            sidebarPanel(
+                                
+                                radioButtons("variantLabMeta", label = h3("MISC Variant type:"),
+                                             choices = list( "Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron"), 
+                                             selected = "Alpha"),
+                                
+                                br(),
+                                
+                                radioButtons("timeLabMeta", "Time point:",
+                                             choices = list("At admission (day 0 or 1)" = "admission", "During admission" = "during"), 
+                                             selected = "during"),
+                                
+                                br(), 
+                                
+                                radioButtons("labMeta", label = h3("Chose a laboratory test:"),
+                                             choices = list("alanine aminotransferase (ALT)" = "alanine aminotransferase (ALT)",
+                                                            "albumin" = "albumin",
+                                                            "aspartate aminotransferase (AST)"   = "aspartate aminotransferase (AST)", 
+                                                            "CRP"     =      "CRP",                      
+                                                            "creatinine"   = "creatinine",                        
+                                                            "ferritin"    = "ferritin",                        
+                                                            "d_dimer" = "d_dimer",                              
+                                                            "troponin normal sensitivity" = "troponin normal sensitivity",         
+                                                            "white blood cell count (Leukocytes)" = "white blood cell count (Leukocytes)" , 
+                                                            "lymphocyte" = "lymphocyte" ,                        
+                                                            "neutrophil"   = "neutrophil",                        
+                                                            "platelets"  = "platelets" ,                         
+                                                            "fibrinogen" = "fibrinogen" ,                         
+                                                            "prothrombin time (PT)" = "prothrombin time (PT)",               
+                                                            "nlr_ratio" = "nlr_ratio")
+                                             
+                                )
+                                
+                            ),
+                            mainPanel(
+                                tabsetPanel(type = "tabs",
+                                            tabPanel("Forest plot by site", plotOutput("forestsiteLab"),  width = "100%"),
+                                            tabPanel("Forest plot by country", plotOutput("forestcountryLab"),  width = "100%")
+                                )
+                            ))
+                        )
+               ),
+               tabPanel("Washout vs. non-washout BCH",
                          fluidRow(p(
                              "Here using BCH as a proof of concept, we compare how the results change based on the variant cut-off date"
                          ),
@@ -173,6 +221,37 @@ ui <- fluidPage(
                              ))
                          )
                ),
+               tabPanel("Washout vs. non-washout H120",
+                        fluidRow(p(
+                            "For Spain, compare how the results change based on the variant cut-off date"
+                        ),
+                        br(),
+                        p(tags$img(src="methods_spain.png",width="1550px",height="400px")),
+                        br(),
+                        sidebarLayout(
+                            sidebarPanel(
+                                
+                                radioButtons("variantW_Spain", label = h3("MISC Variant type:"),
+                                             choices = list("Total" = "total", "Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron", "All" = "all"), 
+                                             selected = "all"),
+                                sliderInput("significant_thresholdW_Spain", "p-value threshold:",
+                                            min = 0, max = 1, value = 0.1
+                                ),
+                            ),
+                            mainPanel(
+                                
+                                tabsetPanel(type = "tabs",
+                                            tabPanel("Categorical Table1 percentages differentes", plotOutput("plot_w1_sp"),  width = "100%"), 
+                                            tabPanel("Categorical Table1 comparison", plotOutput("plot_w2_sp"),  width = "75%"),
+                                            tabPanel("Categorical Table1 p-value comparison", plotOutput("plot_w3_sp"),  width = "100%"), 
+                                            tabPanel("Table3 percentages differentes", plotOutput("plot_w4_sp"),  width = "100%"), 
+                                            tabPanel("Table3 comparison", plotOutput("plot_w5_sp"),  width = "75%"),
+                                            tabPanel("Table3 p-value comparison", plotOutput("plot_w6_sp"),  width = "100%")
+                                )
+                                
+                            ))
+                        )
+               )
                
     )
 )
@@ -187,7 +266,7 @@ server <- function(input, output) {
     output$table <- DT::renderDataTable(DT::datatable({
         
         ### our gold standar codes 
-        clinicalCodes <- read.delim("./clinicalCharacteristics.txt", sep = "\t") %>%
+        clinicalCodes <- read.delim("./clinicalCharacteristics_paper1.txt", sep = "\t") %>%
             mutate( ICDcode = gsub("[.]", "", concept_code)) %>%
             select( -concept_code )
         
@@ -374,6 +453,62 @@ server <- function(input, output) {
         
         
     }, height = 1200, width = 1400)
+    
+    ### labs meta Analysis
+    output$forestsiteLab <- renderPlot({
+        
+        labsToMetaAnalysis <- labs %>%
+            select( variant_misc, variableName, mean_value, sd_value, n_patients, site, time ) %>%
+            mutate( site = sapply( strsplit(site, " "), '[', 1))
+        
+        toForestPlot <- labsToMetaAnalysis %>%
+            filter( variableName == input$labMeta &
+                        variant_misc == input$variantLabMeta &
+                        time == input$timeLabMeta)
+        
+        #toForestPlot <- labsToMetaAnalysis %>%
+        #    filter( variableName == "CRP" &
+        #                variant_misc == "Alpha" &
+        #                time == "admission")
+        
+        metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=site, data=toForestPlot, sm="MRAW", method.ci= "z",
+                 comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
+        
+        mtmean <-  metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=site, data=toForestPlot, sm="MRAW", method.ci= "z",
+                            comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
+        
+        forest(mtmean)
+        
+    }, height = 500, width = 900)
+    
+    output$forestcountryLab<- renderPlot({
+        
+        labsToMetaAnalysis <- labs %>%
+            select( variant_misc, variableName, mean_value, sd_value, n_patients, site, time ) %>%
+            mutate( site = sapply( strsplit(site, " "), '[', 1), 
+                    site = gsub("\n", "", site ))
+        
+        countryMap <- read.delim("./siteCountry.txt")
+        
+        allLabsDataForestCountry <-labsToMetaAnalysis  %>%
+            left_join( countryMap )
+        
+        ### to review
+        toForestPlot <- allLabsDataForestCountry %>%
+            filter( variableName == input$labMeta &
+                        variant_misc == input$variantLabMeta &
+                        time == input$timeLabMeta) %>%
+            group_by( Country ) %>%
+            summarise( mean_value = mean( mean_value ), 
+                       sd_value = mean( sd_value ),
+                       n_patients = sum( n_patients ))
+        
+        mtmean <-  metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=Country, data=toForestPlot, sm="MRAW", method.ci= "z",
+                            comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
+        
+        forest(mtmean)
+    }, height = 500, width = 900)
+    
     
     
     ##### Forest plot 
@@ -1083,6 +1218,396 @@ server <- function(input, output) {
             guides( fill = "none")
         
     }, height = 900, width = 1100)
+    
+    ####### Spain washout 
+    pvalues_H12O_original <- read.delim("./H12O Output/H12O_table1.txt") %>%
+        select( categories, p.value)
+    
+    load("./H12O Output/H12O_table1Categorical.RData")
+    H12O_original <- table1_categorical %>%
+        left_join( pvalues_H12O_original )
+    H12O_original$type <- "H12O_original"
+    H12O_original$total <- ifelse( H12O_original$variant_misc == "Alpha", 98, 
+                                   ifelse( H12O_original$variant_misc == "Delta", 18,
+                                           ifelse( H12O_original$variant_misc == "Omicron", 21, 137))) 
+    
+    H12O_original$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", H12O_original$categories)
+    H12O_original$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", H12O_original$categories)
+    H12O_original$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", H12O_original$categories)
+    H12O_original$categories <- gsub("Kawasaki", "KAWASAKI", H12O_original$categories)
+    
+    
+    
+    
+    rm( table1_categorical )
+    
+    H12O_pvalues_remove <- read.delim("./washoutTestH12O/remove/H12O_table1.txt") %>%
+        select( categories, p.value)
+    load("./washoutTestH12O/remove/H12O_table1Categorical.RData")
+    H12O_removing <- table1_categorical %>%
+        left_join( H12O_pvalues_remove )
+    H12O_removing$type <- "remove"
+    H12O_removing$total <- ifelse( H12O_removing$variant_misc == "Alpha", 98, 
+                                   ifelse( H12O_removing$variant_misc == "Delta", 15,
+                                           ifelse( H12O_removing$variant_misc == "Omicron", 13, 126)))
+    
+    rm(table1_categorical)
+    
+    pvalues_H12O_replace_earlier <- read.delim("./washoutTestH12O/replace_earlier/H12O_table1.txt") %>%
+        select( categories, p.value)
+    load("./washoutTestH12O/replace_earlier/H12O_table1Categorical.RData")
+    H12O_replace_earlier <- table1_categorical  %>%
+        left_join( pvalues_H12O_replace_earlier )
+    H12O_replace_earlier$type <- "H12O_replace_earlier"
+    H12O_replace_earlier$total <- ifelse( H12O_replace_earlier$variant_misc == "Alpha", 98, 
+                                          ifelse( H12O_replace_earlier$variant_misc == "Delta", 16,
+                                                  ifelse( H12O_replace_earlier$variant_misc == "Omicron", 23, 137)))
+    
+    rm(table1_categorical)
+    
+    pvalues_H12O_replace_later <- read.delim("./washoutTestH12O/replace_late/H12O_table1.txt") %>%
+        select( categories, p.value)
+    load("./washoutTestH12O/replace_late/H12O_table1Categorical.RData")
+    H12O_replace_later <- table1_categorical  %>%
+        left_join( pvalues_H12O_replace_later )
+    H12O_replace_later$type <- "H12O_replace_later"
+    rm(table1_categorical)
+    H12O_replace_later$total <- ifelse( H12O_replace_later$variant_misc == "Alpha", 99, 
+                                        ifelse( H12O_replace_later$variant_misc == "Delta", 25,
+                                                ifelse( H12O_replace_later$variant_misc == "Omicron", 13, 137)))
+    
+    H12O_all <- rbind( H12O_original, H12O_removing, H12O_replace_later, H12O_replace_earlier )
+    
+    H12O_all$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", H12O_all$categories)
+    H12O_all$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", H12O_all$categories)
+    H12O_all$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", H12O_all$categories)
+    H12O_all$categories <- gsub("Kawasaki", "KAWASAKI", H12O_all$categories)
+    
+    categoriesToVisualize <- c("CARDIOVASCULAR SYMPTOMS" , "GI SYMPTOMS", "LIVER DYSFUNCTION", 
+                               "NEUROLOGIC SYMPTOMS", "RENAL DYSFUNCTION", "RESPIRATORY SYMPTOMS", 
+                               "GENERALIZED SYMPTOMS", "KAWASAKI" )
+    
+    H12O_allData <- H12O_all %>%
+        filter( categories %in% categoriesToVisualize) %>%
+        mutate( perc = round( n/ total * 100, 2)) %>%
+        select( categories, variant_misc, perc, type )
+    
+    H12O_originalToCompare <- H12O_original %>%
+        filter( categories %in% categoriesToVisualize) %>%
+        mutate( perc = round( n/ total * 100, 2)) %>%
+        select( categories, variant_misc, perc )
+    
+    H12O_allToCompare <-  rbind( H12O_removing, H12O_replace_later, H12O_replace_earlier ) 
+    
+    H12O_allToCompare$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", H12O_allToCompare$categories)
+    H12O_allToCompare$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", H12O_allToCompare$categories)
+    H12O_allToCompare$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", H12O_allToCompare$categories)
+    H12O_allToCompare$categories <- gsub("Kawasaki", "KAWASAKI", H12O_allToCompare$categories)
+    
+    
+    H12O_allToCompare <- H12O_allToCompare %>%
+        filter( categories %in% categoriesToVisualize) %>%
+        mutate( perc = round( n/ total * 100, 2)) %>%
+        select( categories, variant_misc, perc, type ) %>%
+        left_join( H12O_originalToCompare,by = c( "categories", "variant_misc" ),suffix = c(".washout", ".H12O_original")) %>%
+        # i swapped this so that a positive number means the new washout approach is adding patients.
+        mutate( diff = perc.washout - perc.H12O_original) %>%
+        select( categories, variant_misc, diff, type) %>%
+        unique()
+    
+    ### table 3s
+    pvalues_H12O_original3 <- read.delim("./H12O Output/H12O_table3.txt") %>%
+        select( categories, p.value)
+    
+    load("./H12O Output/H12O_table3.RData")
+    H12O_original3 <- table3 %>%
+        left_join( pvalues_H12O_original3 )
+    H12O_original3$type <- "H12O_original"
+    H12O_original3$total <- ifelse( H12O_original3$variant_misc == "Alpha", 98, 
+                                    ifelse( H12O_original3$variant_misc == "Delta", 18,
+                                            ifelse( H12O_original3$variant_misc == "Omicron", 21, 137))) 
+    
+    
+    
+    rm( table3 )
+    rm( pvalues_H12O_original3)
+    
+    H12O_pvalues_remove3 <- read.delim("./washoutTestH12O/remove/H12O_table3.txt") %>%
+        select( categories, p.value)
+    load("./washoutTestH12O/remove/H12O_table3.RData")
+    H12O_removing3 <- table3 %>%
+        left_join( H12O_pvalues_remove3 )
+    H12O_removing3$type <- "remove"
+    H12O_removing3$total <- ifelse( H12O_removing3$variant_misc == "Alpha", 98, 
+                                    ifelse( H12O_removing3$variant_misc == "Delta", 15,
+                                            ifelse( H12O_removing3$variant_misc == "Omicron", 13, 126)))
+    
+    rm( table3 )
+    rm( H12O_pvalues_remove3)
+    
+    pvalues_H12O_replace_earlier3 <- read.delim("./washoutTestH12O/replace_earlier/H12O_table3.txt") %>%
+        select( categories, p.value)
+    load("./washoutTestH12O/replace_earlier/H12O_table3.RData")
+    H12O_replace_earlier3 <- table3  %>%
+        left_join( pvalues_H12O_replace_earlier3 )
+    H12O_replace_earlier3$type <- "H12O_replace_earlier"
+    H12O_replace_earlier3$total <- ifelse( H12O_replace_earlier3$variant_misc == "Alpha", 98, 
+                                           ifelse( H12O_replace_earlier3$variant_misc == "Delta", 16,
+                                                   ifelse( H12O_replace_earlier3$variant_misc == "Omicron", 23, 137)))
+    
+    rm( table3 )
+    rm( pvalues_H12O_replace_earlier3)
+    
+    pvalues_H12O_replace_later3 <- read.delim("./washoutTestH12O/replace_late/H12O_table3.txt") %>%
+        select( categories, p.value)
+    load("./washoutTestH12O/replace_late/H12O_table3.RData")
+    H12O_replace_later3 <- table3  %>%
+        left_join( pvalues_H12O_replace_later3 )
+    H12O_replace_later3$type <- "H12O_replace_later"
+    rm(table3)
+    rm( pvalues_H12O_replace_later3)
+    
+    H12O_replace_later3$total <- ifelse( H12O_replace_later3$variant_misc == "Alpha", 99, 
+                                         ifelse( H12O_replace_later3$variant_misc == "Delta", 25,
+                                                 ifelse( H12O_replace_later3$variant_misc == "Omicron", 13, 137)))
+    
+    H12O_all3 <- rbind( H12O_original3, H12O_removing3, H12O_replace_later3, H12O_replace_earlier3 )
+    
+    H12O_allData3 <- H12O_all3 %>%
+        mutate( perc = round( n/ total * 100, 2)) %>%
+        select( categories, variant_misc, perc, type )
+    
+    H12O_originalToCompare3 <- H12O_original3 %>%
+        mutate( perc = round( n/ total * 100, 2)) %>%
+        select( categories, variant_misc, perc )
+    
+    H12O_allToCompare3 <-  rbind( H12O_removing3, H12O_replace_later3, H12O_replace_earlier3 ) %>%
+        mutate( perc = round( n/ total * 100, 2)) %>%
+        select( categories, variant_misc, perc, type ) %>%
+        left_join( H12O_originalToCompare3,by = c( "categories", "variant_misc" ),suffix = c(".washout", ".H12O_original")) %>%
+        mutate( diff = perc.washout - perc.H12O_original) %>%
+        select( categories, variant_misc, diff, type) %>%
+        unique()
+    
+    
+    
+    
+    output$plot_w2_sp <- renderPlot({
+        
+        if( input$variantW_Spain == "all"){
+            toPlot <- H12O_allData
+            ggplot(toPlot, aes(type, categories, fill= perc)) +
+                geom_tile() + 
+                facet_wrap( ~ variant_misc ) +
+                geom_text(aes(label = round(perc, 1))) +
+                theme(axis.text=element_text(size=10),
+                      axis.text.x = element_text(size=10, hjust = 1), 
+                      axis.text.y = element_text(size=4, hjust = 1), 
+                      strip.text.x = element_text(size = 12, face = "bold" ), 
+                      axis.title.y = element_text(size = 6),
+                      legend.title=element_text(size=10), 
+                      legend.text=element_text(size=10), 
+                      legend.position="top")+
+                theme_bw() +
+                scale_fill_gradient2(low="lightgrey", high="darkgreen")
+            
+            
+        }else{
+            toPlot <- H12O_allData %>% 
+                filter( variant_misc == input$variantW_Spain) 
+            ggplot(toPlot, aes(type, categories, fill= perc)) +
+                geom_tile() + 
+                geom_text(aes(label = round(perc, 1))) +
+                theme(axis.text=element_text(size=10),
+                      axis.text.x = element_text(size=10, hjust = 1), 
+                      axis.text.y = element_text(size=4, hjust = 1), 
+                      strip.text.x = element_text(size = 12, face = "bold" ), 
+                      axis.title.y = element_text(size = 6),
+                      legend.title=element_text(size=10), 
+                      legend.text=element_text(size=10), 
+                      legend.position="top")+
+                theme_bw() +
+                scale_fill_gradient2(low="lightgrey", high="darkgreen")
+            
+            
+        }
+    }, height = 900, width = 1100)
+    output$plot_w1_sp <- renderPlot({
+        
+        if( input$variantW_Spain == "all"){
+            toPlot <- H12O_allToCompare
+            ggplot(toPlot, aes(type, categories, fill= diff)) +
+                geom_tile() + 
+                facet_wrap( ~ variant_misc ) +
+                geom_text(aes(label = round(diff, 3))) +
+                theme(axis.text=element_text(size=10),
+                      axis.text.x = element_text(size=10, hjust = 1), 
+                      axis.text.y = element_text(size=4, hjust = 1), 
+                      strip.text.x = element_text(size = 12, face = "bold" ), 
+                      axis.title.y = element_text(size = 6),
+                      legend.title=element_text(size=10), 
+                      legend.text=element_text(size=10), 
+                      legend.position="top")+
+                theme_bw() +
+                scale_fill_gradient2(low="darkorange", high="blue")
+            
+        }else{
+            toPlot <- H12O_allToCompare %>%
+                filter( variant_misc == input$variantW_Spain) %>%
+                select( categories, variant_misc, type, diff ) %>%
+                unique()
+            
+            ggplot(toPlot, aes(type, categories, fill= diff)) +
+                geom_tile(aes(fill = diff)) +
+                geom_text(aes(label = round(diff, 3))) +
+                theme(axis.text=element_text(size=10),
+                      axis.text.x = element_text(size=10, hjust = 1), 
+                      axis.text.y = element_text(size=4, hjust = 1), 
+                      strip.text.x = element_text(size = 12, face = "bold" ), 
+                      axis.title.y = element_text(size = 6),
+                      legend.title=element_text(size=10), 
+                      legend.text=element_text(size=10), 
+                      legend.position="top")+
+                theme_bw() +
+                scale_fill_gradient2(low="darkorange", high="blue")
+            
+        }
+        
+    }, height = 900, width = 1100)
+    
+    output$plot_w3_sp <- renderPlot({
+        
+        H12O_allPvalue <- H12O_all %>%
+            filter( categories %in% categoriesToVisualize) %>%
+            mutate( significant = ifelse( p.value <= input$significant_thresholdW_Spain, 1, 0)) %>%
+            ungroup() %>%
+            select( categories, p.value, type, significant ) %>%
+            unique()
+        
+        toPlot <- H12O_allPvalue
+        ggplot(toPlot, aes(type, categories, fill= significant)) +
+            geom_tile() + 
+            geom_text(aes(label = ifelse( significant == 1, p.value, ""))) +
+            theme(axis.text=element_text(size=10),
+                  axis.text.x = element_text(size=10, hjust = 1), 
+                  axis.text.y = element_text(size=4, hjust = 1), 
+                  strip.text.x = element_text(size = 12, face = "bold" ), 
+                  axis.title.y = element_text(size = 6)
+            )+
+            theme_bw()+
+            scale_fill_gradient2(low="white", high="yellow") +
+            guides( fill = "none")
+        
+    }, height = 900, width = 1100)
+    
+    output$plot_w5_sp <- renderPlot({
+        
+        if( input$variantW_Spain == "all"){
+            toPlot <- H12O_allData3
+            
+            ggplot(toPlot, aes(type, categories, fill= perc)) +
+                geom_tile() + 
+                facet_wrap( ~ variant_misc ) +
+                theme_bw() +
+                geom_text(aes(label = round(perc, 1))) +
+                theme(axis.text=element_text(size=10),
+                      axis.text.x = element_text(size=10, hjust = 1), 
+                      axis.text.y = element_text(size=12, hjust = 1), 
+                      strip.text.x = element_text(size = 12, face = "bold" ), 
+                      axis.title.y = element_text(size = 6),
+                      legend.title=element_text(size=10), 
+                      legend.text=element_text(size=10), 
+                      legend.position="top")+
+                scale_fill_gradient2(low="lightgrey", high="darkgreen")
+            
+            
+        }else{
+            toPlot <- H12O_allData3 %>% 
+                filter( variant_misc == input$variantW_Spain) 
+            ggplot(toPlot, aes(type, categories, fill= perc)) +
+                geom_tile() + 
+                theme_bw() +
+                geom_text(aes(label = round(perc, 1))) +
+                theme(axis.text=element_text(size=10),
+                      axis.text.x = element_text(size=10, hjust = 1), 
+                      axis.text.y = element_text(size=12, hjust = 1), 
+                      strip.text.x = element_text(size = 12, face = "bold" ), 
+                      axis.title.y = element_text(size = 6),
+                      legend.title=element_text(size=10), 
+                      legend.text=element_text(size=10), 
+                      legend.position="top")+
+                scale_fill_gradient2(low="lightgrey", high="darkgreen")
+            
+            
+        }
+    }, height = 900, width = 1100)
+    output$plot_w4_sp <- renderPlot({
+        
+        if( input$variantW_Spain == "all"){
+            toPlot <- H12O_allToCompare3 
+            ggplot(toPlot, aes(type, categories, fill= diff)) +
+                geom_tile() + 
+                facet_wrap( ~ variant_misc ) +
+                geom_text(aes(label = round(diff, 3))) +
+                theme_bw() +
+                theme(axis.text=element_text(size=10),
+                      axis.text.x = element_text(size=12, hjust = 1), 
+                      axis.text.y = element_text(size=12, hjust = 1), 
+                      strip.text.x = element_text(size = 12, face = "bold" ), 
+                      axis.title.y = element_text(size = 6),
+                      legend.title=element_text(size=10), 
+                      legend.text=element_text(size=10), 
+                      legend.position="top")+
+                scale_fill_gradient2(low="darkorange", high="blue")
+            
+        }else{
+            toPlot <- H12O_allToCompare3 %>%
+                filter( variant_misc == input$variantW_Spain) %>%
+                select( categories, variant_misc, type, diff ) %>%
+                unique()
+            
+            ggplot(toPlot, aes(type, categories, fill= diff)) +
+                geom_tile(aes(fill = diff)) +
+                theme_bw() +
+                geom_text(aes(label = round(diff, 3))) +
+                theme(axis.text=element_text(size=10),
+                      axis.text.x = element_text(size=10, hjust = 1), 
+                      axis.text.y = element_text(size=12, hjust = 1), 
+                      strip.text.x = element_text(size = 12, face = "bold" ), 
+                      axis.title.y = element_text(size = 6),
+                      legend.title=element_text(size=10), 
+                      legend.text=element_text(size=10), 
+                      legend.position="top")+
+                scale_fill_gradient2(low="darkorange", high="blue")
+            
+        }
+        
+    }, height = 900, width = 1100)
+    
+    output$plot_w6_sp <- renderPlot({
+        
+        H12O_allPvalue3 <- H12O_all3 %>%
+            mutate( significant = ifelse( p.value <= input$significant_thresholdW_Spain, 1, 0)) %>%
+            ungroup() %>%
+            select( categories, p.value, type, significant ) %>%
+            unique()
+        
+        toPlot <- H12O_allPvalue3
+        ggplot(toPlot, aes(type, categories, fill= significant)) +
+            geom_tile() + 
+            theme_bw() +
+            geom_text(aes(label = ifelse( significant == 1, p.value, ""))) +
+            theme(axis.text=element_text(size=10),
+                  axis.text.x = element_text(size=10, hjust = 1), 
+                  axis.text.y = element_text(size=12, hjust = 1), 
+                  strip.text.x = element_text(size = 12, face = "bold" ), 
+                  axis.title.y = element_text(size = 6)
+            )+
+            scale_fill_gradient2(low="white", high="yellow") +
+            guides( fill = "none")
+        
+    }, height = 900, width = 1100)
+    
     
 }
 
