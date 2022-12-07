@@ -28,6 +28,7 @@ obesity_overweight	obesity	Z68.45
 obesity_overweight	obesity	Z68.5
 obesity_overweight	obesity	Z68.54
 obesity_overweight	overweight	E66.3
+obesity_overweight	overweight	E66.93
 obesity_overweight	overweight	Z68.25
 obesity_overweight	overweight	Z68.26
 obesity_overweight	overweight	Z68.27
@@ -38,7 +39,11 @@ asthma	asthma	J45.909
 asthma	asthma	J45.901
 asthma	asthma	J45.902
 asthma	asthma	J46
+asthma	asthma	J45.9
+asthma	asthma	J45.20
+asthma	asthma	J45.30
 generalized symptoms	fatigue_asthenia	R53.1
+generalized symptoms	fatigue_asthenia	R53.81
 generalized symptoms	fatigue_asthenia	R53.83
 generalized symptoms	fatigue_asthenia	R53
 generalized symptoms	fatigue_asthenia	R53+2
@@ -54,13 +59,16 @@ generalized symptoms	lymphadenitis_lymphadenopathy	L04.9
 generalized symptoms	lymphadenitis_lymphadenopathy	R59.0
 generalized symptoms	lymphadenitis_lymphadenopathy	R59.1
 generalized symptoms	lymphadenitis_lymphadenopathy	R59.9
+generalized symptoms	lymphadenitis_lymphadenopathy	R22.1
 generalized symptoms	dehydration	E86.0
 generalized symptoms	dehydration	E86
 generalized symptoms	dehydration	E86.1
+generalized symptoms	dehydration	E86.9
 generalized symptoms	fluid_overload_generalized_edema	E87.7
 generalized symptoms	fluid_overload_generalized_edema	E87.70
 generalized symptoms	fluid_overload_generalized_edema	R60.1
 generalized symptoms	fluid_overload_generalized_edema	R60.9
+generalized symptoms	fluid_overload_generalized_edema	E87.79
 generalized symptoms	conjunctivitis	H10.9
 generalized symptoms	conjunctivitis	H103
 generalized symptoms	conjunctivitis	H1030
@@ -69,6 +77,9 @@ generalized symptoms	conjunctivitis	H1033
 generalized symptoms	conjunctivitis	H1089
 generalized symptoms	conjunctivitis	H108
 generalized symptoms	conjunctivitis	H118
+generalized symptoms	conjunctivitis	H100
+generalized symptoms	conjunctivitis	H11433
+generalized symptoms	conjunctivitis	H11439
 GI SYMPTOMS	abdominal pain	R10.0
 GI SYMPTOMS	abdominal pain	R10.2
 GI SYMPTOMS	abdominal pain	R10.9
@@ -99,14 +110,15 @@ GI SYMPTOMS	nausea_vomiting	R11.12
 GI SYMPTOMS	nausea_vomiting	R11.14
 GI SYMPTOMS	nausea_vomiting	R11.2
 GI SYMPTOMS	nausea_vomiting	R11
-GI SYMPTOMS	diarrhea_enteritis_ileitis	K58.0
-GI SYMPTOMS	diarrhea_enteritis_ileitis	K58.9
-GI SYMPTOMS	diarrhea_enteritis_ileitis	P78.3
-GI SYMPTOMS	diarrhea_enteritis_ileitis	K52.9
-GI SYMPTOMS	diarrhea_enteritis_ileitis	K58.9
-GI SYMPTOMS	diarrhea_enteritis_ileitis	R197
-GI SYMPTOMS	diarrhea_enteritis_ileitis	K582
-GI SYMPTOMS	diarrhea_enteritis_ileitis	A099
+GI SYMPTOMS	diarrhea_enteritis_ileitis_ileus	K58.0
+GI SYMPTOMS	diarrhea_enteritis_ileitis_ileus	K58.9
+GI SYMPTOMS	diarrhea_enteritis_ileitis_ileus	P78.3
+GI SYMPTOMS	diarrhea_enteritis_ileitis_ileus	K52.9
+GI SYMPTOMS	diarrhea_enteritis_ileitis_ileus	K58.9
+GI SYMPTOMS	diarrhea_enteritis_ileitis_ileus	R197
+GI SYMPTOMS	diarrhea_enteritis_ileitis_ileus	K582
+GI SYMPTOMS	diarrhea_enteritis_ileitis_ileus	A099
+GI SYMPTOMS	diarrhea_enteritis_ileitis_ileus	K567
 GI SYMPTOMS	apendicitis_peritonitis	K35.30
 GI SYMPTOMS	apendicitis_peritonitis	K35.31
 GI SYMPTOMS	apendicitis_peritonitis	K35.33
@@ -157,6 +169,8 @@ RESPIRATORY SYMPTOMS	respiratory failure	J96.22
 RESPIRATORY SYMPTOMS	respiratory failure	J96.91
 RESPIRATORY SYMPTOMS	respiratory failure	J96.92
 RESPIRATORY SYMPTOMS	respiratory failure	J96.90
+RESPIRATORY SYMPTOMS	respiratory failure	J96.99
+RESPIRATORY SYMPTOMS	respiratory failure	J96.09
 RESPIRATORY SYMPTOMS	ards	J80
 RESPIRATORY SYMPTOMS	pulmonary edema	J81
 RESPIRATORY SYMPTOMS	pulmonary edema	J810
@@ -188,6 +202,7 @@ NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G049
 NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G0490
 NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G9349
 NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G96.9
+NEUROLOGIC SYMPTOMS	encephalopathy_meningoencephalitis	G039
 NEUROLOGIC SYMPTOMS	seizures	R56.9
 NEUROLOGIC SYMPTOMS	seizures	G40.909
 NEUROLOGIC SYMPTOMS	seizures	G40419
@@ -238,6 +253,7 @@ CARDIOVASCULAR SYMPTOMS	pre-syncope_syncope	R05.4
 CARDIOVASCULAR SYMPTOMS	left ventricular dysfunction	I5010	
 CARDIOVASCULAR SYMPTOMS	left ventricular dysfunction	I5011
 CARDIOVASCULAR SYMPTOMS	left ventricular dysfunction	I5012
+CARDIOVASCULAR SYMPTOMS	left ventricular dysfunction	I501
 CARDIOVASCULAR SYMPTOMS	heart failure	I50.20
 CARDIOVASCULAR SYMPTOMS	heart failure	I50.21
 CARDIOVASCULAR SYMPTOMS	heart failure	I50.23
@@ -278,20 +294,8 @@ CARDIOVASCULAR SYMPTOMS	coronary thrombosis or myocardial infarction	I209
 CARDIOVASCULAR SYMPTOMS	coronary thrombosis or myocardial infarction	I219
 CARDIOVASCULAR SYMPTOMS	coronary thrombosis or myocardial infarction	I240
 CARDIOVASCULAR SYMPTOMS	coronary thrombosis or myocardial infarction	I249
-CARDIOVASCULAR SYMPTOMS	shock	R57.0
-CARDIOVASCULAR SYMPTOMS	shock	R57.9
-CARDIOVASCULAR SYMPTOMS	shock	R571
-CARDIOVASCULAR SYMPTOMS	shock	R572
-CARDIOVASCULAR SYMPTOMS	shock	R6521
-CARDIOVASCULAR SYMPTOMS	shock	R578
-CARDIOVASCULAR SYMPTOMS	shock	R579
-CARDIOVASCULAR SYMPTOMS	SIRS	R650
-CARDIOVASCULAR SYMPTOMS	SIRS	R651
-CARDIOVASCULAR SYMPTOMS	SIRS	R6510
-CARDIOVASCULAR SYMPTOMS	SIRS	R6511
-CARDIOVASCULAR SYMPTOMS	SIRS	R652
-CARDIOVASCULAR SYMPTOMS	SIRS	R653
-CARDIOVASCULAR SYMPTOMS	SIRS	R659
+CARDIOVASCULAR SYMPTOMS	shock cardiogenic	R57.0
+CARDIOVASCULAR SYMPTOMS	shock cardiogenic	R57.9
 CARDIOVASCULAR SYMPTOMS	pericarditis, pericardial effusion	I300
 CARDIOVASCULAR SYMPTOMS	pericarditis, pericardial effusion	I308
 CARDIOVASCULAR SYMPTOMS	pericarditis, pericardial effusion	I309
@@ -303,6 +307,18 @@ CARDIOVASCULAR SYMPTOMS	myocarditis	I41
 CARDIOVASCULAR SYMPTOMS	myocarditis	I411
 CARDIOVASCULAR SYMPTOMS	myocarditis	I418
 CARDIOVASCULAR SYMPTOMS	myocarditis	I514
+SHOCK	SHOCK	R571
+SHOCK	SHOCK	R572
+SHOCK	SHOCK	R6521
+SHOCK	SHOCK	R578
+SHOCK	SHOCK	R579
+SIRS	SIRS	R650
+SIRS	SIRS	R651
+SIRS	SIRS	R6510
+SIRS	SIRS	R6511
+SIRS	SIRS	R652
+SIRS	SIRS	R653
+SIRS	SIRS	R659
 RENAL DYSFUNCTION	RENAL DYSFUNCTION	N170
 RENAL DYSFUNCTION	RENAL DYSFUNCTION	N171
 RENAL DYSFUNCTION	RENAL DYSFUNCTION	N172
@@ -345,10 +361,16 @@ Abnormal WBC	Other abnormal WBC	D7289
 Anemia	Anemia	D508
 Anemia	Anemia	D509
 Anemia	Anemia	D649
+Anemia	Anemia	D500
 Thrombocytopenia	Thrombocytopenia	D696
 Coagulation abnormalities	Coagulation abnormalities	D89
 Coagulation abnormalities	Coagulation abnormalities	D688
 Coagulation abnormalities	Coagulation abnormalities	R791
+Coagulation abnormalities	Coagulation abnormalities	D65
+Coagulation abnormalities	Coagulation abnormalities	D684
+Coagulation abnormalities	Coagulation abnormalities	D689
+Coagulation abnormalities	Coagulation abnormalities	D686
+Coagulation abnormalities	Coagulation abnormalities	D6869
 Electrolytes abnormalities	Electrolytes abnormalities	E833
 Electrolytes abnormalities	Electrolytes abnormalities	E8330
 Electrolytes abnormalities	Electrolytes abnormalities	E8339
@@ -370,6 +392,7 @@ Electrolytes abnormalities	Hyponatremia	E8718
 Electrolytes abnormalities	Hypokalemia	E876
 Electrolytes abnormalities	Hypokalemia	E8760
 Electrolytes abnormalities	Hypokalemia	E8768
+Hyperglycemia	Hyperglycemia	R739
 Acidosis	Acidosis	E872
 Alkalosis	Alkalosis	E873
 Elevated LDH	Elevated LDH	R740
