@@ -1,7 +1,7 @@
 Package: FourCePhase2.2MISC
 Type: Package
 Title: 4CE Consortium for COVID-19 - MISC Pediatric group
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     c(person(given = "Alba", family = "Gutierrez",role = c("aut", "cre"),email = "alba_gutierrez@hms.harvard.edu"),
     person(given = "Simran", family = "Makwana",role = c("aut"),email = "simran_makwana@hms.harvard.edu"))
