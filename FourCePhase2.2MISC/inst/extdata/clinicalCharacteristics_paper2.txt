@@ -31,10 +31,3 @@ ARRYTHMIAS	Other conduction disorders arrhythmias	I4589
 ARRYTHMIAS	Other conduction disorders arrhythmias	I459
 ARRYTHMIAS	Long QT arrhythmias	 I4581
 ARRYTHMIAS	Atrial fibrillation / flutter arrhythmias	 I48
-SHOCK	cardiogenic shock	R57.0
-SHOCK	cardiogenic shock	R57.9
-SHOCK	hypovolemic shock	R571
-SHOCK	septic shock	R572
-SHOCK	septic shock	R6521
-SHOCK	unspecified / other shock	R578
-SHOCK	unspecified / other shock	R579

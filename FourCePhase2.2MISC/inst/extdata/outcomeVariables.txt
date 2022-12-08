@@ -54,3 +54,7 @@ Composite adverse cardiovascular outcome	I24.0
 Composite adverse cardiovascular outcome	I24.9
 Composite adverse cardiovascular outcome	R57.0
 Composite adverse cardiovascular outcome	R57.9
+Composite adverse cardiovascular outcome	I5010	
+Composite adverse cardiovascular outcome	I5011
+Composite adverse cardiovascular outcome	I5012
+Composite adverse cardiovascular outcome	I501
