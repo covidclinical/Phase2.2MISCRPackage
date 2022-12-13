@@ -73,7 +73,9 @@ misc_table3 <- function(complete_df, obfuscation_threshold, currSiteId, dir.inpu
   print(paste0("clin_var table generated, with ", nrow(clin_var), " rows"))
 
   # note that we cannot replace the NA race values (if any) with 0, replace them with no_information here
-  mainTable$race_4ce[is.na(mainTable$race_4ce)] <- 'no_information'
+  if( raceAvailable == TRUE ){
+    mainTable$race_4ce[is.na(mainTable$race_4ce)] <- 'no_information'
+  }
 
   ### add the new variables and
   mainTable <- mainTable %>%
