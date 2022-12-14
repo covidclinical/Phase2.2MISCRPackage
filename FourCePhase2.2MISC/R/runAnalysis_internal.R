@@ -15,6 +15,7 @@
 #' @param verbose By default \code{FALSE}. Change it to \code{TRUE} to get an on-time log from the function.
 #' @return An object of class \code{list} with the \code{data.frames}.
 #' @examples
+#' @export runAnalysis_internal
 #'
 #' FourCePhase2.2MISC::runAnalysis_internal()
 
@@ -130,6 +131,9 @@ runAnalysis_internal <- function( dir.input,
       site <- site[1]
       print(paste0("Site ID is: ", site ))
     }
+
+    # ensure the misc_complete df has a siteid column
+    misc_complete$siteid <- site
 
     ### check how many of the patients got hospitalized in day_since_admission = 0
     ### filter
