@@ -2,7 +2,7 @@ library(dplyr)
 library(tidyr)
 library(meta)
 rm(list=ls())
-setwd('/Users/alba/Desktop/4CE_MISC_outputs/')
+setwd('/Users/smakwana/Desktop/finalTablesTest/4CE_MISC_outputs/')
 sites <- list.files("./")
 
 ########################
@@ -66,7 +66,7 @@ combineCategoricalDataFromSites <- function( fileList, table_num ){
   return( table_output )
 }
 
-##### combine categorical data from sites
+##### combine continuous data from sites
 combineContinuousDataFromSites <- function( fileList, time_point, table_num ){
   
   for( i in 1:length( fileList )){
@@ -118,67 +118,28 @@ combineContinuousDataFromSites <- function( fileList, time_point, table_num ){
 
 
 # run categorical meta-analysis
-categoricalToMetaAnalysis <- function( df, variant ){
-  df_selection <- df %>% 
-    filter( variant_misc == variant )
+categoricalToMetaAnalysis <- function(n, total, site){
   
-  output <- as.data.frame( matrix( ncol=4, nrow=length(unique(df_selection$categories ))))
-  output$V1 <- unique( df_selection$categories)
-  output$V3 <- variant
+  tryCatch({
+    mtprop <- metaprop(event = n, n = total, studlab = site, method = 'GLMM', sm = 'PLOGIT', hakn = TRUE)
+    r <- paste0( round( mtprop$TE.random, 2), " [", round(mtprop$lower.random, 2), ", ",round( mtprop$upper.random, 2),  "]")
+    return(r)
+  }, error = function(e) return(NA))
   
-  for(i in 1:nrow( output )){
-    
-    variable <- output$V1[i]
-    print(variable)
-    print(i)
-    
-    toForestOutput <- df_selection %>%
-      filter( categories == variable )
-    
-    ## this needs to be checked. it is failing if not
-    if( 1 %in% unique(toForestOutput$n) & nrow(toForestOutput) == 2 ){
-      toForestOutput <- toForestOutput %>%
-       filter(n > 1)
-
-     if(nrow( toForestOutput) == 0){
-       next()
-     }
-    }
-    
-    mtprop <- metaprop(event=n, n=total, studlab=site, data=toForestOutput, method = "GLMM", sm = "PLOGIT",
-                       comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE, verbose = TRUE)
-    
-    
-    output$V2[i] <- paste0( round( mtprop$TE.random, 2), " [", round(mtprop$lower.random, 2), ", ",round( mtprop$upper.random, 2),  "]")
-    output$V4[i] <- sum(mtprop$n)
-  }
-  return(output)
 }
 
 ## run continous meta-analysis 
-continuousToMetaAnalysis <- function( df, time, variant ){
-  df_selection <- df %>% 
-    filter( time == time & variant_misc == variant )
+continuousToMetaAnalysis <- function(n_patients, mean_value, sd_value, site){
   
-  output <- as.data.frame( matrix( ncol=5, nrow=length(unique(df_selection$variableName ))))
-  output$V1 <- unique( df_selection$variableName)
-  output$V3 <- time
-  output$V5 <- variant
-  
-  for(i in 1:nrow( output )){
-    
-    variable <- output$V1[i]
-    
-    toForestOutput <- df_selection %>%
-      filter( variableName == variable )
-    
-    mtmean <-  metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=site, data=toForestOutput, sm="MRAW", method.ci= "z",
+  tryCatch({
+    mtmean <-  metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=site, sm="MRAW", method.ci= "z",
                         comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
-    output$V2[i] <- paste0( round( mtmean$TE.random, 2), " [", round(mtmean$lower.random, 2), ", ",round( mtmean$upper.random, 2),  "]")
-    output$V4[i] <- sum(mtmean$n)
-  }
-  return(output)
+    r <- paste0( round( mtmean$TE.random, 2), " [", round(mtmean$lower.random, 2), ", ",round( mtmean$upper.random, 2),  "]")
+    return(r)
+  }, error = function(e) return(NA))
+  
 }
+
 
 
 #####################
@@ -199,25 +160,69 @@ categoricalTable1 <- table1_files[ grepl( "Categorical.RData", table1_files)]
 
 table1_categorical <- combineCategoricalDataFromSites( fileList = categoricalTable1, table_num = 1 )
 
-variants <- c("Alpha", "Delta", "Omicron", "total")
 
-for( v in 1:length(variants ) ){
-  print(paste0("Variant: ", variants[v]))
-  if( v == 1 ){
-    t1_categorical_output <- categoricalToMetaAnalysis(df = table1_categorical, variant = variants[v])
-  }else{
-    t1_categorical_outputInt <- categoricalToMetaAnalysis(df = table1_categorical, variant = variants[v])
-    t1_categorical_output <- rbind( t1_categorical_output, t1_categorical_outputInt)
-  }
+table1_categorical_results <- table1_categorical %>% 
+  group_by(categories, variant_misc) %>%
+  summarise(res = categoricalToMetaAnalysis(n, total, site),
+            total = sum(total))
+
+rm(table1_categorical)
+colnames(table1_categorical_results) <- c("Variable", "variant", "value", "total")
+
+# the continuous function does not work to combine table 1 variables because they are special
+# we do this instead
+
+table1_continuous_combined <- data.frame(variant_misc = '', 
+                                variableName = '', 
+                                mean_value = NA, 
+                                sd_value = NA, 
+                                n_patients = NA, 
+                                site = '')
+# save thsi for later
+total_n <- data.frame()
+
+for (s in sites) {
+  
+  load(paste0('./', s, '/original/', s, '_table1Continuous.RData'))
+  t1 <- read.table(paste0('./', s, '/original/', s, '_table1.txt'), sep = '\t')
+  
+  nvec <- t1[1,]
+  ndf <- data.frame(variant_misc = c('Alpha', 'Delta', 'Omicron', 'total'),
+                    n_patients = c(str_extract(nvec$V2, '\\d+'),
+                                   str_extract(nvec$V3, '\\d+'),
+                                   str_extract(nvec$V4, '\\d+'),
+                                   str_extract(nvec$V5, '\\d+'))) %>%
+    mutate(n_patients = as.numeric(n_patients))
+  
+  total_n <- rbind(total_n, ndf %>% mutate(site = s))
+  
+  df <- table1_continuous
+  df2 <- df %>%
+    pivot_longer(cols = colnames(df)[-1]) %>%
+    mutate(name = gsub('length_hospitalization', 'lengthhospitalization', name)) %>%
+    separate(name, into = c('variableName', 'stat'), sep = '_') %>%
+    pivot_wider(id_cols = c(variant_misc, variableName), names_from = stat, values_from = value) %>%
+    mutate(site = s) %>%
+    rename('mean_value' = mean,
+           'sd_value' = sd) %>%
+    left_join(ndf) %>%
+    select(variant_misc, variableName, mean_value, sd_value, n_patients, site)
+  
+  table1_continuous_combined <- rbind(table1_continuous_combined, df2)
+
 }
 
-rm(t1_categorical_outputInt)
-rm(table1_categorical)
-colnames(t1_categorical_output) <- c("Variable", "value", "variant", "total")
+table1_continuous_combined <- table1_continuous_combined[-1,]
 
-# the continuous function does not work for table 1 variables because they are special
-#table1_continuous <- combineContinuousDataFromSites( fileList = continuousTable1, table_num = 1)
 
+table1_continuous_results <- table1_continuous_combined %>%
+  group_by(variant_misc, variableName) %>%
+  summarise(res = continuousToMetaAnalysis(n_patients, mean_value, sd_value, site),
+            total = sum(n_patients))
+
+colnames(table1_continuous_results) <- c("variant", "variable", "value", "total")
+
+rm(df, df2, ndf, nvec, t1, table1_continuous, table1_continuous_combined)
 
 #####################
 ###### TABLE 3 ######
@@ -235,19 +240,13 @@ table3_all <- combineCategoricalDataFromSites( fileList = table3_files, table_nu
 
 ### final table 3
 
-variants <- c("Alpha", "Delta", "Omicron", "total")
+table3_categorical_results <- table3_all %>% 
+  group_by(categories, variant_misc) %>%
+  summarise(res = categoricalToMetaAnalysis(n, total, site),
+            total = sum(total))
 
-for( v in 1:length(variants ) ){
-  print(paste0("Variant: ", variants[v]))
-  if( v == 1 ){
-    t3_output <- categoricalToMetaAnalysis(df = table3_all, variant = variants[v])
-    }else{
-      t3_outputInt <- categoricalToMetaAnalysis(df = table3_all, variant = variants[v])
-      t3_output <- rbind( t3_output, t3_outputInt)
-    }
-}
-
-colnames(t3_output) <- c("Variable", "value", "variant", "total")
+rm(table3_all)
+colnames(table3_categorical_results) <- c("Variable", "variant", "value", "total")
 
 
 
@@ -264,7 +263,6 @@ for( i in 1:length(sites)){
 }
 
 
-
 ### split the files
 atAdmission <- labFiles[ grepl( "AtAdmission.RData", labFiles)] 
 duringAdmission <- labFiles[ grepl( "DuringAdmission.RData", labFiles)] 
@@ -274,36 +272,115 @@ labsAllDuring <- combineContinuousDataFromSites( fileList = duringAdmission, tim
 
   
 ### final table 2 at admission
-times <- c("admission", "during")
-variants <- c("Alpha", "Delta", "Omicron", "total_n")
-labsAll <- rbind( labsAllAdm, labsAllDuring)
+labsAllAdm_results <- labsAllAdm %>%
+  group_by(variant_misc, variableName, time) %>%
+  summarise(res = continuousToMetaAnalysis(n_patients, mean_value, sd_value, site),
+            total = sum(n_patients))
 
-for( j in 1:length(times)){
-  time_selection <- times[j]
-  print(paste0("Time: ", time_selection ) )
-  
-  for( h in 1:length(variants ) ){
-    print(paste0("Variant: ", variants[h]))
-    if( j == 1 & h == 1){
-      t2_output <- continuousToMetaAnalysis(df = labsAll, time = times[j], variant = variants[h])
-    }else{
-      t2_outputInt <- continuousToMetaAnalysis(df = labsAll, time = times[j], variant = variants[h])
-      t2_output <- rbind( t2_output, t2_outputInt)
-    }
-  }
-}
-colnames(t2_output) <- c("Variable", "value", "time", "total", "variant")
+labsAllDuring_results <- labsAllDuring %>%
+  group_by(variant_misc, variableName, time) %>%
+  summarise(res = continuousToMetaAnalysis(n_patients, mean_value, sd_value, site),
+            total = sum(n_patients))
+
+
+labsAll_results <- rbind( labsAllAdm_results, labsAllDuring_results)
+
+colnames(labsAll_results) <- c("variant", "variable", "time", "value", "total")
+
+rm(labsAllAdm, labsAllAdm_results, labsAllDuring, labsAllDuring_results)
+
+
 
 # transform to follow the format of the table 2
-#t2_output_pivot <- t2_output %>%
-#  pivot_wider(names_from = variant, values_from = value )
+
+total_n_dfx <- total_n %>% 
+  group_by(variant_misc) %>% 
+  summarise(total_n = sum(n_patients)) %>%
+  mutate(names = paste0(variant_misc, ' (N = ', total_n, ')')) %>%
+  select(-total_n)
+
+df <- labsAll_results
+
+df2 <- df %>%
+  pivot_wider(id_cols = c(variable, time), 
+              names_from = variant, values_from = c(value, total)) %>%
+  mutate(combined_n = paste0('(', total_Alpha, ', ', total_Delta, ', ', total_Omicron, ', ', total_total_n, ')')) %>%
+  select(-total_Alpha, -total_Delta, -total_Omicron, -total_total_n) %>%
+  arrange(variable) %>%
+  select(variable, combined_n, time, value_Alpha, value_Delta, value_Omicron, value_total_n)
+
+colnames(df2) <- c('Variable', 'Patients per variant', 'Timepoint', total_n_dfx$names)
+
+table2 <- df2
+
+rm(df, df2, labsAll_results)
 
 
-#colnames( finalTable2 ) <- c("Variable", "Alpha", "Delta", "Omicron", "Total", "Time Point")
+##########
+# save rdata files
+save(table1_categorical_results, table1_continuous_results, table2, table3_categorical_results, total_n_dfx, 
+     file = '../output/results.Rdata')
 
-#finalTable2 <- finalTable2 %>%
-#  select( Variable, Total, Alpha, Delta, Omicron, `Time Point`) %>%
-#  arrange( Variable ) %>%
-#  flextable::flextable() %>% 
-#  flextable::save_as_docx(path = "/Users/alba/Desktop/tentative_final_table2.docx")
+
+###########
+# transform and write pretty
+library(flextable)
+
+table1_categorical_results2 <- table1_categorical_results %>%
+  pivot_wider(id_cols = Variable, 
+              names_from = variant, values_from = c(value, total)) %>%
+  mutate(combined_n = paste0('(', total_Alpha, ', ', total_Delta, ', ', total_Omicron, ', ', total_total, ')')) %>%
+  select(-total_Alpha, -total_Delta, -total_Omicron, -total_total) %>%
+  arrange(Variable) %>%
+  select(Variable, combined_n, value_Alpha, value_Delta, value_Omicron, value_total)
+
+colnames(table1_categorical_results2) <- c('Variable', 'Patients per variant', total_n_dfx$names)
+
+table1_categorical_results2 %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "../output/final_table1_categorical.docx")
+
+
+##
+
+table1_continuous_results2 <- table1_continuous_results %>%
+  pivot_wider(id_cols = variable, 
+              names_from = variant, values_from = c(value, total)) %>%
+  mutate(combined_n = paste0('(', total_Alpha, ', ', total_Delta, ', ', total_Omicron, ', ', total_total, ')')) %>%
+  select(-total_Alpha, -total_Delta, -total_Omicron, -total_total) %>%
+  arrange(variable) %>%
+  select(variable, combined_n, value_Alpha, value_Delta, value_Omicron, value_total)
+
+colnames(table1_continuous_results2) <- c('Variable', 'Patients per variant', total_n_dfx$names)
+
+table1_continuous_results2 %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "../output/final_table1_continuous.docx")
+
+##
+
+table2 %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "../output/final_table2.docx")
+
+##
+
+table3 <- table3_categorical_results %>%
+  pivot_wider(id_cols = Variable, 
+              names_from = variant, values_from = c(value, total)) %>%
+  mutate(combined_n = paste0('(', total_Alpha, ', ', total_Delta, ', ', total_Omicron, ', ', total_total, ')')) %>%
+  select(-total_Alpha, -total_Delta, -total_Omicron, -total_total) %>%
+  arrange(Variable) %>%
+  select(Variable, combined_n, value_Alpha, value_Delta, value_Omicron, value_total)
+
+colnames(table3) <- c('Variable', 'Patients per variant', total_n_dfx$names)
+
+table3 %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "../output/final_table3.docx")
+
+
+
+
+
 
