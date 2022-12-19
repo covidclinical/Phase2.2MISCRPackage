@@ -1,8 +1,10 @@
 library(dplyr)
 library(tidyr)
 library(meta)
+library(stringr)
 rm(list=ls())
-setwd('/Users/smakwana/Desktop/finalTablesTest/4CE_MISC_outputs/')
+#setwd('/Users/smakwana/Desktop/finalTablesTest/4CE_MISC_outputs/')
+setwd("/Users/alba/Desktop/finalTablesTest/4CE_MISC_outputs/")
 sites <- list.files("./")
 
 ########################
@@ -67,17 +69,17 @@ combineCategoricalDataFromSites <- function( fileList, table_num ){
 }
 
 ##### combine continuous data from sites
-combineContinuousDataFromSites <- function( fileList, time_point, table_num ){
+combineContinuousDataFromSites <- function( fileList, time_point){
   
   for( i in 1:length( fileList )){
     
     #extract the site id
     site_id <- sapply( strsplit(fileList[i], "[_]"), '[', 1)
+    print(site_id)
     
     #load the file
     load( paste0("./", site_id, "/original/", fileList[i]))
     
-    if( table_num == 2){
       if( time_point =="admission"){
         inputData <- table2_admission
         rm(table2_admission)
@@ -91,17 +93,7 @@ combineContinuousDataFromSites <- function( fileList, time_point, table_num ){
         mutate( site = site_id,
                 time = time_point) %>%
         select( variant_misc, variableName, mean_value, sd_value, n_patients, site, time ) 
-    }
-    
-    if( table_num == 1){
-      inputData <- table1_continuous
-      rm( table1_continuous )
-      
-      table_output <- inputData %>%
-        mutate( site = site_id ) %>%
-        select( variant_misc, variableName, mean_value, sd_value, n_patients, site) 
-      
-    }
+  
     
     #remove the original df
     rm(inputData)
@@ -109,11 +101,11 @@ combineContinuousDataFromSites <- function( fileList, time_point, table_num ){
     if( i ==1 ){
       output <- table_output
     }else{
-      table_output <- rbind( table_output, output)
+      output <- rbind( table_output, output)
     }
-    
   }
-  return( table_output )
+  return( output )
+  
 }
 
 
@@ -122,7 +114,9 @@ categoricalToMetaAnalysis <- function(n, total, site){
   
   tryCatch({
     mtprop <- metaprop(event = n, n = total, studlab = site, method = 'GLMM', sm = 'PLOGIT', hakn = TRUE)
-    r <- paste0( round( mtprop$TE.random, 2), " [", round(mtprop$lower.random, 2), ", ",round( mtprop$upper.random, 2),  "]")
+    random.est_values <- c(mtprop$TE.random,mtprop$lower.random,mtprop$upper.random)
+    values_forTable <- meta:::backtransf(random.est_values, sm="PLOGIT")
+    r <- paste0( round(values_forTable[1], 2), " [", round(values_forTable[2], 2), ", ",round( values_forTable[3], 2),  "]")
     return(r)
   }, error = function(e) return(NA))
   
@@ -267,8 +261,8 @@ for( i in 1:length(sites)){
 atAdmission <- labFiles[ grepl( "AtAdmission.RData", labFiles)] 
 duringAdmission <- labFiles[ grepl( "DuringAdmission.RData", labFiles)] 
 
-labsAllAdm <- combineContinuousDataFromSites( fileList = atAdmission, time_point = "admission", table_num =  2)
-labsAllDuring <- combineContinuousDataFromSites( fileList = duringAdmission, time_point = "during", table_num = 2)
+labsAllAdm <- combineContinuousDataFromSites( fileList = atAdmission, time_point = "admission")
+labsAllDuring <- combineContinuousDataFromSites( fileList = duringAdmission, time_point = "during")
 
   
 ### final table 2 at admission
