@@ -18,21 +18,21 @@ combineCategoricalDataFromSites <- function( fileList, table_num ){
     site_id <- sapply( strsplit(fileList[i], "[_]"), '[', 1)
     
     #load the file
-    load( paste0("./", site_id, "/original/", fileList[i]))
+    load( paste0("./", site_id, "/replace_earlier/", fileList[i]))
     
     if( table_num == 1){
       inputData <- table1_categorical %>% 
         mutate( site = site_id )
       rm(table1_categorical)
       
-      total_Values <- read.delim(paste0("./", site_id, "/original/", site_id, "_table1.txt" ))
+      total_Values <- read.delim(paste0("./", site_id, "/replace_earlier/", site_id, "_table1.txt" ))
       
     }else if( table_num == 3){
       inputData <- table3 %>% 
         mutate( site = site_id )
       rm(table3)
       
-      total_Values <- read.delim(paste0("./", site_id, "/original/", site_id, "_table3.txt" ))
+      total_Values <- read.delim(paste0("./", site_id, "/replace_earlier/", site_id, "_table3.txt" ))
       
     }
     
@@ -78,7 +78,7 @@ combineContinuousDataFromSites <- function( fileList, time_point){
     print(site_id)
     
     #load the file
-    load( paste0("./", site_id, "/original/", fileList[i]))
+    load( paste0("./", site_id, "/replace_earlier/", fileList[i]))
     
       if( time_point =="admission"){
         inputData <- table2_admission
@@ -116,7 +116,7 @@ categoricalToMetaAnalysis <- function(n, total, site){
     mtprop <- metaprop(event = n, n = total, studlab = site, method = 'GLMM', sm = 'PLOGIT', hakn = TRUE)
     random.est_values <- c(mtprop$TE.random,mtprop$lower.random,mtprop$upper.random)
     values_forTable <- meta:::backtransf(random.est_values, sm="PLOGIT")
-    r <- paste0( round(values_forTable[1], 2), " [", round(values_forTable[2], 2), ", ",round( values_forTable[3], 2),  "]")
+    r <- paste0( round(values_forTable[1], 2), " [", round(values_forTable[2], 2), ", ",round( values_forTable[3], 2),  "] ;", sum(mtprop$event))
     return(r)
   }, error = function(e) return(NA))
   
@@ -141,9 +141,9 @@ continuousToMetaAnalysis <- function(n_patients, mean_value, sd_value, site){
 #####################
 for( i in 1:length(sites)){
   if(i == 1){
-    table1_files <-  list.files(paste0("./", sites[i], "/original/"), pattern = "table1")
+    table1_files <-  list.files(paste0("./", sites[i], "/replace_earlier/"), pattern = "table1")
   }else{
-    table1_filesInt <-  list.files(paste0("./", sites[i], "/original/"), pattern = "table1")
+    table1_filesInt <-  list.files(paste0("./", sites[i], "/replace_earlier/"), pattern = "table1")
     table1_files <- c( table1_files, table1_filesInt)
   }
 }
@@ -158,7 +158,9 @@ table1_categorical <- combineCategoricalDataFromSites( fileList = categoricalTab
 table1_categorical_results <- table1_categorical %>% 
   group_by(categories, variant_misc) %>%
   summarise(res = categoricalToMetaAnalysis(n, total, site),
-            total = sum(total))
+            total = sapply( strsplit(res, " ;"), '[', 2), 
+            res = sapply( strsplit(res, " ;"), '[', 1)
+            )
 
 rm(table1_categorical)
 colnames(table1_categorical_results) <- c("Variable", "variant", "value", "total")
@@ -177,8 +179,8 @@ total_n <- data.frame()
 
 for (s in sites) {
   
-  load(paste0('./', s, '/original/', s, '_table1Continuous.RData'))
-  t1 <- read.table(paste0('./', s, '/original/', s, '_table1.txt'), sep = '\t')
+  load(paste0('./', s, '/replace_earlier/', s, '_table1Continuous.RData'))
+  t1 <- read.table(paste0('./', s, '/replace_earlier/', s, '_table1.txt'), sep = '\t')
   
   nvec <- t1[1,]
   ndf <- data.frame(variant_misc = c('Alpha', 'Delta', 'Omicron', 'total'),
@@ -223,9 +225,9 @@ rm(df, df2, ndf, nvec, t1, table1_continuous, table1_continuous_combined)
 #####################
 for( i in 1:length(sites)){
   if(i == 1){
-    table3_files <-  list.files(paste0("./", sites[i], "/original/"), pattern = "table3.RData")
+    table3_files <-  list.files(paste0("./", sites[i], "/replace_earlier/"), pattern = "table3.RData")
   }else{
-    table3_filesInt <-  list.files(paste0("./", sites[i], "/original/"), pattern = "table3.RData")
+    table3_filesInt <-  list.files(paste0("./", sites[i], "/replace_earlier/"), pattern = "table3.RData")
     table3_files <- c( table3_files, table3_filesInt)
   }
 }
@@ -237,7 +239,9 @@ table3_all <- combineCategoricalDataFromSites( fileList = table3_files, table_nu
 table3_categorical_results <- table3_all %>% 
   group_by(categories, variant_misc) %>%
   summarise(res = categoricalToMetaAnalysis(n, total, site),
-            total = sum(total))
+            total = sapply( strsplit(res, " ;"), '[', 2), 
+            res = sapply( strsplit(res, " ;"), '[', 1)
+  )
 
 rm(table3_all)
 colnames(table3_categorical_results) <- c("Variable", "variant", "value", "total")
@@ -249,9 +253,9 @@ colnames(table3_categorical_results) <- c("Variable", "variant", "value", "total
 #####################
 for( i in 1:length(sites)){
   if(i == 1){
-    labFiles <-  list.files(paste0("./", sites[i], "/original/"), pattern = "table2")
+    labFiles <-  list.files(paste0("./", sites[i], "/replace_earlier/"), pattern = "table2")
   }else{
-    labFilesInt <-  list.files(paste0("./", sites[i], "/original/"), pattern = "table2")
+    labFilesInt <-  list.files(paste0("./", sites[i], "/replace_earlier/"), pattern = "table2")
     labFiles <- c( labFiles, labFilesInt)
   }
 }
