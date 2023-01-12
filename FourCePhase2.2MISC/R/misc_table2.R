@@ -60,6 +60,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
   # summarise
   atAdmission_per_variant <- atAdmission_per_variant %>%
     dplyr::group_by( variableName, variant_misc ) %>%
+    dplyr::filter( ! is.na( selected_value)) %>%
     dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
                    iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
                    mean_value =  round( mean(selected_value, na.rm = TRUE), 2),
@@ -103,6 +104,7 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
 
   atAdmission_total <- atAdmission_total %>%
     dplyr::group_by( variableName) %>%
+    dplyr::filter( ! is.na( selected_value)) %>%
     dplyr::mutate( variant_misc = "total_n",
                    median_value = round( median(selected_value, na.rm = TRUE), 2),
                    iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
@@ -156,12 +158,13 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
 
   duringAdmission_per_variant <- duringAdmission_per_variant %>%
     dplyr::group_by( patient_num, variableName, variant_misc ) %>%
-    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
+    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value, na.rm = TRUE ), max( value, na.rm = TRUE ) ) ) %>%
     dplyr::ungroup( ) %>%
     rbind(nlr_df3) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
     dplyr::group_by( variableName, variant_misc ) %>%
+    dplyr::filter( ! is.na( selected_value)) %>%
     dplyr::mutate( median_value = round( median(selected_value, na.rm = TRUE), 2),
                    iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
                    mean_value =  round( mean(selected_value, na.rm = TRUE), 2),
@@ -205,12 +208,13 @@ misc_table2 <- function(complete_df, currSiteId, obfuscation_threshold, dir.outp
 
   duringAdmission_total <- duringAdmission_total %>%
     dplyr::group_by( patient_num, variableName ) %>%
-    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value ), max( value ) ) ) %>%
+    dplyr::mutate(  selected_value = ifelse( worstValue == "lowest", min( value, na.rm = TRUE ), max( value, na.rm = TRUE ) ) ) %>%
     dplyr::ungroup( ) %>%
     rbind(nlr_df4) %>%
     dplyr::select(patient_num, variableName, units, selected_value, variant_misc ) %>%
     unique() %>%
     dplyr::group_by( variableName ) %>%
+    dplyr::filter( ! is.na( selected_value)) %>%
     dplyr::mutate( variant_misc = "total_n",
                    median_value = round( median(selected_value, na.rm = TRUE), 2),
                    iqr_value = round( IQR(selected_value, na.rm = TRUE), 2),
