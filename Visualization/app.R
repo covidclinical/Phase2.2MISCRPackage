@@ -189,70 +189,7 @@ ui <- fluidPage(
                                 )
                             ))
                         )
-               ),
-               tabPanel("Washout vs. non-washout BCH",
-                         fluidRow(p(
-                             "Here using BCH as a proof of concept, we compare how the results change based on the variant cut-off date"
-                         ),
-                         br(),
-                         p(tags$img(src="methods.png",width="1750px",height="400px")),
-                         br(),
-                         sidebarLayout(
-                             sidebarPanel(
-                                 
-                                 radioButtons("variantW", label = h3("MISC Variant type:"),
-                                              choices = list("Total" = "total", "Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron", "All" = "all"), 
-                                              selected = "all"),
-                                 sliderInput("significant_thresholdW", "p-value threshold:",
-                                             min = 0, max = 1, value = 0.1
-                                 ),
-                             ),
-                             mainPanel(
-                                 
-                                 tabsetPanel(type = "tabs",
-                                             tabPanel("Categorical Table1 percentages differentes", plotOutput("plot_w1"),  width = "100%"), 
-                                             tabPanel("Categorical Table1 comparison", plotOutput("plot_w2"),  width = "75%"),
-                                             tabPanel("Categorical Table1 p-value comparison", plotOutput("plot_w3"),  width = "100%"), 
-                                             tabPanel("Table3 percentages differentes", plotOutput("plot_w4"),  width = "100%"), 
-                                             tabPanel("Table3 comparison", plotOutput("plot_w5"),  width = "75%"),
-                                             tabPanel("Table3 p-value comparison", plotOutput("plot_w6"),  width = "100%")
-                                 )
-                                 
-                             ))
-                         )
-               ),
-               tabPanel("Washout vs. non-washout H120",
-                        fluidRow(p(
-                            "For Spain, compare how the results change based on the variant cut-off date"
-                        ),
-                        br(),
-                        p(tags$img(src="methods_spain.png",width="1550px",height="400px")),
-                        br(),
-                        sidebarLayout(
-                            sidebarPanel(
-                                
-                                radioButtons("variantW_Spain", label = h3("MISC Variant type:"),
-                                             choices = list("Total" = "total", "Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron", "All" = "all"), 
-                                             selected = "all"),
-                                sliderInput("significant_thresholdW_Spain", "p-value threshold:",
-                                            min = 0, max = 1, value = 0.1
-                                ),
-                            ),
-                            mainPanel(
-                                
-                                tabsetPanel(type = "tabs",
-                                            tabPanel("Categorical Table1 percentages differentes", plotOutput("plot_w1_sp"),  width = "100%"), 
-                                            tabPanel("Categorical Table1 comparison", plotOutput("plot_w2_sp"),  width = "75%"),
-                                            tabPanel("Categorical Table1 p-value comparison", plotOutput("plot_w3_sp"),  width = "100%"), 
-                                            tabPanel("Table3 percentages differentes", plotOutput("plot_w4_sp"),  width = "100%"), 
-                                            tabPanel("Table3 comparison", plotOutput("plot_w5_sp"),  width = "75%"),
-                                            tabPanel("Table3 p-value comparison", plotOutput("plot_w6_sp"),  width = "100%")
-                                )
-                                
-                            ))
-                        )
                )
-               
     )
 )
 
@@ -261,6 +198,7 @@ ui <- fluidPage(
 ######################################################################################
 
 server <- function(input, output) {
+    sites <- list.files("./4CE_MISC_outputs/")
     
     #### ICD code QC
     output$table <- DT::renderDataTable(DT::datatable({
@@ -274,12 +212,12 @@ server <- function(input, output) {
         totalN <- read.delim("./sites_totalPatients.txt")
         
         ### read the ICD files from each site
-        files <- list.files("./sitesICDcodes/")
-        
+        files <- list.files("./4CE_MISC_outputs/")
+    
         for( i in 1:length( files )){
-            site_id <- sapply( strsplit(files[i], "[_]"), '[', 1)
+            site_id <- files[i]
             n_total <- totalN %>% filter( site == site_id )
-            load( paste0("./sitesICDcodes/", files[i]))
+            load( paste0("./4CE_MISC_outputs/", files[i], "/replace_earlier/QC/", files[i], "_ICDdiagnosisCodes.RData"))
             
             if( i ==1 ){
                 site_codes <- diag_sum %>%
@@ -350,14 +288,29 @@ server <- function(input, output) {
     }, options = list("pageLength" = 50),  filter = "top", rownames = FALSE))
     
     #### Labs QC
-    at_admission_files <- list.files("./atAdmission/")
-    during_admission_files <- list.files("./duringAdmission/")
+    for( i in 1:length(sites)){
+        print(sites)
+        if(i == 1){
+            labFiles <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table2")
+        }else{
+            labFilesInt <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table2")
+            labFiles <- c( labFiles, labFilesInt)
+        }
+    }
+    
+    
+    
+    ### split the files
+    at_admission_files <- labFiles[ grepl( "AtAdmission.RData", labFiles)] 
+    during_admission_files <- labFiles[ grepl( "DuringAdmission.RData", labFiles)] 
+    
     totalN <- read.delim("./sites_totalPatients.txt")
     
     for( i in 1:length( at_admission_files )){
         site_id <- sapply( strsplit(at_admission_files[i], "[_]"), '[', 1)
         
-        load( paste0("./atAdmission/", at_admission_files[i]))
+        #load the file
+        load( paste0("./4CE_MISC_outputs/", site_id, "/replace_earlier/",site_id,  "_table2AtAdmission.RData"))
         n_total <- totalN %>% filter( site == site_id )
         
         if( i ==1 ){
@@ -365,7 +318,7 @@ server <- function(input, output) {
             labs_adm <- table2_admission %>%
                 mutate( percs = round(n_patients / n_total$total_n *100, 2),
                         label = paste0( variableName, " (", units, ")"), 
-                        site = paste0( site_id, "\n (", n_total$total_n, ")"),
+                        site = site_id,
                         site_label =  paste0( site_id, "\n (", n_patients, ")"),
                         time = "admission")
             
@@ -374,7 +327,7 @@ server <- function(input, output) {
             int_labs_adm <- table2_admission %>%
                 mutate( percs = round(n_patients / n_total$total_n *100, 2),
                         label = paste0( variableName, " (", units, ")"), 
-                        site = paste0( site_id, "\n (", n_total$total_n, ")"), 
+                        site = site_id, 
                         site_label =  paste0( site_id, "\n (", n_patients, ")"),
                         time = "admission" )
             labs_adm <- rbind( labs_adm, int_labs_adm)
@@ -383,7 +336,7 @@ server <- function(input, output) {
     
     for( i in 1:length( during_admission_files )){
         site_id <- sapply( strsplit(during_admission_files[i], "[_]"), '[', 1)
-        load( paste0("./duringAdmission/", during_admission_files[i]))
+        load( paste0("./4CE_MISC_outputs/", site_id, "/replace_earlier/",site_id,  "_table2DuringAdmission.RData"))
         n_total <- totalN %>% filter( site == site_id )
         
         if( i ==1 ){
@@ -391,7 +344,7 @@ server <- function(input, output) {
             labs_during <- table2_during %>%
                 mutate( percs = round(n_patients / n_total$total_n *100, 2),
                         label = paste0( variableName, " (", units, ")"), 
-                        site = paste0( site_id, "\n (", n_total$total_n, ")"), 
+                        site = site_id, 
                         site_label =  paste0( site_id, "\n (", n_patients, ")"),
                         time = "during")
             
@@ -400,7 +353,7 @@ server <- function(input, output) {
             int_labs_during <- table2_during %>%
                 mutate( percs = round(n_patients / n_total$total_n *100, 2),
                         label = paste0( variableName, " (", units, ")"), 
-                        site = paste0( site_id, "\n (", n_total$total_n, ")"), 
+                        site = site_id, 
                         site_label =  paste0( site_id, "\n (", n_patients, ")"),
                         time = "during" )
             labs_during <- rbind( labs_during, int_labs_during)
@@ -414,7 +367,7 @@ server <- function(input, output) {
             filter( variant_misc == input$variant, 
                     time == input$time)
         
-        ggplot(labs_to_plot, aes(site_label, fill = site)) +
+        ggplot(labs_to_plot, aes(site, fill = site)) +
             geom_boxplot(
                 stat = "identity",
                 aes(lower  = q25_value,
@@ -439,7 +392,7 @@ server <- function(input, output) {
             filter( variant_misc == input$variant, 
                     time == input$time)
         
-        ggplot(labs_to_plot,  aes(x=site_label, y=percs, fill=site)) +
+        ggplot(labs_to_plot,  aes(x=site, y=percs, fill=site)) +
             geom_bar(stat="identity") +
             facet_wrap( .~ label, scales = "free", labeller = label_wrap_gen(multi_line = TRUE) )+
             theme(axis.text=element_text(size=14),
@@ -466,18 +419,13 @@ server <- function(input, output) {
                         variant_misc == input$variantLabMeta &
                         time == input$timeLabMeta)
         
-        #toForestPlot <- labsToMetaAnalysis %>%
-        #    filter( variableName == "CRP" &
-        #                variant_misc == "Alpha" &
-        #                time == "admission")
-        
         metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=site, data=toForestPlot, sm="MRAW", method.ci= "z",
                  comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
         
         mtmean <-  metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=site, data=toForestPlot, sm="MRAW", method.ci= "z",
                             comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
         
-        forest(mtmean)
+        forest.meta(mtmean, layout = "JAMA")
         
     }, height = 500, width = 900)
     
@@ -506,19 +454,30 @@ server <- function(input, output) {
         mtmean <-  metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=Country, data=toForestPlot, sm="MRAW", method.ci= "z",
                             comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
         
-        forest(mtmean)
+        forest.meta(mtmean, layout = "JAMA")
     }, height = 500, width = 900)
     
     
     
     ##### Forest plot 
-    pvaluesFiles3 <- list.files( path = "./table3s/", pattern = "3.txt")
-    rdataFiles3 <- list.files( path = "./table3s/", pattern = "table3.RData")
+    for( i in 1:length(sites)){
+        if(i == 1){
+            pvaluesFiles3 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "3.txt")
+            rdataFiles3 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table3.RData")
+        }else{
+            pvaluesFiles3Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "3.txt")
+            rdataFiles3Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table3.RData")
+            
+            pvaluesFiles3 <- c( pvaluesFiles3, pvaluesFiles3Int)
+            rdataFiles3 <- c( rdataFiles3, rdataFiles3Int)
+            
+        }
+    }
     
     for( i in 1:length(pvaluesFiles3)){
         print(i)
         siteid <- unlist(strsplit(x = pvaluesFiles3[i], split = "_"))[1]
-        p_values <- read.delim(paste0( "./table3s/", pvaluesFiles3[i]))
+        p_values <- read.delim(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/",pvaluesFiles3[i]))
         
         variantsN <- as.data.frame(matrix(ncol=2, nrow=4))
         colnames(variantsN) <- c("variant_misc", "total")
@@ -551,7 +510,7 @@ server <- function(input, output) {
     for( i in 1:length(rdataFiles3)){
         print(i)
         siteid <- unlist(strsplit(x = rdataFiles3[i], split = "_"))[1]
-        load(paste0( "./table3s/", rdataFiles3[i]))
+        load(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/", rdataFiles3[i]))
         table3$site <- siteid
         
         if( i == 1){
@@ -566,13 +525,24 @@ server <- function(input, output) {
         left_join( variantsData3, by = c("variant_misc", "site"))
     
     ### table 1 categorical
-    pvaluesFiles1 <- list.files( path = "./table1s/", pattern = "1.txt")
-    rdataFiles1 <- list.files( path = "./table1s/", pattern = "table1Categorical.RData")
-    
+    for( i in 1:length(sites)){
+        if(i == 1){
+            pvaluesFiles1 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "1.txt")
+            rdataFiles1 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table1Categorical.RData")
+        }else{
+            pvaluesFiles1Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "1.txt")
+            rdataFiles1Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table1Categorical.RData")
+            
+            pvaluesFiles1 <- c( pvaluesFiles1, pvaluesFiles1Int)
+            rdataFiles1 <- c( rdataFiles1, rdataFiles1Int)
+            
+        }
+    }
+
     for( i in 1:length(pvaluesFiles1)){
         print(i)
         siteid <- unlist(strsplit(x = pvaluesFiles1[i], split = "_"))[1]
-        p_values <- read.delim(paste0( "./table1s/", pvaluesFiles1[i]))
+        p_values <- read.delim(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/",pvaluesFiles1[i]))
         
         variantsN <- as.data.frame(matrix(ncol=2, nrow=4))
         colnames(variantsN) <- c("variant_misc", "total")
@@ -604,7 +574,7 @@ server <- function(input, output) {
     for( i in 1:length(rdataFiles1)){
         print(i)
         siteid <- unlist(strsplit(x = rdataFiles1[i], split = "_"))[1]
-        load(paste0( "./table1s/", rdataFiles1[i]))
+        load(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/", rdataFiles1[i]))
         table1_categorical$site <- siteid
         
         if( i == 1){
@@ -643,7 +613,8 @@ server <- function(input, output) {
         mtprop <- metaprop(event=n, n=total, studlab=site, data=toForestPlot, method = "GLMM", sm = "PLOGIT",
                            comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
         
-        forest(mtprop)
+        forest.meta(mtprop, layout = "JAMA")
+        
     }, height = 500, width = 900)
     
     output$forestcountry<- renderPlot({
@@ -666,7 +637,8 @@ server <- function(input, output) {
         mtprop <- metaprop(event=n, n=total, studlab=Country, data=toForestPlot, method = "GLMM", sm = "PLOGIT",
                            comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
         
-        forest(mtprop)
+        forest.meta(mtprop, layout = "JAMA")
+        
     }, height = 500, width = 900)
     
     ### compare categorical var in table 1 and 3 across sites 
@@ -827,788 +799,6 @@ server <- function(input, output) {
             guides( fill = "none")
         
     }, height = 900, width = 1100)
-    
-    ### washout vs. non washout 
-    ### table 1s
-    
-    pvalues_bch_original <- read.delim("./BCH Output/BCH_table1.txt") %>%
-        select( categories, p.value)
-    
-    load("./BCH Output/BCH_table1Categorical.RData")
-    bch_original <- table1_categorical %>%
-        left_join( pvalues_bch_original )
-    bch_original$type <- "bch_original"
-    bch_original$total <- ifelse( bch_original$variant_misc == "Alpha", 98, 
-                                  ifelse( bch_original$variant_misc == "Delta", 18,
-                                          ifelse( bch_original$variant_misc == "Omicron", 21, 137))) 
-    
-    bch_original$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", bch_original$categories)
-    bch_original$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", bch_original$categories)
-    bch_original$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", bch_original$categories)
-    bch_original$categories <- gsub("Kawasaki", "KAWASAKI", bch_original$categories)
-    
-    
-    
-    
-    rm( table1_categorical )
-    
-    bch_pvalues_remove <- read.delim("./washoutTestBCH/outputMISC_washout14/BCH_table1.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestBCH/outputMISC_washout14/BCH_table1Categorical.RData")
-    bch_removing <- table1_categorical %>%
-        left_join( bch_pvalues_remove )
-    bch_removing$type <- "remove"
-    bch_removing$total <- ifelse( bch_removing$variant_misc == "Alpha", 98, 
-                                  ifelse( bch_removing$variant_misc == "Delta", 15,
-                                          ifelse( bch_removing$variant_misc == "Omicron", 13, 126)))
-    
-    rm(table1_categorical)
-    
-    pvalues_bch_replace_earlier <- read.delim("./washoutTestBCH/outputMISC_washout_replaceEarlier14/BCH_table1.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestBCH/outputMISC_washout_replaceEarlier14/BCH_table1Categorical.RData")
-    bch_replace_earlier <- table1_categorical  %>%
-        left_join( pvalues_bch_replace_earlier )
-    bch_replace_earlier$type <- "bch_replace_earlier"
-    bch_replace_earlier$total <- ifelse( bch_replace_earlier$variant_misc == "Alpha", 98, 
-                                         ifelse( bch_replace_earlier$variant_misc == "Delta", 16,
-                                                 ifelse( bch_replace_earlier$variant_misc == "Omicron", 23, 137)))
-    
-    rm(table1_categorical)
-    
-    pvalues_bch_replace_later <- read.delim("./washoutTestBCH/outputMISC_washout_replaceLater14/BCH_table1.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestBCH/outputMISC_washout_replaceLater14/BCH_table1Categorical.RData")
-    bch_replace_later <- table1_categorical  %>%
-        left_join( pvalues_bch_replace_later )
-    bch_replace_later$type <- "bch_replace_later"
-    rm(table1_categorical)
-    bch_replace_later$total <- ifelse( bch_replace_later$variant_misc == "Alpha", 99, 
-                                       ifelse( bch_replace_later$variant_misc == "Delta", 25,
-                                               ifelse( bch_replace_later$variant_misc == "Omicron", 13, 137)))
-    
-    bch_all <- rbind( bch_original, bch_removing, bch_replace_later, bch_replace_earlier )
-    
-    bch_all$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", bch_all$categories)
-    bch_all$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", bch_all$categories)
-    bch_all$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", bch_all$categories)
-    bch_all$categories <- gsub("Kawasaki", "KAWASAKI", bch_all$categories)
-    
-    categoriesToVisualize <- c("CARDIOVASCULAR SYMPTOMS" , "GI SYMPTOMS", "LIVER DYSFUNCTION", 
-                               "NEUROLOGIC SYMPTOMS", "RENAL DYSFUNCTION", "RESPIRATORY SYMPTOMS", 
-                               "GENERALIZED SYMPTOMS", "KAWASAKI" )
-    
-    bch_allData <- bch_all %>%
-        filter( categories %in% categoriesToVisualize) %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc, type )
-    
-    bch_originalToCompare <- bch_original %>%
-        filter( categories %in% categoriesToVisualize) %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc )
-    
-    bch_allToCompare <-  rbind( bch_removing, bch_replace_later, bch_replace_earlier ) 
-    
-    bch_allToCompare$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", bch_allToCompare$categories)
-    bch_allToCompare$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", bch_allToCompare$categories)
-    bch_allToCompare$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", bch_allToCompare$categories)
-    bch_allToCompare$categories <- gsub("Kawasaki", "KAWASAKI", bch_allToCompare$categories)
-    
-    
-    bch_allToCompare <- bch_allToCompare %>%
-        filter( categories %in% categoriesToVisualize) %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc, type ) %>%
-        left_join( bch_originalToCompare,by = c( "categories", "variant_misc" ),suffix = c(".washout", ".bch_original")) %>%
-        # i swapped this so that a positive number means the new washout approach is adding patients.
-        mutate( diff = perc.washout - perc.bch_original) %>%
-        select( categories, variant_misc, diff, type) %>%
-        unique()
-    
-    ### table 3s
-    pvalues_bch_original3 <- read.delim("./BCH Output/BCH_table3.txt") %>%
-        select( categories, p.value)
-    
-    load("./BCH Output/BCH_table3.RData")
-    bch_original3 <- table3 %>%
-        left_join( pvalues_bch_original3 )
-    bch_original3$type <- "bch_original"
-    bch_original3$total <- ifelse( bch_original3$variant_misc == "Alpha", 98, 
-                                   ifelse( bch_original3$variant_misc == "Delta", 18,
-                                           ifelse( bch_original3$variant_misc == "Omicron", 21, 137))) 
-    
-    
-    
-    rm( table3 )
-    rm( pvalues_bch_original3)
-    
-    bch_pvalues_remove3 <- read.delim("./washoutTestBCH/outputMISC_washout14/BCH_table3.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestBCH/outputMISC_washout14/BCH_table3.RData")
-    bch_removing3 <- table3 %>%
-        left_join( bch_pvalues_remove3 )
-    bch_removing3$type <- "remove"
-    bch_removing3$total <- ifelse( bch_removing3$variant_misc == "Alpha", 98, 
-                                   ifelse( bch_removing3$variant_misc == "Delta", 15,
-                                           ifelse( bch_removing3$variant_misc == "Omicron", 13, 126)))
-    
-    rm( table3 )
-    rm( bch_pvalues_remove3)
-    
-    pvalues_bch_replace_earlier3 <- read.delim("./washoutTestBCH/outputMISC_washout_replaceEarlier14/BCH_table3.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestBCH/outputMISC_washout_replaceEarlier14/BCH_table3.RData")
-    bch_replace_earlier3 <- table3  %>%
-        left_join( pvalues_bch_replace_earlier3 )
-    bch_replace_earlier3$type <- "bch_replace_earlier"
-    bch_replace_earlier3$total <- ifelse( bch_replace_earlier3$variant_misc == "Alpha", 98, 
-                                          ifelse( bch_replace_earlier3$variant_misc == "Delta", 16,
-                                                  ifelse( bch_replace_earlier3$variant_misc == "Omicron", 23, 137)))
-    
-    rm( table3 )
-    rm( pvalues_bch_replace_earlier3)
-    
-    pvalues_bch_replace_later3 <- read.delim("./washoutTestBCH/outputMISC_washout_replaceLater14/BCH_table3.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestBCH/outputMISC_washout_replaceLater14/BCH_table3.RData")
-    bch_replace_later3 <- table3  %>%
-        left_join( pvalues_bch_replace_later3 )
-    bch_replace_later3$type <- "bch_replace_later"
-    rm(table3)
-    rm( pvalues_bch_replace_later3)
-    
-    bch_replace_later3$total <- ifelse( bch_replace_later3$variant_misc == "Alpha", 99, 
-                                        ifelse( bch_replace_later3$variant_misc == "Delta", 25,
-                                                ifelse( bch_replace_later3$variant_misc == "Omicron", 13, 137)))
-    
-    bch_all3 <- rbind( bch_original3, bch_removing3, bch_replace_later3, bch_replace_earlier3 )
-    
-    bch_allData3 <- bch_all3 %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc, type )
-    
-    bch_originalToCompare3 <- bch_original3 %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc )
-    
-    bch_allToCompare3 <-  rbind( bch_removing3, bch_replace_later3, bch_replace_earlier3 ) %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc, type ) %>%
-        left_join( bch_originalToCompare3,by = c( "categories", "variant_misc" ),suffix = c(".washout", ".bch_original")) %>%
-        mutate( diff = perc.washout - perc.bch_original) %>%
-        select( categories, variant_misc, diff, type) %>%
-        unique()
-    
-    
-    
-    
-    output$plot_w2 <- renderPlot({
-        
-        if( input$variantW == "all"){
-            toPlot <- bch_allData
-            ggplot(toPlot, aes(type, categories, fill= perc)) +
-                geom_tile() + 
-                facet_wrap( ~ variant_misc ) +
-                geom_text(aes(label = round(perc, 1))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=4, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                theme_bw() +
-                scale_fill_gradient2(low="lightgrey", high="darkgreen")
-            
-            
-        }else{
-            toPlot <- bch_allData %>% 
-                filter( variant_misc == input$variantW) 
-            ggplot(toPlot, aes(type, categories, fill= perc)) +
-                geom_tile() + 
-                geom_text(aes(label = round(perc, 1))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=4, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                theme_bw() +
-                scale_fill_gradient2(low="lightgrey", high="darkgreen")
-            
-            
-        }
-    }, height = 900, width = 1100)
-    output$plot_w1 <- renderPlot({
-        
-        if( input$variantW == "all"){
-            toPlot <- bch_allToCompare
-            ggplot(toPlot, aes(type, categories, fill= diff)) +
-                geom_tile() + 
-                facet_wrap( ~ variant_misc ) +
-                geom_text(aes(label = round(diff, 3))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=4, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                theme_bw() +
-                scale_fill_gradient2(low="darkorange", high="blue")
-            
-        }else{
-            toPlot <- bch_allToCompare %>%
-                filter( variant_misc == input$variantW) %>%
-                select( categories, variant_misc, type, diff ) %>%
-                unique()
-            
-            ggplot(toPlot, aes(type, categories, fill= diff)) +
-                geom_tile(aes(fill = diff)) +
-                geom_text(aes(label = round(diff, 3))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=4, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                theme_bw() +
-                scale_fill_gradient2(low="darkorange", high="blue")
-            
-        }
-        
-    }, height = 900, width = 1100)
-    
-    output$plot_w3 <- renderPlot({
-        
-        bch_allPvalue <- bch_all %>%
-            filter( categories %in% categoriesToVisualize) %>%
-            mutate( significant = ifelse( p.value <= input$significant_thresholdW, 1, 0)) %>%
-            ungroup() %>%
-            select( categories, p.value, type, significant ) %>%
-            unique()
-        
-        toPlot <- bch_allPvalue
-        ggplot(toPlot, aes(type, categories, fill= significant)) +
-            geom_tile() + 
-            geom_text(aes(label = ifelse( significant == 1, p.value, ""))) +
-            theme(axis.text=element_text(size=10),
-                  axis.text.x = element_text(size=10, hjust = 1), 
-                  axis.text.y = element_text(size=4, hjust = 1), 
-                  strip.text.x = element_text(size = 12, face = "bold" ), 
-                  axis.title.y = element_text(size = 6)
-            )+
-            theme_bw()+
-            scale_fill_gradient2(low="white", high="yellow") +
-            guides( fill = "none")
-        
-    }, height = 900, width = 1100)
-    
-    output$plot_w5 <- renderPlot({
-        
-        if( input$variantW == "all"){
-            toPlot <- bch_allData3
-            
-            ggplot(toPlot, aes(type, categories, fill= perc)) +
-                geom_tile() + 
-                facet_wrap( ~ variant_misc ) +
-                theme_bw() +
-                geom_text(aes(label = round(perc, 1))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=12, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                scale_fill_gradient2(low="lightgrey", high="darkgreen")
-            
-            
-        }else{
-            toPlot <- bch_allData3 %>% 
-                filter( variant_misc == input$variantW) 
-            ggplot(toPlot, aes(type, categories, fill= perc)) +
-                geom_tile() + 
-                theme_bw() +
-                geom_text(aes(label = round(perc, 1))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=12, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                scale_fill_gradient2(low="lightgrey", high="darkgreen")
-            
-            
-        }
-    }, height = 900, width = 1100)
-    output$plot_w4 <- renderPlot({
-        
-        if( input$variantW == "all"){
-            toPlot <- bch_allToCompare3 
-            ggplot(toPlot, aes(type, categories, fill= diff)) +
-                geom_tile() + 
-                facet_wrap( ~ variant_misc ) +
-                geom_text(aes(label = round(diff, 3))) +
-                theme_bw() +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=12, hjust = 1), 
-                      axis.text.y = element_text(size=12, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                scale_fill_gradient2(low="darkorange", high="blue")
-            
-        }else{
-            toPlot <- bch_allToCompare3 %>%
-                filter( variant_misc == input$variantW) %>%
-                select( categories, variant_misc, type, diff ) %>%
-                unique()
-            
-            ggplot(toPlot, aes(type, categories, fill= diff)) +
-                geom_tile(aes(fill = diff)) +
-                theme_bw() +
-                geom_text(aes(label = round(diff, 3))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=12, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                scale_fill_gradient2(low="darkorange", high="blue")
-            
-        }
-        
-    }, height = 900, width = 1100)
-    
-    output$plot_w6 <- renderPlot({
-        
-        bch_allPvalue3 <- bch_all3 %>%
-            mutate( significant = ifelse( p.value <= input$significant_thresholdW, 1, 0)) %>%
-            ungroup() %>%
-            select( categories, p.value, type, significant ) %>%
-            unique()
-        
-        toPlot <- bch_allPvalue3
-        ggplot(toPlot, aes(type, categories, fill= significant)) +
-            geom_tile() + 
-            theme_bw() +
-            geom_text(aes(label = ifelse( significant == 1, p.value, ""))) +
-            theme(axis.text=element_text(size=10),
-                  axis.text.x = element_text(size=10, hjust = 1), 
-                  axis.text.y = element_text(size=12, hjust = 1), 
-                  strip.text.x = element_text(size = 12, face = "bold" ), 
-                  axis.title.y = element_text(size = 6)
-            )+
-            scale_fill_gradient2(low="white", high="yellow") +
-            guides( fill = "none")
-        
-    }, height = 900, width = 1100)
-    
-    ####### Spain washout 
-    pvalues_H12O_original <- read.delim("./H12O Output/H12O_table1.txt") %>%
-        select( categories, p.value)
-    
-    load("./H12O Output/H12O_table1Categorical.RData")
-    H12O_original <- table1_categorical %>%
-        left_join( pvalues_H12O_original )
-    H12O_original$type <- "H12O_original"
-    H12O_original$total <- ifelse( H12O_original$variant_misc == "Alpha", 98, 
-                                   ifelse( H12O_original$variant_misc == "Delta", 18,
-                                           ifelse( H12O_original$variant_misc == "Omicron", 21, 137))) 
-    
-    H12O_original$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", H12O_original$categories)
-    H12O_original$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", H12O_original$categories)
-    H12O_original$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", H12O_original$categories)
-    H12O_original$categories <- gsub("Kawasaki", "KAWASAKI", H12O_original$categories)
-    
-    
-    
-    
-    rm( table1_categorical )
-    
-    H12O_pvalues_remove <- read.delim("./washoutTestH12O/remove/H12O_table1.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestH12O/remove/H12O_table1Categorical.RData")
-    H12O_removing <- table1_categorical %>%
-        left_join( H12O_pvalues_remove )
-    H12O_removing$type <- "remove"
-    H12O_removing$total <- ifelse( H12O_removing$variant_misc == "Alpha", 98, 
-                                   ifelse( H12O_removing$variant_misc == "Delta", 15,
-                                           ifelse( H12O_removing$variant_misc == "Omicron", 13, 126)))
-    
-    rm(table1_categorical)
-    
-    pvalues_H12O_replace_earlier <- read.delim("./washoutTestH12O/replace_earlier/H12O_table1.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestH12O/replace_earlier/H12O_table1Categorical.RData")
-    H12O_replace_earlier <- table1_categorical  %>%
-        left_join( pvalues_H12O_replace_earlier )
-    H12O_replace_earlier$type <- "H12O_replace_earlier"
-    H12O_replace_earlier$total <- ifelse( H12O_replace_earlier$variant_misc == "Alpha", 98, 
-                                          ifelse( H12O_replace_earlier$variant_misc == "Delta", 16,
-                                                  ifelse( H12O_replace_earlier$variant_misc == "Omicron", 23, 137)))
-    
-    rm(table1_categorical)
-    
-    pvalues_H12O_replace_later <- read.delim("./washoutTestH12O/replace_late/H12O_table1.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestH12O/replace_late/H12O_table1Categorical.RData")
-    H12O_replace_later <- table1_categorical  %>%
-        left_join( pvalues_H12O_replace_later )
-    H12O_replace_later$type <- "H12O_replace_later"
-    rm(table1_categorical)
-    H12O_replace_later$total <- ifelse( H12O_replace_later$variant_misc == "Alpha", 99, 
-                                        ifelse( H12O_replace_later$variant_misc == "Delta", 25,
-                                                ifelse( H12O_replace_later$variant_misc == "Omicron", 13, 137)))
-    
-    H12O_all <- rbind( H12O_original, H12O_removing, H12O_replace_later, H12O_replace_earlier )
-    
-    H12O_all$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", H12O_all$categories)
-    H12O_all$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", H12O_all$categories)
-    H12O_all$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", H12O_all$categories)
-    H12O_all$categories <- gsub("Kawasaki", "KAWASAKI", H12O_all$categories)
-    
-    categoriesToVisualize <- c("CARDIOVASCULAR SYMPTOMS" , "GI SYMPTOMS", "LIVER DYSFUNCTION", 
-                               "NEUROLOGIC SYMPTOMS", "RENAL DYSFUNCTION", "RESPIRATORY SYMPTOMS", 
-                               "GENERALIZED SYMPTOMS", "KAWASAKI" )
-    
-    H12O_allData <- H12O_all %>%
-        filter( categories %in% categoriesToVisualize) %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc, type )
-    
-    H12O_originalToCompare <- H12O_original %>%
-        filter( categories %in% categoriesToVisualize) %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc )
-    
-    H12O_allToCompare <-  rbind( H12O_removing, H12O_replace_later, H12O_replace_earlier ) 
-    
-    H12O_allToCompare$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", H12O_allToCompare$categories)
-    H12O_allToCompare$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", H12O_allToCompare$categories)
-    H12O_allToCompare$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", H12O_allToCompare$categories)
-    H12O_allToCompare$categories <- gsub("Kawasaki", "KAWASAKI", H12O_allToCompare$categories)
-    
-    
-    H12O_allToCompare <- H12O_allToCompare %>%
-        filter( categories %in% categoriesToVisualize) %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc, type ) %>%
-        left_join( H12O_originalToCompare,by = c( "categories", "variant_misc" ),suffix = c(".washout", ".H12O_original")) %>%
-        # i swapped this so that a positive number means the new washout approach is adding patients.
-        mutate( diff = perc.washout - perc.H12O_original) %>%
-        select( categories, variant_misc, diff, type) %>%
-        unique()
-    
-    ### table 3s
-    pvalues_H12O_original3 <- read.delim("./H12O Output/H12O_table3.txt") %>%
-        select( categories, p.value)
-    
-    load("./H12O Output/H12O_table3.RData")
-    H12O_original3 <- table3 %>%
-        left_join( pvalues_H12O_original3 )
-    H12O_original3$type <- "H12O_original"
-    H12O_original3$total <- ifelse( H12O_original3$variant_misc == "Alpha", 98, 
-                                    ifelse( H12O_original3$variant_misc == "Delta", 18,
-                                            ifelse( H12O_original3$variant_misc == "Omicron", 21, 137))) 
-    
-    
-    
-    rm( table3 )
-    rm( pvalues_H12O_original3)
-    
-    H12O_pvalues_remove3 <- read.delim("./washoutTestH12O/remove/H12O_table3.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestH12O/remove/H12O_table3.RData")
-    H12O_removing3 <- table3 %>%
-        left_join( H12O_pvalues_remove3 )
-    H12O_removing3$type <- "remove"
-    H12O_removing3$total <- ifelse( H12O_removing3$variant_misc == "Alpha", 98, 
-                                    ifelse( H12O_removing3$variant_misc == "Delta", 15,
-                                            ifelse( H12O_removing3$variant_misc == "Omicron", 13, 126)))
-    
-    rm( table3 )
-    rm( H12O_pvalues_remove3)
-    
-    pvalues_H12O_replace_earlier3 <- read.delim("./washoutTestH12O/replace_earlier/H12O_table3.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestH12O/replace_earlier/H12O_table3.RData")
-    H12O_replace_earlier3 <- table3  %>%
-        left_join( pvalues_H12O_replace_earlier3 )
-    H12O_replace_earlier3$type <- "H12O_replace_earlier"
-    H12O_replace_earlier3$total <- ifelse( H12O_replace_earlier3$variant_misc == "Alpha", 98, 
-                                           ifelse( H12O_replace_earlier3$variant_misc == "Delta", 16,
-                                                   ifelse( H12O_replace_earlier3$variant_misc == "Omicron", 23, 137)))
-    
-    rm( table3 )
-    rm( pvalues_H12O_replace_earlier3)
-    
-    pvalues_H12O_replace_later3 <- read.delim("./washoutTestH12O/replace_late/H12O_table3.txt") %>%
-        select( categories, p.value)
-    load("./washoutTestH12O/replace_late/H12O_table3.RData")
-    H12O_replace_later3 <- table3  %>%
-        left_join( pvalues_H12O_replace_later3 )
-    H12O_replace_later3$type <- "H12O_replace_later"
-    rm(table3)
-    rm( pvalues_H12O_replace_later3)
-    
-    H12O_replace_later3$total <- ifelse( H12O_replace_later3$variant_misc == "Alpha", 99, 
-                                         ifelse( H12O_replace_later3$variant_misc == "Delta", 25,
-                                                 ifelse( H12O_replace_later3$variant_misc == "Omicron", 13, 137)))
-    
-    H12O_all3 <- rbind( H12O_original3, H12O_removing3, H12O_replace_later3, H12O_replace_earlier3 )
-    
-    H12O_allData3 <- H12O_all3 %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc, type )
-    
-    H12O_originalToCompare3 <- H12O_original3 %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc )
-    
-    H12O_allToCompare3 <-  rbind( H12O_removing3, H12O_replace_later3, H12O_replace_earlier3 ) %>%
-        mutate( perc = round( n/ total * 100, 2)) %>%
-        select( categories, variant_misc, perc, type ) %>%
-        left_join( H12O_originalToCompare3,by = c( "categories", "variant_misc" ),suffix = c(".washout", ".H12O_original")) %>%
-        mutate( diff = perc.washout - perc.H12O_original) %>%
-        select( categories, variant_misc, diff, type) %>%
-        unique()
-    
-    
-    
-    
-    output$plot_w2_sp <- renderPlot({
-        
-        if( input$variantW_Spain == "all"){
-            toPlot <- H12O_allData
-            ggplot(toPlot, aes(type, categories, fill= perc)) +
-                geom_tile() + 
-                facet_wrap( ~ variant_misc ) +
-                geom_text(aes(label = round(perc, 1))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=4, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                theme_bw() +
-                scale_fill_gradient2(low="lightgrey", high="darkgreen")
-            
-            
-        }else{
-            toPlot <- H12O_allData %>% 
-                filter( variant_misc == input$variantW_Spain) 
-            ggplot(toPlot, aes(type, categories, fill= perc)) +
-                geom_tile() + 
-                geom_text(aes(label = round(perc, 1))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=4, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                theme_bw() +
-                scale_fill_gradient2(low="lightgrey", high="darkgreen")
-            
-            
-        }
-    }, height = 900, width = 1100)
-    output$plot_w1_sp <- renderPlot({
-        
-        if( input$variantW_Spain == "all"){
-            toPlot <- H12O_allToCompare
-            ggplot(toPlot, aes(type, categories, fill= diff)) +
-                geom_tile() + 
-                facet_wrap( ~ variant_misc ) +
-                geom_text(aes(label = round(diff, 3))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=4, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                theme_bw() +
-                scale_fill_gradient2(low="darkorange", high="blue")
-            
-        }else{
-            toPlot <- H12O_allToCompare %>%
-                filter( variant_misc == input$variantW_Spain) %>%
-                select( categories, variant_misc, type, diff ) %>%
-                unique()
-            
-            ggplot(toPlot, aes(type, categories, fill= diff)) +
-                geom_tile(aes(fill = diff)) +
-                geom_text(aes(label = round(diff, 3))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=4, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                theme_bw() +
-                scale_fill_gradient2(low="darkorange", high="blue")
-            
-        }
-        
-    }, height = 900, width = 1100)
-    
-    output$plot_w3_sp <- renderPlot({
-        
-        H12O_allPvalue <- H12O_all %>%
-            filter( categories %in% categoriesToVisualize) %>%
-            mutate( significant = ifelse( p.value <= input$significant_thresholdW_Spain, 1, 0)) %>%
-            ungroup() %>%
-            select( categories, p.value, type, significant ) %>%
-            unique()
-        
-        toPlot <- H12O_allPvalue
-        ggplot(toPlot, aes(type, categories, fill= significant)) +
-            geom_tile() + 
-            geom_text(aes(label = ifelse( significant == 1, p.value, ""))) +
-            theme(axis.text=element_text(size=10),
-                  axis.text.x = element_text(size=10, hjust = 1), 
-                  axis.text.y = element_text(size=4, hjust = 1), 
-                  strip.text.x = element_text(size = 12, face = "bold" ), 
-                  axis.title.y = element_text(size = 6)
-            )+
-            theme_bw()+
-            scale_fill_gradient2(low="white", high="yellow") +
-            guides( fill = "none")
-        
-    }, height = 900, width = 1100)
-    
-    output$plot_w5_sp <- renderPlot({
-        
-        if( input$variantW_Spain == "all"){
-            toPlot <- H12O_allData3
-            
-            ggplot(toPlot, aes(type, categories, fill= perc)) +
-                geom_tile() + 
-                facet_wrap( ~ variant_misc ) +
-                theme_bw() +
-                geom_text(aes(label = round(perc, 1))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=12, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                scale_fill_gradient2(low="lightgrey", high="darkgreen")
-            
-            
-        }else{
-            toPlot <- H12O_allData3 %>% 
-                filter( variant_misc == input$variantW_Spain) 
-            ggplot(toPlot, aes(type, categories, fill= perc)) +
-                geom_tile() + 
-                theme_bw() +
-                geom_text(aes(label = round(perc, 1))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=12, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                scale_fill_gradient2(low="lightgrey", high="darkgreen")
-            
-            
-        }
-    }, height = 900, width = 1100)
-    output$plot_w4_sp <- renderPlot({
-        
-        if( input$variantW_Spain == "all"){
-            toPlot <- H12O_allToCompare3 
-            ggplot(toPlot, aes(type, categories, fill= diff)) +
-                geom_tile() + 
-                facet_wrap( ~ variant_misc ) +
-                geom_text(aes(label = round(diff, 3))) +
-                theme_bw() +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=12, hjust = 1), 
-                      axis.text.y = element_text(size=12, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                scale_fill_gradient2(low="darkorange", high="blue")
-            
-        }else{
-            toPlot <- H12O_allToCompare3 %>%
-                filter( variant_misc == input$variantW_Spain) %>%
-                select( categories, variant_misc, type, diff ) %>%
-                unique()
-            
-            ggplot(toPlot, aes(type, categories, fill= diff)) +
-                geom_tile(aes(fill = diff)) +
-                theme_bw() +
-                geom_text(aes(label = round(diff, 3))) +
-                theme(axis.text=element_text(size=10),
-                      axis.text.x = element_text(size=10, hjust = 1), 
-                      axis.text.y = element_text(size=12, hjust = 1), 
-                      strip.text.x = element_text(size = 12, face = "bold" ), 
-                      axis.title.y = element_text(size = 6),
-                      legend.title=element_text(size=10), 
-                      legend.text=element_text(size=10), 
-                      legend.position="top")+
-                scale_fill_gradient2(low="darkorange", high="blue")
-            
-        }
-        
-    }, height = 900, width = 1100)
-    
-    output$plot_w6_sp <- renderPlot({
-        
-        H12O_allPvalue3 <- H12O_all3 %>%
-            mutate( significant = ifelse( p.value <= input$significant_thresholdW_Spain, 1, 0)) %>%
-            ungroup() %>%
-            select( categories, p.value, type, significant ) %>%
-            unique()
-        
-        toPlot <- H12O_allPvalue3
-        ggplot(toPlot, aes(type, categories, fill= significant)) +
-            geom_tile() + 
-            theme_bw() +
-            geom_text(aes(label = ifelse( significant == 1, p.value, ""))) +
-            theme(axis.text=element_text(size=10),
-                  axis.text.x = element_text(size=10, hjust = 1), 
-                  axis.text.y = element_text(size=12, hjust = 1), 
-                  strip.text.x = element_text(size = 12, face = "bold" ), 
-                  axis.title.y = element_text(size = 6)
-            )+
-            scale_fill_gradient2(low="white", high="yellow") +
-            guides( fill = "none")
-        
-    }, height = 900, width = 1100)
-    
-    
 }
 
 # Run the application 
