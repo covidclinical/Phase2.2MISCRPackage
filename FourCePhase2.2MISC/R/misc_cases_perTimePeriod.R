@@ -69,6 +69,13 @@ misc_cases_perTimePeriod <- function( integrated_df, period = "month", obfuscati
 
     ggplot2::ggsave(filename=file.path(dir.output,paste0('/figures/',currSiteId, "_MISCpatientCounts_per", period, ".png")),plot=print(misc_counts_plot))
 
+    write.table( x         = misc_cases,
+                 file      = file.path(dir.output,paste0('/figures/',currSiteId,"_MISCpatientCounts_per", period, ".txt")),
+                 col.names = TRUE,
+                 row.names = FALSE,
+                 quote     = FALSE,
+                 sep       = "\t" )
+
   }
 
 
