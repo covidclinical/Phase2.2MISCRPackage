@@ -3,8 +3,7 @@ library(tidyr)
 library(meta)
 library(stringr)
 rm(list=ls())
-#setwd('/Users/smakwana/Desktop/finalTablesTest/4CE_MISC_outputs/')
-setwd("/Users/alba/Desktop/finalTablesTest/4CE_MISC_outputs/")
+setwd("/Users/alba/Desktop/finalTablesTestWithP-val/4CE_MISC_outputs/")
 sites <- list.files("./")
 
 ########################
@@ -14,6 +13,7 @@ combineCategoricalDataFromSites <- function( fileList, table_num ){
   
   for( i in 1:length( fileList )){
     
+    print(i)
     #extract the site id
     site_id <- sapply( strsplit(fileList[i], "[_]"), '[', 1)
     
@@ -134,6 +134,22 @@ continuousToMetaAnalysis <- function(n_patients, mean_value, sd_value, site){
   
 }
 
+categoricalFisherPval <- function(affected, variant_misc){
+  tryCatch({
+    variant_misc <- c("Alpha", "Delta", "Omicron")
+    totalValues <- c(380,109,100)
+    contingencyTable <- data.frame( variant_misc, totalValues)
+    
+    casesTable <- data.frame( variant_misc, affected )
+    
+    fisherTable <- merge( casesTable, contingencyTable ) %>%
+      mutate( non_affected = totalValues - affected) %>%
+      select( affected, non_affected )
+    pVal <- round( fisher.test( fisherTable )$p.value, 3) 
+    return(pVal)
+  }, error = function(e) return(NA))
+  
+}
 
 
 #####################
@@ -154,13 +170,49 @@ categoricalTable1 <- table1_files[ grepl( "Categorical.RData", table1_files)]
 
 table1_categorical <- combineCategoricalDataFromSites( fileList = categoricalTable1, table_num = 1 )
 
+##### add with 0s the sites that do not have a variable
+ allVariables <- unique( table1_categorical$categories)
+ counts <- table1_categorical %>% ungroup() %>% select( site, variant_misc, total) %>% unique()
+ allSites <- unique(table1_categorical$site)
+ allVariants <- unique(table1_categorical$variant_misc)
+ 
+ toTest <- expand.grid(allSites, allVariants, allVariables) %>%
+   mutate(allCombinations = paste0(Var1, '--', Var2, '--', Var3))
+ 
+ toCompare <- table1_categorical %>%
+   mutate(allCombinations = paste0(site, '--', variant_misc, '--', categories))
+ missingCombinations <- toTest$allCombinations[!toTest$allCombinations %in% toCompare$allCombinations]
+ toAdd <- data.frame(comb = missingCombinations) %>%
+   separate(col = comb, into = c('site', 'variant_misc', 'categories'), sep = '--') %>%
+   mutate( n = 0 ) %>%
+   dplyr::left_join( counts, by = c('site', 'variant_misc'))
+ 
+table1_categorical <- rbind( table1_categorical, toAdd)
+
+#### change obfuscation from 0.5 to 1 and remove total < 10
+table1_categorical <- table1_categorical %>%
+  mutate( n = ifelse( n == 0.5, 1, n )) 
 
 table1_categorical_results <- table1_categorical %>% 
+  filter( total >= 10) %>%
   group_by(categories, variant_misc) %>%
   summarise(res = categoricalToMetaAnalysis(n, total, site),
             total = sapply( strsplit(res, " ;"), '[', 2), 
             res = sapply( strsplit(res, " ;"), '[', 1)
             )
+
+
+table1_categorical_counts_pval <- table1_categorical %>%
+  filter( variant_misc != "total") %>%
+  group_by( categories, variant_misc ) %>%
+  summarise( affected = sum( n )) %>%
+  ungroup() %>%
+  group_by( categories ) %>%
+  summarise( pval = categoricalFisherPval( affected, variant_misc), 
+             variant_misc = variant_misc, 
+             n = affected )
+
+
 
 rm(table1_categorical)
 colnames(table1_categorical_results) <- c("Variable", "variant", "value", "total")
@@ -176,7 +228,6 @@ table1_continuous_combined <- data.frame(variant_misc = '',
                                 site = '')
 # save thsi for later
 total_n <- data.frame()
-
 for (s in sites) {
   
   load(paste0('./', s, '/replace_earlier/', s, '_table1Continuous.RData'))
@@ -223,25 +274,63 @@ rm(df, df2, ndf, nvec, t1, table1_continuous, table1_continuous_combined)
 #####################
 ###### TABLE 3 ######
 #####################
-for( i in 1:length(sites)){
+sitesNoChop <- sites[c(1,3:7)]
+
+for( i in 1:length(sitesNoChop)){
   if(i == 1){
-    table3_files <-  list.files(paste0("./", sites[i], "/replace_earlier/"), pattern = "table3.RData")
+    table3_files <-  list.files(paste0("./", sitesNoChop[i], "/replace_earlier/"), pattern = "table3.RData")
   }else{
-    table3_filesInt <-  list.files(paste0("./", sites[i], "/replace_earlier/"), pattern = "table3.RData")
+    table3_filesInt <-  list.files(paste0("./", sitesNoChop[i], "/replace_earlier/"), pattern = "table3.RData")
     table3_files <- c( table3_files, table3_filesInt)
   }
 }
 
 table3_all <- combineCategoricalDataFromSites( fileList = table3_files, table_num = 3 )
 
+##### add with 0s the sites that do not have a variable
+allVariables <- unique( table3_all$categories)
+counts <- table3_all %>% ungroup() %>% select( site, variant_misc, total) %>% unique()
+allSites <- unique(table3_all$site)
+allVariants <- unique(table3_all$variant_misc)
+
+toTest <- expand.grid(allSites, allVariants, allVariables) %>%
+  mutate(allCombinations = paste0(Var1, '--', Var2, '--', Var3))
+
+toCompare <- table3_all %>%
+  mutate(allCombinations = paste0(site, '--', variant_misc, '--', categories))
+missingCombinations <- toTest$allCombinations[!toTest$allCombinations %in% toCompare$allCombinations]
+
+toAdd <- data.frame(comb = missingCombinations) %>%
+  separate(col = comb, into = c('site', 'variant_misc', 'categories'), sep = '--') %>%
+  mutate( n = 0 ) %>%
+  dplyr::left_join( counts, by = c('site', 'variant_misc'))
+
+table3_all <- rbind( table3_all, toAdd)
+
+
+#### change obfuscation from 0.5 to 1
+table3_all <- table3_all %>%
+  mutate( n = ifelse( n == 0.5, 1, n ))
+
 ### final table 3
 
 table3_categorical_results <- table3_all %>% 
+  filter( total >= 10 ) %>% # add the filter to 10
   group_by(categories, variant_misc) %>%
   summarise(res = categoricalToMetaAnalysis(n, total, site),
             total = sapply( strsplit(res, " ;"), '[', 2), 
             res = sapply( strsplit(res, " ;"), '[', 1)
   )
+
+table3_categorical_counts_pval <- table3_all %>% 
+  filter( variant_misc != "total") %>%
+  group_by( categories, variant_misc ) %>%
+  summarise( affected = sum( n )) %>%
+  ungroup() %>%
+  group_by( categories ) %>%
+  summarise( pval = categoricalFisherPval( affected, variant_misc), 
+             variant_misc = variant_misc, 
+             n = affected )
 
 rm(table3_all)
 colnames(table3_categorical_results) <- c("Variable", "variant", "value", "total")
@@ -356,6 +445,27 @@ table1_continuous_results2 %>%
   flextable::save_as_docx(path = "../output/final_table1_continuous.docx")
 
 ##
+library( rstatix) #to add the significance symbols
+
+table1_categorical_count_output <- table1_categorical_counts_pval %>%
+  pivot_wider(id_cols = categories, 
+              names_from = variant_misc, values_from = c( n, pval) ) %>%
+  mutate(n_total =  n_Alpha + n_Delta + n_Omicron, 
+         pValue = pval_Alpha) %>%
+  select( -pval_Alpha, -pval_Delta, -pval_Omicron) %>%
+  add_significance("pValue")
+
+#table1_categorical_count_output <- table1_categorical_count_output %>% filter( pValue.signif == "***")
+
+
+###
+colnames(table1_categorical_count_output) <- c('Variable', 'Alpha (N = 380)','Delta (N = 109)', 'Omicron (N = 100)', 'Total (N = 589)', "p-value", "significance")
+
+table1_categorical_count_output %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "../output/final_table1_categorical_count_pvalue.docx")
+
+##
 
 table2 %>%
   flextable::flextable() %>%
@@ -377,6 +487,22 @@ table3 %>%
   flextable::flextable() %>%
   flextable::save_as_docx(path = "../output/final_table3.docx")
 
+##
+table3_categorical_count_output <- table3_categorical_counts_pval %>%
+  pivot_wider(id_cols = categories, 
+              names_from = variant_misc, values_from = c( n, pval) ) %>%
+  mutate(n_total =  n_Alpha + n_Delta + n_Omicron, 
+         pValue = pval_Alpha) %>%
+  select( -pval_Alpha, -pval_Delta, -pval_Omicron) %>%
+  add_significance("pValue")
+
+
+###
+colnames(table3_categorical_count_output) <- c('Variable', 'Alpha (N = 380)','Delta (N = 109)', 'Omicron (N = 100)', 'Total (N = 589)', "p-value", "significance")
+
+table3_categorical_count_output %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "../output/final_table3_categorical_count_pvalue.docx")
 
 
 
