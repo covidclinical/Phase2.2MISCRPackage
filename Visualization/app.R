@@ -58,8 +58,8 @@ ui <- fluidPage(
                             sidebarPanel(
                                 
                                 radioButtons("variant", label = h3("MISC Variant type:"),
-                                             choices = list("Total" = "total_n", "Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron"), 
-                                             selected = "total_n"),
+                                             choices = list("Total" = "total", "Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron"), 
+                                             selected = "total"),
                                 
                                 br(),
                                 
@@ -87,16 +87,17 @@ ui <- fluidPage(
                                 radioButtons("variantC", label = h3("MISC Variant type:"),
                                              choices = list("Total" = "total", "Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron", "All" = "all"), 
                                              selected = "all"),
-                                sliderInput("significant_threshold", "p-value threshold:",
-                                            min = 0, max = 1, value = 0.1
-                                ),
+                                #sliderInput("significant_threshold", "p-value threshold:",
+                                #            min = 0, max = 1, value = 0.1
+                                #),
                             ),
                             mainPanel(
                                 tabsetPanel(type = "tabs",
-                                            tabPanel("Table 3: percentages", plotOutput("plot3_perc"),  width = "100%"), 
-                                            tabPanel("Table 3: p-values", plotOutput("plot3_pval"),  width = "100%"), 
-                                            tabPanel("Table 1: percentages", plotOutput("plot1_perc"),  width = "100%"), 
-                                            tabPanel("Table 1: p-values", plotOutput("plot1_pval"),  width = "100%")
+                                            tabPanel("Table 1: percentages", plotOutput("plot1_perc"),  width = "100%"),
+                                            tabPanel("Table 3: percentages", plotOutput("plot3_perc"),  width = "100%") 
+                                            #tabPanel("Table 3: p-values", plotOutput("plot3_pval"),  width = "100%"), 
+                                            #,
+                                            #tabPanel("Table 1: p-values", plotOutput("plot1_pval"),  width = "100%")
                                 )
                             ))
                         )
@@ -112,6 +113,10 @@ ui <- fluidPage(
                                 radioButtons("variants", label = h3("MISC Variant type:"),
                                              choices = list("Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron"), 
                                              selected = "Alpha"),
+                                
+                                sliderInput("sampleSizeCutOff", "Sample size cut-off",
+                                                       min = 0, max = 10, value = 10
+                                            ),
                                 
                                 radioButtons("var_category", label = h3("Chose a variable:"),
                                              choices = list("CARDIOVASCULAR SYMPTOMS"  =  "CARDIOVASCULAR SYMPTOMS",                
@@ -155,6 +160,10 @@ ui <- fluidPage(
                                              selected = "Alpha"),
                                 
                                 br(),
+                                sliderInput("sampleSizeLabsCutOff", "Sample size cut-off",
+                                            min = 0, max = 10, value = 10
+                                ),
+                                br(),
                                 
                                 radioButtons("timeLabMeta", "Time point:",
                                              choices = list("At admission (day 0 or 1)" = "admission", "During admission" = "during"), 
@@ -189,6 +198,43 @@ ui <- fluidPage(
                                 )
                             ))
                         )
+               ),
+               tabPanel("Pooled proportion: Outcomes",
+                        fluidRow(p(
+                            "Meta-analysis per variant type and variable"
+                        ),
+                        br(),
+                        sidebarLayout(
+                            sidebarPanel(
+                                
+                                radioButtons("variants_outcome", label = h3("MISC Variant type:"),
+                                             choices = list("Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron"), 
+                                             selected = "Alpha"),
+                                
+                                sliderInput("sampleSizeCutOff_outcome", "Sample size cut-off",
+                                            min = 0, max = 10, value = 10
+                                ),
+                                
+                                radioButtons("outcome_category", label = h3("Chose a variable:"),
+                                             choices = list("Anticoagulation therapy" = "Anticoagulation therapy",
+                                                            "Cardiac arrest" = "Cardiac arrest",                       
+                                                            "Composite adverse cardiovascular outcome"= "Composite adverse cardiovascular outcome",
+                                                            "Coronary aneurysm" = "Coronary aneurysm",                         
+                                                            "Diuretic therapy" = "Diuretic therapy",                         
+                                                            "ECMO" = "ECMO",                                 
+                                                            "in_icu"  = "in_icu",                                  
+                                                            "Inotropic support" = "Inotropic support",                       
+                                                            "Invasive monitoring (arterial line)" = "Invasive monitoring (arterial line)",        
+                                                            "Oxygen supplementation" = "Oxygen supplementation",                  
+                                                            "Sedation or muscle relaxant"  = "Sedation or muscle relaxant"  ), selected = "Composite adverse cardiovascular outcome")
+                            ),
+                            mainPanel(
+                                tabsetPanel(type = "tabs",
+                                            tabPanel("Forest plot by site", plotOutput("forestsiteoutcome"),  width = "100%"),
+                                            tabPanel("Forest plot by country", plotOutput("forestcountryoutcome"),  width = "100%")
+                                )
+                            ))
+                        )
                )
     )
 )
@@ -213,7 +259,7 @@ server <- function(input, output) {
         
         ### read the ICD files from each site
         files <- list.files("./4CE_MISC_outputs/")
-    
+
         for( i in 1:length( files )){
             site_id <- files[i]
             n_total <- totalN %>% filter( site == site_id )
@@ -221,6 +267,7 @@ server <- function(input, output) {
             
             if( i ==1 ){
                 site_codes <- diag_sum %>%
+                    dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1
                     dplyr::mutate( perc = round(n_patients / n_total$total_n *100, 2), 
                                    site = site_id, 
                                    ICDcode = gsub("[.]", "", concept_code)) %>%
@@ -230,6 +277,7 @@ server <- function(input, output) {
                 rm( diag_sum )
             }else{
                 int_site_codes <- diag_sum %>%
+                    dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1
                     dplyr::mutate( perc = round(n_patients / n_total$total_n *100, 2), 
                                    site = site_id, 
                                    ICDcode = gsub("[.]", "", concept_code)) %>%
@@ -287,6 +335,191 @@ server <- function(input, output) {
         
     }, options = list("pageLength" = 50),  filter = "top", rownames = FALSE))
     
+    
+    ##### Forest plot 
+    for( i in 1:length(sites)){
+      if(i == 1){
+        pvaluesFiles3 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "3.txt")
+        rdataFiles3 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table3.RData")
+      }else{
+        pvaluesFiles3Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "3.txt")
+        rdataFiles3Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table3.RData")
+        
+        pvaluesFiles3 <- c( pvaluesFiles3, pvaluesFiles3Int)
+        rdataFiles3 <- c( rdataFiles3, rdataFiles3Int)
+        
+      }
+    }
+    
+    for( i in 1:length(pvaluesFiles3)){
+      print(i)
+      siteid <- unlist(strsplit(x = pvaluesFiles3[i], split = "_"))[1]
+      p_values <- read.delim(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/",pvaluesFiles3[i]))
+      
+      variantsN <- as.data.frame(matrix(ncol=2, nrow=4))
+      colnames(variantsN) <- c("variant_misc", "total")
+      variantsN$variant_misc <- c("Alpha", "Delta", "Omicron", "total")
+      
+      variantsN$total[1] <- as.numeric(sapply(strsplit( colnames(p_values)[2], "[.]"), tail, 1))
+      variantsN$total[2] <- as.numeric(sapply(strsplit( colnames(p_values)[3], "[.]"), tail, 1))
+      variantsN$total[3] <- as.numeric(sapply(strsplit( colnames(p_values)[4], "[.]"), tail, 1))
+      variantsN$total[4] <- as.numeric(sapply(strsplit( colnames(p_values)[5], "[.]"), tail, 1))
+      variantsN$site <- siteid
+      #colnames(p_values) <- c("categories", "Alpha", "Delta", "Omicron", "total", "p.value")
+      p_values <- p_values[, c(1:5)]
+      colnames(p_values) <- c("categories", "Alpha", "Delta", "Omicron", "total")
+      p_values$site <- siteid
+      
+      if( i == 1){
+        pvalData3 <- p_values 
+        variantsData3 <- variantsN
+      }else{
+        pvalData3 <- rbind(pvalData3, p_values)
+        variantsData3 <- rbind(variantsData3, variantsN)
+        
+      }
+    }
+    
+    pvalData3 <- pvalData3 %>%
+      select( categories, site )
+    
+    rm(variantsN)
+    rm(p_values)
+    
+    for( i in 1:length(rdataFiles3)){
+      print(i)
+      siteid <- unlist(strsplit(x = rdataFiles3[i], split = "_"))[1]
+      load(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/", rdataFiles3[i]))
+      table3$site <- siteid
+      
+      if( i == 1){
+        complete_table3 <- table3
+      }else{
+        complete_table3 <- rbind(complete_table3, table3)
+      }
+    }
+    
+    ### table 3 generation
+    complete_table3 <- complete_table3 %>%
+      left_join( pvalData3, by = c("categories", "site") ) %>%
+      left_join( variantsData3, by = c("variant_misc", "site"))
+    
+    ##### add with 0s the sites that do not have a variable
+    allOutcomes <- unique( complete_table3$categories)
+    totalOutcomeCounts <- complete_table3 %>% ungroup() %>% select( site, variant_misc, total) %>% unique()
+    allSites <- unique(complete_table3$site)
+    allVariants <- unique(complete_table3$variant_misc)
+    
+    toTest <- expand.grid(allSites, allVariants, allOutcomes) %>%
+      mutate(allCombinations = paste0(Var1, '--', Var2, '--', Var3))
+    
+    toCompare <- complete_table3 %>%
+      mutate(allCombinations = paste0(site, '--', variant_misc, '--', categories))
+    missingCombinations <- toTest$allCombinations[!toTest$allCombinations %in% toCompare$allCombinations]
+    toAdd <- data.frame(comb = missingCombinations) %>%
+      tidyr::separate(col = comb, into = c('site', 'variant_misc', 'categories'), sep = '--') %>%
+      mutate( n = 0 ) %>%
+      dplyr::left_join( totalOutcomeCounts, by = c('site', 'variant_misc'))
+    
+    complete_table3 <- rbind( complete_table3, toAdd) %>% 
+      dplyr::mutate( n = ifelse( n == 0.5, 1, n))#change obfuscation from 0.5 to 1
+    ######
+    
+    ### table 1 generation
+    ### table 1 categorical
+    for( i in 1:length(sites)){
+      if(i == 1){
+        pvaluesFiles1 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "1.txt")
+        rdataFiles1 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table1Categorical.RData")
+      }else{
+        pvaluesFiles1Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "1.txt")
+        rdataFiles1Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table1Categorical.RData")
+        
+        pvaluesFiles1 <- c( pvaluesFiles1, pvaluesFiles1Int)
+        rdataFiles1 <- c( rdataFiles1, rdataFiles1Int)
+        
+      }
+    }
+    
+    for( i in 1:length(pvaluesFiles1)){
+      print(i)
+      siteid <- unlist(strsplit(x = pvaluesFiles1[i], split = "_"))[1]
+      p_values <- read.delim(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/",pvaluesFiles1[i]))
+      
+      variantsN <- as.data.frame(matrix(ncol=2, nrow=4))
+      colnames(variantsN) <- c("variant_misc", "total")
+      variantsN$variant_misc <- c("Alpha", "Delta", "Omicron", "total")
+      
+      variantsN$total[1] <- as.numeric(sapply(strsplit( colnames(p_values)[2], "[.]"), tail, 1))
+      variantsN$total[2] <- as.numeric(sapply(strsplit( colnames(p_values)[3], "[.]"), tail, 1))
+      variantsN$total[3] <- as.numeric(sapply(strsplit( colnames(p_values)[4], "[.]"), tail, 1))
+      variantsN$total[4] <- as.numeric(sapply(strsplit( colnames(p_values)[5], "[.]"), tail, 1))
+      variantsN$site <- siteid
+      p_values <- p_values[, c(1:5)]
+      colnames(p_values) <- c("categories", "Alpha", "Delta", "Omicron", "total")
+      p_values$site <- siteid
+      
+      if( i == 1){
+        pvalData1 <- p_values 
+        variantsData1 <- variantsN
+      }else{
+        pvalData1 <- rbind(pvalData1, p_values)
+        variantsData1 <- rbind(variantsData1, variantsN)
+        
+      }
+    }
+    pvalData1 <- pvalData1 %>%
+      select( categories, site )
+    
+    rm(variantsN)
+    rm(p_values)
+    
+    for( i in 1:length(rdataFiles1)){
+      print(i)
+      siteid <- unlist(strsplit(x = rdataFiles1[i], split = "_"))[1]
+      load(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/", rdataFiles1[i]))
+      table1_categorical$site <- siteid
+      
+      if( i == 1){
+        complete_table1 <- table1_categorical
+      }else{
+        complete_table1 <- rbind(complete_table1, table1_categorical)
+      }
+    }
+    
+    complete_table1 <- complete_table1 %>%
+      left_join( pvalData1, by = c("categories", "site") ) %>%
+      left_join( variantsData1, by = c("variant_misc", "site")) %>%
+      unique()
+    
+    ##### add with 0s the sites that do not have a variable
+    allVariables <- unique( complete_table1$categories)
+    counts <- complete_table1 %>% ungroup() %>% select( site, variant_misc, total) %>% unique()
+    allSites <- unique(complete_table1$site)
+    allVariants <- unique(complete_table1$variant_misc)
+    
+    toTest <- expand.grid(allSites, allVariants, allVariables) %>%
+      mutate(allCombinations = paste0(Var1, '--', Var2, '--', Var3))
+    
+    toCompare <- complete_table1 %>%
+      mutate(allCombinations = paste0(site, '--', variant_misc, '--', categories))
+    missingCombinations <- toTest$allCombinations[!toTest$allCombinations %in% toCompare$allCombinations]
+    toAdd <- data.frame(comb = missingCombinations) %>%
+      tidyr::separate(col = comb, into = c('site', 'variant_misc', 'categories'), sep = '--') %>%
+      mutate( n = 0 ) %>%
+      dplyr::left_join( counts, by = c('site', 'variant_misc'))
+    
+    complete_table1 <- rbind( complete_table1, toAdd) %>% 
+      dplyr::mutate( n = ifelse( n == 0.5, 1, n))#change obfuscation from 0.5 to 1
+    
+    ### change renal involvement by renal disfunction
+    complete_table1$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", complete_table1$categories)
+    
+    categoriesToVisualize <- c("CARDIOVASCULAR SYMPTOMS" , "GI SYMPTOMS", "LIVER DYSFUNCTION", 
+                               "NEUROLOGIC SYMPTOMS", "RENAL DYSFUNCTION", "RESPIRATORY SYMPTOMS", 
+                               "GENERALIZED SYMPTOMS", "Kawasaki" )
+    
+    
     #### Labs QC
     for( i in 1:length(sites)){
         print(sites)
@@ -316,18 +549,24 @@ server <- function(input, output) {
         if( i ==1 ){
             
             labs_adm <- table2_admission %>%
-                mutate( percs = round(n_patients / n_total$total_n *100, 2),
+                dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1
+              mutate(site = site_id,
+                     variant_misc = ifelse(variant_misc == 'total_n', 'total', variant_misc)) %>%
+              left_join(variantsData1) %>%
+              mutate( percs = round(n_patients / total *100, 2),
                         label = paste0( variableName, " (", units, ")"), 
-                        site = site_id,
                         site_label =  paste0( site_id, "\n (", n_patients, ")"),
                         time = "admission")
             
             rm(table2_admission)
         }else{
             int_labs_adm <- table2_admission %>%
-                mutate( percs = round(n_patients / n_total$total_n *100, 2),
+                dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1
+              mutate(site = site_id,
+                     variant_misc = ifelse(variant_misc == 'total_n', 'total', variant_misc)) %>%
+              left_join(variantsData1) %>%  
+              mutate( percs = round(n_patients / total *100, 2),
                         label = paste0( variableName, " (", units, ")"), 
-                        site = site_id, 
                         site_label =  paste0( site_id, "\n (", n_patients, ")"),
                         time = "admission" )
             labs_adm <- rbind( labs_adm, int_labs_adm)
@@ -342,18 +581,24 @@ server <- function(input, output) {
         if( i ==1 ){
             
             labs_during <- table2_during %>%
-                mutate( percs = round(n_patients / n_total$total_n *100, 2),
+                dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1
+              mutate(site = site_id,
+                     variant_misc = ifelse(variant_misc == 'total_n', 'total', variant_misc)) %>%
+              left_join(variantsData1) %>%  
+              mutate( percs = round(n_patients / total *100, 2),
                         label = paste0( variableName, " (", units, ")"), 
-                        site = site_id, 
                         site_label =  paste0( site_id, "\n (", n_patients, ")"),
                         time = "during")
             
             rm(table2_during)
         }else{
             int_labs_during <- table2_during %>%
-                mutate( percs = round(n_patients / n_total$total_n *100, 2),
+              dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1  
+              mutate(site = site_id,
+                     variant_misc = ifelse(variant_misc == 'total_n', 'total', variant_misc)) %>%
+              left_join(variantsData1) %>%  
+              mutate( percs = round(n_patients / total *100, 2),
                         label = paste0( variableName, " (", units, ")"), 
-                        site = site_id, 
                         site_label =  paste0( site_id, "\n (", n_patients, ")"),
                         time = "during" )
             labs_during <- rbind( labs_during, int_labs_during)
@@ -411,6 +656,8 @@ server <- function(input, output) {
     output$forestsiteLab <- renderPlot({
         
         labsToMetaAnalysis <- labs %>%
+            dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1
+            filter( total > input$sampleSizeLabsCutOff) %>% # filter based on total n per variant
             select( variant_misc, variableName, mean_value, sd_value, n_patients, site, time ) %>%
             mutate( site = sapply( strsplit(site, " "), '[', 1))
         
@@ -432,6 +679,8 @@ server <- function(input, output) {
     output$forestcountryLab<- renderPlot({
         
         labsToMetaAnalysis <- labs %>%
+            dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1
+            filter( n_total > input$sampleSizeLabsCutOff) %>% ## filter based on total n per variant
             select( variant_misc, variableName, mean_value, sd_value, n_patients, site, time ) %>%
             mutate( site = sapply( strsplit(site, " "), '[', 1), 
                     site = gsub("\n", "", site ))
@@ -443,7 +692,7 @@ server <- function(input, output) {
         
         ### to review
         toForestPlot <- allLabsDataForestCountry %>%
-            filter( variableName == input$labMeta &
+          filter( variableName == input$labMeta &
                         variant_misc == input$variantLabMeta &
                         time == input$timeLabMeta) %>%
             group_by( Country ) %>%
@@ -459,150 +708,18 @@ server <- function(input, output) {
     
     
     
-    ##### Forest plot 
-    for( i in 1:length(sites)){
-        if(i == 1){
-            pvaluesFiles3 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "3.txt")
-            rdataFiles3 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table3.RData")
-        }else{
-            pvaluesFiles3Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "3.txt")
-            rdataFiles3Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table3.RData")
-            
-            pvaluesFiles3 <- c( pvaluesFiles3, pvaluesFiles3Int)
-            rdataFiles3 <- c( rdataFiles3, rdataFiles3Int)
-            
-        }
-    }
     
-    for( i in 1:length(pvaluesFiles3)){
-        print(i)
-        siteid <- unlist(strsplit(x = pvaluesFiles3[i], split = "_"))[1]
-        p_values <- read.delim(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/",pvaluesFiles3[i]))
-        
-        variantsN <- as.data.frame(matrix(ncol=2, nrow=4))
-        colnames(variantsN) <- c("variant_misc", "total")
-        variantsN$variant_misc <- c("Alpha", "Delta", "Omicron", "total")
-        
-        variantsN$total[1] <- as.numeric(sapply(strsplit( colnames(p_values)[2], "[.]"), tail, 1))
-        variantsN$total[2] <- as.numeric(sapply(strsplit( colnames(p_values)[3], "[.]"), tail, 1))
-        variantsN$total[3] <- as.numeric(sapply(strsplit( colnames(p_values)[4], "[.]"), tail, 1))
-        variantsN$total[4] <- as.numeric(sapply(strsplit( colnames(p_values)[5], "[.]"), tail, 1))
-        variantsN$site <- siteid
-        colnames(p_values) <- c("categories", "Alpha", "Delta", "Omicron", "total", "p.value")
-        p_values$site <- siteid
-        
-        if( i == 1){
-            pvalData3 <- p_values 
-            variantsData3 <- variantsN
-        }else{
-            pvalData3 <- rbind(pvalData3, p_values)
-            variantsData3 <- rbind(variantsData3, variantsN)
-            
-        }
-    }
     
-    pvalData3 <- pvalData3 %>%
-        select( categories, p.value, site )
-    
-    rm(variantsN)
-    rm(p_values)
-    
-    for( i in 1:length(rdataFiles3)){
-        print(i)
-        siteid <- unlist(strsplit(x = rdataFiles3[i], split = "_"))[1]
-        load(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/", rdataFiles3[i]))
-        table3$site <- siteid
-        
-        if( i == 1){
-            complete_table3 <- table3
-        }else{
-            complete_table3 <- rbind(complete_table3, table3)
-        }
-    }
-    
-    complete_table3 <- complete_table3 %>%
-        left_join( pvalData3, by = c("categories", "site") ) %>%
-        left_join( variantsData3, by = c("variant_misc", "site"))
-    
-    ### table 1 categorical
-    for( i in 1:length(sites)){
-        if(i == 1){
-            pvaluesFiles1 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "1.txt")
-            rdataFiles1 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table1Categorical.RData")
-        }else{
-            pvaluesFiles1Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "1.txt")
-            rdataFiles1Int <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "table1Categorical.RData")
-            
-            pvaluesFiles1 <- c( pvaluesFiles1, pvaluesFiles1Int)
-            rdataFiles1 <- c( rdataFiles1, rdataFiles1Int)
-            
-        }
-    }
 
-    for( i in 1:length(pvaluesFiles1)){
-        print(i)
-        siteid <- unlist(strsplit(x = pvaluesFiles1[i], split = "_"))[1]
-        p_values <- read.delim(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/",pvaluesFiles1[i]))
-        
-        variantsN <- as.data.frame(matrix(ncol=2, nrow=4))
-        colnames(variantsN) <- c("variant_misc", "total")
-        variantsN$variant_misc <- c("Alpha", "Delta", "Omicron", "total")
-        
-        variantsN$total[1] <- as.numeric(sapply(strsplit( colnames(p_values)[2], "[.]"), tail, 1))
-        variantsN$total[2] <- as.numeric(sapply(strsplit( colnames(p_values)[3], "[.]"), tail, 1))
-        variantsN$total[3] <- as.numeric(sapply(strsplit( colnames(p_values)[4], "[.]"), tail, 1))
-        variantsN$total[4] <- as.numeric(sapply(strsplit( colnames(p_values)[5], "[.]"), tail, 1))
-        variantsN$site <- siteid
-        colnames(p_values) <- c("categories", "Alpha", "Delta", "Omicron", "total", "p.value")
-        p_values$site <- siteid
-        
-        if( i == 1){
-            pvalData1 <- p_values 
-            variantsData1 <- variantsN
-        }else{
-            pvalData1 <- rbind(pvalData1, p_values)
-            variantsData1 <- rbind(variantsData1, variantsN)
-            
-        }
-    }
-    pvalData1 <- pvalData1 %>%
-        select( categories, p.value, site )
-    
-    rm(variantsN)
-    rm(p_values)
-    
-    for( i in 1:length(rdataFiles1)){
-        print(i)
-        siteid <- unlist(strsplit(x = rdataFiles1[i], split = "_"))[1]
-        load(paste0( "./4CE_MISC_outputs/", siteid, "/replace_earlier/", rdataFiles1[i]))
-        table1_categorical$site <- siteid
-        
-        if( i == 1){
-            complete_table1 <- table1_categorical
-        }else{
-            complete_table1 <- rbind(complete_table1, table1_categorical)
-        }
-    }
-    
-    complete_table1 <- complete_table1 %>%
-        left_join( pvalData1, by = c("categories", "site") ) %>%
-        left_join( variantsData1, by = c("variant_misc", "site"))
     
     
-    ### change renal involvement by renal disfunction
-    complete_table1$categories <- gsub("RENAL INVOLVEMENT", "RENAL DYSFUNCTION", complete_table1$categories)
-    complete_table1$categories <- gsub("LIVER INVOLVEMENT", "LIVER DYSFUNCTION", complete_table1$categories)
-    complete_table1$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", complete_table1$categories)
-    
-    categoriesToVisualize <- c("CARDIOVASCULAR SYMPTOMS" , "GI SYMPTOMS", "LIVER DYSFUNCTION", 
-                               "NEUROLOGIC SYMPTOMS", "RENAL DYSFUNCTION", "RESPIRATORY SYMPTOMS", 
-                               "GENERALIZED SYMPTOMS", "Kawasaki" )
     
     
     output$forestsite <- renderPlot({
         
         complete_table1_forest <- complete_table1 %>%
-            filter( categories %in% categoriesToVisualize)
+            filter( categories %in% categoriesToVisualize) %>%
+            filter( total >= input$sampleSizeCutOff )
         
         allDataForest <- rbind( complete_table3, complete_table1_forest )
             
@@ -620,7 +737,8 @@ server <- function(input, output) {
     output$forestcountry<- renderPlot({
         
         complete_table1 <- complete_table1 %>%
-            filter( categories %in% categoriesToVisualize)
+            filter( categories %in% categoriesToVisualize)%>%
+            filter( total >= input$sampleSizeCutOff )
         
         countryMap <- read.delim("./siteCountry.txt")
         
@@ -650,8 +768,8 @@ server <- function(input, output) {
                        total = sum( total ) ) %>%
             mutate( site = "ALL Combined")
         
-        complete_table3 <- rbind( complete_table3, allCombined_t3 )
-        
+        complete_table3 <- rbind( complete_table3, allCombined_t3 ) 
+
         if( input$variantC == "all"){
             toPlot <- complete_table3 %>%
                 mutate( perc = n/total*100)
@@ -695,39 +813,17 @@ server <- function(input, output) {
         }
     }, height = 900, width = 1100)
     
-    output$plot3_pval <- renderPlot({
-        
-        allPvalue <- complete_table3 %>%
-            mutate( significant = ifelse( p.value <= input$significant_threshold, 1, 0)) %>%
-            ungroup() %>%
-            select( categories, p.value, site, significant ) %>%
-            unique()
-        
-        toPlot <- allPvalue
-        ggplot(toPlot, aes(site, categories, fill= significant)) +
-            geom_tile() + 
-            theme_bw() +
-            geom_text(aes(label = ifelse( significant == 1, p.value, ""))) +
-            theme(axis.text=element_text(size=10),
-                  axis.text.x = element_text(size=10, hjust = 1), 
-                  axis.text.y = element_text(size=12, hjust = 1), 
-                  strip.text.x = element_text(size = 12, face = "bold" ), 
-                  axis.title.y = element_text(size = 6)
-            )+
-            scale_fill_gradient2(low="white", high="yellow") +
-            guides( fill = "none")
-        
-    }, height = 900, width = 1100)
-    
     output$plot1_perc <- renderPlot({
         
+        complete_table1 <- complete_table1 
+      
         allCombined_t1 <- complete_table1 %>% 
             group_by( categories, variant_misc ) %>%
             summarise( n = sum(n), 
                        total = sum( total ) ) %>%
             mutate( site = "ALL Combined")
         
-        complete_table1 <- rbind( complete_table1, allCombined_t1 )
+        complete_table1 <- rbind( complete_table1, allCombined_t1 ) 
         
         if( input$variantC == "all"){
             toPlot <- complete_table1 %>%
@@ -775,30 +871,47 @@ server <- function(input, output) {
         }
     }, height = 900, width = 1100)
     
-    output$plot1_pval <- renderPlot({
+    
+    output$forestsiteoutcome <- renderPlot({
         
-        allPvalue <- complete_table1 %>%
-            filter( categories %in% categoriesToVisualize ) %>%
-            mutate( significant = ifelse( p.value <= input$significant_threshold, 1, 0)) %>%
-            ungroup() %>%
-            select( categories, p.value, site, significant ) %>%
-            unique()
+        complete_table3_forest <- complete_table3 %>%
+            filter( total >= input$sampleSizeCutOff_outcome )
         
-        toPlot <- allPvalue
-        ggplot(toPlot, aes(site, categories, fill= significant)) +
-            geom_tile() + 
-            theme_bw() +
-            geom_text(aes(label = ifelse( significant == 1, p.value, ""))) +
-            theme(axis.text=element_text(size=10),
-                  axis.text.x = element_text(size=10, hjust = 1), 
-                  axis.text.y = element_text(size=12, hjust = 1), 
-                  strip.text.x = element_text(size = 12, face = "bold" ), 
-                  axis.title.y = element_text(size = 6)
-            )+
-            scale_fill_gradient2(low="white", high="yellow") +
-            guides( fill = "none")
+        toForestPlot <- complete_table3_forest %>%
+            filter( categories == input$outcome_category &
+                        variant_misc == input$variants_outcome )
         
-    }, height = 900, width = 1100)
+        mtprop <- metaprop(event=n, n=total, studlab=site, data=toForestPlot, method = "GLMM", sm = "PLOGIT",
+                           comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
+        
+        forest.meta(mtprop, layout = "JAMA")
+        
+    }, height = 500, width = 900)
+    
+    output$forestcountryoutcome<- renderPlot({
+        
+        complete_table3_forest_country <- complete_table3 %>%
+            filter( total >= input$sampleSizeCutOff_outcome )
+        
+        countryMap <- read.delim("./siteCountry.txt")
+        
+        allDataForestCountry <- complete_table3_forest_country %>%
+            left_join( countryMap )
+        
+        toForestPlot <- allDataForestCountry %>%
+            filter( categories == input$outcome_category &
+                        variant_misc == input$variants_outcome ) %>%
+            group_by( Country ) %>%
+            summarise( n = sum( n ), 
+                       total = sum( total ))
+        
+        mtprop <- metaprop(event=n, n=total, studlab=Country, data=toForestPlot, method = "GLMM", sm = "PLOGIT",
+                           comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
+        
+        forest.meta(mtprop, layout = "JAMA")
+        
+    }, height = 500, width = 900)
+    
 }
 
 # Run the application 
