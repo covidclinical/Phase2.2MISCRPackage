@@ -212,6 +212,7 @@ lab_names_list <- lab_bysite[[1]]$variableName
 labs_results <- as.data.frame( matrix( ncol = 3, nrow = length(lab_names_list)))
 colnames( labs_results) <- c("lab", "alpha_delta_pval", "alpha_omicron_pval")
 
+outputs_to_plot <- list()
 
 for( j in 1:length(lab_names_list)){
   
@@ -271,11 +272,18 @@ for( j in 1:length(lab_names_list)){
   labs_results$alpha_delta_pval[j] <- stats_output_alpha_delta$pval
   labs_results$alpha_omicron_pval[j] <- stats_output_alpha_omicron$pval
   
+  if( stats_output_alpha_delta$pval < 0.05){
+    outputs_to_plot[[this_lab]] <- stats_output_alpha_delta
+  }
+  if( stats_output_alpha_omicron$pval < 0.05){
+    outputs_to_plot[[this_lab]] <- stats_output_alpha_omicron
+  }
   #labs_results$alpha_delta_pval_ee[j] <- stats_output_alpha_delta_ee$pval
   #labs_results$alpha_omicron_pval_ee[j] <- stats_output_alpha_omicron_ee$pval
 }
 
-
+forest( outputs_to_plot[[1]])
+forest( outputs_to_plot[[2]])
 
 ###### if everything else fails then try this
 
