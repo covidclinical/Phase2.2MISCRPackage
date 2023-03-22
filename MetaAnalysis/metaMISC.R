@@ -192,11 +192,11 @@ print( omicron.hybrid %>% filter( pval < 0.05))
 lab_bysite = vector("list",length(site_list))
 for (i in 1:length(site_list)){
   print(i)
-  filename = paste0("table2/",site_list[i],"_table2AtAdmission.RData")
+  filename = paste(site_list[i], "/replace_earlier/",site_list[i],"_table2AtAdmission.RData",sep="")
+  #filename = paste0("table2/",site_list[i],"_table2AtAdmission.RData")
   load(filename)
-  if (i == 2){
-    table2_admission = table2_admission[-c(1,46),]
-  }
+  
+  table2_admission = table2_admission %>% filter( ! is.na( median_value ))
   mean_sd = data.frame(table2_admission[,c("variant_misc","variableName","mean_value","sd_value","n_patients")])
   mean_sd_reshape = reshape(mean_sd,direction="wide",idvar="variableName",timevar="variant_misc")
   lab_bysite[[i]] = mean_sd_reshape
@@ -205,29 +205,75 @@ for (i in 1:length(site_list)){
   print(dim(lab_bysite[[i]]))
 }
 
-this_lab = "albumin"
+lab_names_list <- lab_bysite[[1]]$variableName
+#this_lab = "albumin"
+#labs_results <- as.data.frame( matrix( ncol = 5, nrow = length(lab_names_list)))
+#colnames( labs_results) <- c("lab", "alpha_delta_pval", "alpha_omicron_pval",  "alpha_delta_pval_ee", "alpha_omicron_pval_ee")
+labs_results <- as.data.frame( matrix( ncol = 3, nrow = length(lab_names_list)))
+colnames( labs_results) <- c("lab", "alpha_delta_pval", "alpha_omicron_pval")
 
-for (i in 1:length(site_list)){
-  print(this_lab %in% lab_bysite[[1]][,1])
-}
 
-# all sites measured albumin, we take albumin as an example
-diff = rep(0,length(site_list))
-var.diff = rep(0,length(site_list))
-thres = 0
-sites.exclude = NULL
-for (i in 1:length(site_list)){
-  print(i)
-  index = which(lab_bysite[[i]]$variableName == this_lab)
-  min.size = min(lab_bysite[[i]]$n_patients.Alpha[index],lab_bysite[[i]]$n_patients.Delta[index],lab_bysite[[i]]$n_patients.Omicron[index])
-  if (min.size < thres | is.na(min.size)){
-    sites.exclude = c(sites.exclude,i)
+for( j in 1:length(lab_names_list)){
+  
+  this_lab = lab_names_list[j]
+  print(this_lab)
+  
+  # all sites measured albumin, we take albumin as an example
+  diff_alpha_delta = rep(0,length(site_list))
+  var.diff_alpha_delta = rep(0,length(site_list))
+  
+  diff_alpha_omicron = rep(0,length(site_list))
+  var.diff_alpha_omicron = rep(0,length(site_list))
+  
+  thres = 0
+  sites.exclude = NULL
+  for (i in 1:length(site_list)){
+    
+    #print(i)
+    index = which(lab_bysite[[i]]$variableName == this_lab)
+    
+    if( !any(index) ){
+      sites.exclude = c(sites.exclude,i)
+    }else{
+      min.size = min(lab_bysite[[i]]$n_patients.Alpha[index],lab_bysite[[i]]$n_patients.Delta[index],lab_bysite[[i]]$n_patients.Omicron[index])
+      if (min.size < thres | is.na(min.size)){
+        sites.exclude = c(sites.exclude,i)
+      }
+      diff_alpha_delta[i] = lab_bysite[[i]]$mean_value.Delta[index] - lab_bysite[[i]]$mean_value.Alpha[index]
+      var.diff_alpha_delta[i] = lab_bysite[[i]]$sd_value.Delta[index]^2/sample_size[i,2] + lab_bysite[[i]]$sd_value.Alpha[index]^2/sample_size[i,1]
+      
+      diff_alpha_omicron[i] = lab_bysite[[i]]$mean_value.Omicron[index] - lab_bysite[[i]]$mean_value.Alpha[index]
+      var.diff_alpha_omicron[i] = lab_bysite[[i]]$sd_value.Omicron[index]^2/sample_size[i,3] + lab_bysite[[i]]$sd_value.Alpha[index]^2/sample_size[i,1]
+      
+    }
+     }
+  
+  set.seed(123)
+  #rma(diff[-sites.exclude], var.diff[-sites.exclude], method="EE")
+  if( is.null(sites.exclude )){
+    stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta)
+    stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron)
+   
+    #stats_output_alpha_delta_ee <- rma(diff_alpha_delta, var.diff_alpha_delta, method="EE")
+    #stats_output_alpha_omicron_ee <- rma(diff_alpha_omicron, var.diff_alpha_omicron, method="EE")
+    
+    #stats_output <- rma(diff, var.diff, method="EE")
+  }else{
+    stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude])
+    stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude])
+    
+    #stats_output_alpha_delta_ee  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude], method="EE")
+    #stats_output_alpha_omicron_ee  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude], method="EE")
+    
   }
-  diff[i] = lab_bysite[[i]]$mean_value.Delta[index] - lab_bysite[[i]]$mean_value.Alpha[index]
-  var.diff[i] = lab_bysite[[i]]$sd_value.Delta[index]^2/sample_size[i,2] + lab_bysite[[i]]$sd_value.Alpha[index]^2/sample_size[i,1]
+
+  labs_results$lab[j] <- this_lab
+  labs_results$alpha_delta_pval[j] <- stats_output_alpha_delta$pval
+  labs_results$alpha_omicron_pval[j] <- stats_output_alpha_omicron$pval
+  
+  #labs_results$alpha_delta_pval_ee[j] <- stats_output_alpha_delta_ee$pval
+  #labs_results$alpha_omicron_pval_ee[j] <- stats_output_alpha_omicron_ee$pval
 }
-rma(diff[-sites.exclude], var.diff[-sites.exclude], method="EE")
-rma(diff[-sites.exclude], var.diff[-sites.exclude])
 
 
 
