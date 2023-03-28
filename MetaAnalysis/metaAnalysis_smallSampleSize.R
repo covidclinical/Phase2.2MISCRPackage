@@ -13,6 +13,7 @@ library(dplyr)
 
 ## Read the file with the sample size for alpha, delta and omicron for each site
 sample_size <- read.delim("/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/sample_size.txt")
+sample_size <- sample_size[ sample_size$site != "CHOP", ]
 
 #####################
 ##### Functions #####
@@ -32,9 +33,9 @@ ft.inverse = function(x){
 binary_outcome_data <- function( site_df, rdata_fileName, files_path ){
   
   #we do not have outcome data for chop, so for table 3 we exclude it from the df
-  if( rdata_fileName == "table3.RData" ){
-    site_df <- site_df[-which(site_df$site == "CHOP"), ]
-  }
+  #if( rdata_fileName == "table3.RData" ){
+  #  site_df <- site_df[-which(site_df$site == "CHOP"), ]
+  #}
   
   #create the list of sites
   site_list <- site_df$site
