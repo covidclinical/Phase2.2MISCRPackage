@@ -163,11 +163,6 @@ exact_method_format_results <- function( exact_results, p_value, input_char_to_e
 }
 
 ### function to extract the results with method III: exact site CI, standard meta
-exact_results = exact_method_alldiag[[1]] 
-p_value = 0.05
-input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all 
-filter_p_val = TRUE
-
 exact_site_standardMeta <- function( exact_results, p_value, input_char_to_evaluate, filter_p_val){
   output.hybrid = NULL
   transform = FALSE
