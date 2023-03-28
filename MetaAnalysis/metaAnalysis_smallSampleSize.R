@@ -163,6 +163,10 @@ exact_method_format_results <- function( exact_results, p_value, input_char_to_e
 }
 
 ### function to extract the results with method III: exact site CI, standard meta
+exact_results = exact_method_alldiag[[1]] 
+p_value = 0.05
+input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all 
+filter_p_val = TRUE
 
 exact_site_standardMeta <- function( exact_results, p_value, input_char_to_evaluate, filter_p_val){
   output.hybrid = NULL
@@ -181,7 +185,8 @@ exact_site_standardMeta <- function( exact_results, p_value, input_char_to_evalu
         vi = c(vi,(ft(CIs[j,3]) - ft(CIs[j,2]))/2/qnorm(0.975))
       }
       vi = vi^2
-      mod = rma.uni(yi,vi)
+      tryCatch({mod <- rma.uni(yi, vi)
+      }, error = function(e) mod <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       output.hybrid = rbind(output.hybrid, c(ft.inverse(mod$beta),ft.inverse(mod$ci.lb), ft.inverse(mod$ci.ub), mod$pval))
     } else {
       for (j in 1:nrow(CIs)){
@@ -190,7 +195,8 @@ exact_site_standardMeta <- function( exact_results, p_value, input_char_to_evalu
         vi = c(vi,(CIs[j,3] - CIs[j,2])/2/qnorm(0.975))
       }
       vi = vi^2
-      mod = rma.uni(yi,vi)
+      tryCatch({mod <- rma.uni(yi, vi)
+      }, error = function(e) mod <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       output.hybrid = rbind(output.hybrid, c(mod$beta,mod$ci.lb, mod$ci.ub, mod$pval))
     }
   }
@@ -358,6 +364,7 @@ exact_method_allcategories <- exact_method(
   sample_size_df = sample_size
 )
 
+
 exact_method_alloutcomes <- exact_method(
   input_char_to_evaluate = list_to_evaluate$Outcomes_all,
   formated_meta_analysis_list = data_alloutcomes,
@@ -373,7 +380,13 @@ exact_method_alldiag <- exact_method(
   sample_size_df = sample_size
 )
 
+
+
+
 # get the statistically significant results 
+load("/Users/alba/Desktop/exactMethod_outcomes.RData")
+exact_method_alloutcomes <- list( res.exact.delta,res.exact.omicron )
+
 stat_significant_outcomes <- list()
 stat_significant_outcomes[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_alloutcomes[[1]], 
                                                              p_value = 0.05, 
@@ -388,6 +401,9 @@ stat_significant_outcomes[["alphavsomicron"]] <-exact_method_format_results( exa
 ### results on alpha vs. omicron for anti-coagulation therapy
 
 # for the categories
+load("/Users/alba/Desktop/exactMethod_categories.RData")
+exact_method_allcategories <- list( res.exact.delta,res.exact.omicron )
+
 stat_significant_categories <- list()
 stat_significant_categories[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_allcategories[[1]], 
                                                                            p_value = 0.05, 
@@ -399,6 +415,23 @@ stat_significant_categories[["alphavsomicron"]] <-exact_method_format_results( e
                                                                              input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
                                                                              filter_p_val = TRUE)
 ### no statistical results for the categories with the restrictive method
+
+# for all diagnosis
+load("/Users/alba/Desktop/exactMethod_allDiagnosis.RData")
+exact_method_alldiag <- list( res.exact.delta,res.exact.omicron )
+
+stat_significant_categories <- list()
+stat_significant_categories[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[1]], 
+                                                                             p_value = 0.05, 
+                                                                             input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
+                                                                             filter_p_val = TRUE)
+
+stat_significant_categories[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[2]], 
+                                                                               p_value = 0.05, 
+                                                                               input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
+                                                                               filter_p_val = TRUE)
+
+
 
 ### run method 3, less restrictive
 stat_significant_categories_standardMeta <- list()
@@ -428,9 +461,25 @@ stat_significant_outcomes_standardMeta[["alphavsdelta"]] <- exact_site_standardM
 stat_significant_outcomes_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_alloutcomes[[2]], 
                                                                                          p_value = 0.05, 
                                                                                          input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-                                                                                         filter_p_val = TRUE)
+                                                                                         filter_p_val = FALSE)
 
 # with this method anticoagulation therapy is not stat significant
+
+### run method 3, for allDiagnosis
+stat_significant_allDiag_standardMeta <- list()
+stat_significant_allDiag_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_alldiag[[1]], 
+                                                                                     p_value = 0.05, 
+                                                                                     input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
+                                                                                     filter_p_val = TRUE)
+
+# history of covid, NEUROLOGY SYMPTOMS and SHOCK/IRS
+
+stat_significant_allDiag_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_alldiag[[2]], 
+                                                                                       p_value = 0.05, 
+                                                                                       input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
+                                                                                       filter_p_val = FALSE)
+
+
 
 
 ##################################################################
