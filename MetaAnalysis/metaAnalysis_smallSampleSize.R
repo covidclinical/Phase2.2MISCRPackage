@@ -372,7 +372,7 @@ exact_method_alloutcomes <- exact_method(
 exact_method_alldiag <- exact_method(
   input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all,
   formated_meta_analysis_list = data_alldiag,
-  outputPath = "/Users/alba/Desktop/exactMethod_allDiagnosis.RData",
+  outputPath = "/Users/alba/Desktop/replace_earlier/exactMethod_allDiagnosis.RData",
   sample_size_df = sample_size
 )
 
@@ -380,7 +380,7 @@ exact_method_alldiag <- exact_method(
 
 
 # get the statistically significant results 
-load("/Users/alba/Desktop/exactMethod_outcomes.RData")
+load("/Users/alba/Desktop/replace_earlier/exactMethod_outcomes.RData")
 exact_method_alloutcomes <- list( res.exact.delta,res.exact.omicron )
 
 stat_significant_outcomes <- list()
@@ -397,7 +397,7 @@ stat_significant_outcomes[["alphavsomicron"]] <-exact_method_format_results( exa
 ### results on alpha vs. omicron for anti-coagulation therapy
 
 # for the categories
-load("/Users/alba/Desktop/exactMethod_categories.RData")
+load("/Users/alba/Desktop/replace_earlier/exactMethod_categories.RData")
 exact_method_allcategories <- list( res.exact.delta,res.exact.omicron )
 
 stat_significant_categories <- list()
@@ -413,7 +413,7 @@ stat_significant_categories[["alphavsomicron"]] <-exact_method_format_results( e
 ### no statistical results for the categories with the restrictive method
 
 # for all diagnosis
-load("/Users/alba/Desktop/exactMethod_allDiagnosis.RData")
+load("/Users/alba/Desktop/replace_earlier/exactMethod_allDiagnosis.RData")
 exact_method_alldiag <- list( res.exact.delta,res.exact.omicron )
 
 stat_significant_categories <- list()
