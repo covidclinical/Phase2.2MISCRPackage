@@ -301,18 +301,18 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
     # run the meta-analysis, using the rma function
     if( is.null(sites.exclude )){
       
-      tryCatch({stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta)
+      tryCatch({stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta, method = "EE")
       }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
-      tryCatch({stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron)
+      tryCatch({stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron, method = "EE")
       }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       
       
     }else{
       
-      tryCatch({stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude])
+      tryCatch({stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude], method = "EE")
       }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       
-      tryCatch({stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude])
+      tryCatch({stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude], method = "EE")
       }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       
       
@@ -441,50 +441,6 @@ stat_significant_categories[["alphavsomicron"]] <-exact_method_format_results( e
 
 
 
-### run method 3, less restrictive
-stat_significant_categories_standardMeta <- list()
-stat_significant_categories_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_allcategories[[1]], 
-                                                                                       p_value = 0.05, 
-                                                                                       input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
-                                                                                       filter_p_val = TRUE)
-
-# in alpha vs. delta we find neurological symptoms and shock/irs with sig p-value
-
-stat_significant_categories_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_allcategories[[2]], 
-                                                                                         p_value = 0.05, 
-                                                                                         input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
-                                                                                         filter_p_val = TRUE)
-
-
-### run method 3, for outcomes
-stat_significant_outcomes_standardMeta <- list()
-stat_significant_outcomes_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_alloutcomes[[1]], 
-                                                                                     p_value = 0.05, 
-                                                                                     input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-                                                                                     filter_p_val = TRUE)
-
-# composite adverse cardiovascular outcome is significant 
-
-stat_significant_outcomes_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_alloutcomes[[2]], 
-                                                                                       p_value = 0.05, 
-                                                                                       input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-                                                                                       filter_p_val = FALSE)
-
-# with this method anticoagulation therapy is not stat significant
-
-### run method 3, for allDiagnosis
-stat_significant_allDiag_standardMeta <- list()
-stat_significant_allDiag_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_alldiag[[1]], 
-                                                                                    p_value = 0.05, 
-                                                                                    input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
-                                                                                    filter_p_val = TRUE)
-
-# history of covid, NEUROLOGY SYMPTOMS and SHOCK/IRS
-
-stat_significant_allDiag_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_alldiag[[2]], 
-                                                                                      p_value = 0.05, 
-                                                                                      input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
-                                                                                      filter_p_val = TRUE)
 ##################################################################
 ## Labs; Continuous outputs: meta analysis of two-sample t-test ##
 ##################################################################
@@ -512,7 +468,10 @@ labs_at_admission_outputs_to_plot <- labs_at_admission_metaAnalysis_output[[2]]
 names(labs_at_admission_outputs_to_plot)
 forest( labs_at_admission_outputs_to_plot[[1]])
 forest( labs_at_admission_outputs_to_plot[[2]])
-# troponin normal sensitivity and lymphocyte stat significant
+forest( labs_at_admission_outputs_to_plot[[3]])
+forest( labs_at_admission_outputs_to_plot[[4]])
+forest( labs_at_admission_outputs_to_plot[[5]])
+# CRP, d_dimer, PT, troponin normal sensitivity and lymphocyte stat significant
 
 # lab during admission meta-analysis results
 labs_during_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
@@ -525,5 +484,52 @@ labs_during_admission_outputs_to_plot <- labs_during_admission_metaAnalysis_outp
 names(labs_during_admission_outputs_to_plot)
 forest( labs_during_admission_outputs_to_plot[[1]])
 forest( labs_during_admission_outputs_to_plot[[2]])
+# alt, troponin, lymphocyte and pt
+
+#### method 3 not needed
+# ### run method 3, less restrictive
+# stat_significant_categories_standardMeta <- list()
+# stat_significant_categories_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_allcategories[[1]], 
+#                                                                                        p_value = 0.05, 
+#                                                                                        input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
+#                                                                                        filter_p_val = TRUE)
+# 
+# # in alpha vs. delta we find neurological symptoms and shock/irs with sig p-value
+# 
+# stat_significant_categories_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_allcategories[[2]], 
+#                                                                                          p_value = 0.05, 
+#                                                                                          input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
+#                                                                                          filter_p_val = TRUE)
+# 
+# 
+# ### run method 3, for outcomes
+# stat_significant_outcomes_standardMeta <- list()
+# stat_significant_outcomes_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_alloutcomes[[1]], 
+#                                                                                      p_value = 0.05, 
+#                                                                                      input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
+#                                                                                      filter_p_val = TRUE)
+# 
+# # composite adverse cardiovascular outcome is significant 
+# 
+# stat_significant_outcomes_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_alloutcomes[[2]], 
+#                                                                                        p_value = 0.05, 
+#                                                                                        input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
+#                                                                                        filter_p_val = FALSE)
+# 
+# # with this method anticoagulation therapy is not stat significant
+# 
+# ### run method 3, for allDiagnosis
+# stat_significant_allDiag_standardMeta <- list()
+# stat_significant_allDiag_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_alldiag[[1]], 
+#                                                                                     p_value = 0.05, 
+#                                                                                     input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
+#                                                                                     filter_p_val = TRUE)
+# 
+# # history of covid, NEUROLOGY SYMPTOMS and SHOCK/IRS
+# 
+# stat_significant_allDiag_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_alldiag[[2]], 
+#                                                                                       p_value = 0.05, 
+#                                                                                       input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
+#                                                                                       filter_p_val = TRUE)
 
 
