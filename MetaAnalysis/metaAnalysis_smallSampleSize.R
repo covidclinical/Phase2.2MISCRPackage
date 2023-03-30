@@ -181,7 +181,7 @@ exact_site_standardMeta <- function( exact_results, p_value, input_char_to_evalu
         vi = c(vi,(ft(CIs[j,3]) - ft(CIs[j,2]))/2/qnorm(0.975))
       }
       vi = vi^2
-      tryCatch({mod <- rma.uni(yi, vi)
+      tryCatch({mod <- rma.uni(yi, vi, method = "EE")
       }, error = function(e) mod <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       output.hybrid = rbind(output.hybrid, c(ft.inverse(mod$beta),ft.inverse(mod$ci.lb), ft.inverse(mod$ci.ub), mod$pval))
     } else {
@@ -191,7 +191,7 @@ exact_site_standardMeta <- function( exact_results, p_value, input_char_to_evalu
         vi = c(vi,(CIs[j,3] - CIs[j,2])/2/qnorm(0.975))
       }
       vi = vi^2
-      tryCatch({mod <- rma.uni(yi, vi)
+      tryCatch({mod <- rma.uni(yi, vi, method = "EE")
       }, error = function(e) mod <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       output.hybrid = rbind(output.hybrid, c(mod$beta,mod$ci.lb, mod$ci.ub, mod$pval))
     }
@@ -300,11 +300,11 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
     
     # run the meta-analysis, using the rma function
     if( is.null(sites.exclude )){
-      stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta)
-      stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron)
+      stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta, method = "EE")
+      stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron, method = "EE")
     }else{
-      stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude])
-      stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude])
+      stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude], method = "EE")
+      stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude], method = "EE")
     }
     
     labs_results$lab[j] <- this_lab
@@ -387,12 +387,12 @@ stat_significant_outcomes <- list()
 stat_significant_outcomes[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_alloutcomes[[1]], 
                                                              p_value = 0.05, 
                                                              input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-                                                             filter_p_val = TRUE)
+                                                             filter_p_val = FALSE)
 
 stat_significant_outcomes[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_alloutcomes[[2]], 
                                                                         p_value = 0.05, 
                                                                         input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-                                                                        filter_p_val = TRUE)
+                                                                        filter_p_val = FALSE)
 ### based on the most restrictive statistical method we find stat significant
 ### results on alpha vs. omicron for anti-coagulation therapy
 
@@ -473,7 +473,7 @@ stat_significant_allDiag_standardMeta[["alphavsdelta"]] <- exact_site_standardMe
 stat_significant_allDiag_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_alldiag[[2]], 
                                                                                        p_value = 0.05, 
                                                                                        input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
-                                                                                       filter_p_val = FALSE)
+                                                                                       filter_p_val = TRUE)
 
 
 
