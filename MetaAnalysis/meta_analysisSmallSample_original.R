@@ -13,7 +13,7 @@ library(dplyr)
 
 ## Read the file with the sample size for alpha, delta and omicron for each site
 sample_size <- read.delim("/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/sample_size_original.txt")
-sample_size <- sample_size[ sample_size$site != "CHOP", ]
+#sample_size <- sample_size[ sample_size$site != "CHOP", ]
 
 #####################
 ##### Functions #####
@@ -300,23 +300,37 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
     
     # run the meta-analysis, using the rma function
     if( is.null(sites.exclude )){
-      stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta)
-      stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron)
+      
+      tryCatch({stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta)
+      }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
+      tryCatch({stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron)
+      }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
+      
+      
     }else{
-      stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude])
-      stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude])
+      
+      tryCatch({stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude])
+      }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
+      
+      tryCatch({stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude])
+      }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
+      
+      
     }
     
     labs_results$lab[j] <- this_lab
     labs_results$alpha_delta_pval[j] <- stats_output_alpha_delta$pval
     labs_results$alpha_omicron_pval[j] <- stats_output_alpha_omicron$pval
     
-    if( stats_output_alpha_delta$pval < p_value){
-      outputs_to_plot[[this_lab]] <- stats_output_alpha_delta
-    }
-    if( stats_output_alpha_omicron$pval < p_value){
-      outputs_to_plot[[this_lab]] <- stats_output_alpha_omicron
-    }
+    if( !is.na(stats_output_alpha_delta$pval)){
+      if (stats_output_alpha_delta$pval < p_value){
+        outputs_to_plot[[this_lab]] <- stats_output_alpha_delta
+      }}
+    if( !is.na(stats_output_alpha_omicron$pval)){
+      if(stats_output_alpha_omicron$pval < p_value){
+        outputs_to_plot[[this_lab]] <- stats_output_alpha_omicron
+      }}
+   
   }
   return( list( labs_results, outputs_to_plot) )
   
@@ -471,6 +485,45 @@ stat_significant_allDiag_standardMeta[["alphavsomicron"]] <- exact_site_standard
                                                                                       p_value = 0.05, 
                                                                                       input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
                                                                                       filter_p_val = TRUE)
+##################################################################
+## Labs; Continuous outputs: meta analysis of two-sample t-test ##
+##################################################################
 
+labs_at_admission <- continuous_outcome_data( site_df = sample_size, 
+                                              rdata_fileName =  "table2AtAdmission.RData", 
+                                              files_path     =  "/Users/alba/Desktop/finalTablesTest/4CE_MISC_outputs/")
+
+labs_during_admission <- continuous_outcome_data( site_df = sample_size, 
+                                                  rdata_fileName =  "table2DuringAdmission.RData", 
+                                                  files_path     =  "/Users/alba/Desktop/finalTablesTest/4CE_MISC_outputs/")
+
+
+# extract all the lab names 
+lab_names_list <- labs_at_admission[[1]]$variableName
+
+# lab at admission meta-analysis results
+labs_at_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
+                                                             lab_data = labs_at_admission, 
+                                                             p_value = 0.05) 
+
+labs_at_admission_metaAnalysis_output_df <- labs_at_admission_metaAnalysis_output[[1]]
+labs_at_admission_outputs_to_plot <- labs_at_admission_metaAnalysis_output[[2]]
+
+names(labs_at_admission_outputs_to_plot)
+forest( labs_at_admission_outputs_to_plot[[1]])
+forest( labs_at_admission_outputs_to_plot[[2]])
+# troponin normal sensitivity and lymphocyte stat significant
+
+# lab during admission meta-analysis results
+labs_during_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
+                                                                 lab_data = labs_during_admission, 
+                                                                 p_value = 0.05) 
+
+labs_during_admission_metaAnalysis_output_df <- labs_during_admission_metaAnalysis_output[[1]]
+labs_during_admission_outputs_to_plot <- labs_during_admission_metaAnalysis_output[[2]]
+
+names(labs_during_admission_outputs_to_plot)
+forest( labs_during_admission_outputs_to_plot[[1]])
+forest( labs_during_admission_outputs_to_plot[[2]])
 
 
