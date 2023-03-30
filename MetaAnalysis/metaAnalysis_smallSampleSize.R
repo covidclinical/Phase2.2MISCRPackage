@@ -152,10 +152,18 @@ exact_method_format_results <- function( exact_results, p_value, input_char_to_e
     output.exact = rbind(output.exact,exact_results[[i]]$ci.fixed[,2])
   }
   output.exact = data.frame(output.exact)
-  output.exact$outcome = input_char_to_evaluate
   
+  output.exact <- output.exact %>%
+    mutate( outcome = input_char_to_evaluate, 
+            or = round(exp( est ), 3), 
+            est = round( est, 3), 
+            pVal = round(p, 3), 
+            CI = paste0( "[", round(lower.CI, 3), ",", round(upper.CI, 3), "]")) %>%
+    select( outcome,  est, CI, pVal )
+  
+
   if( filter_p_val == TRUE ){
-    output <- output.exact %>% filter( p < p_value)
+    output <- output.exact %>% filter( pVal < p_value)
     print( output )
     return( output )
   }else{
@@ -163,52 +171,6 @@ exact_method_format_results <- function( exact_results, p_value, input_char_to_e
   }
 }
 
-### function to extract the results with method III: exact site CI, standard meta
-exact_site_standardMeta <- function( exact_results, p_value, input_char_to_evaluate, filter_p_val){
-  output.hybrid = NULL
-  transform = FALSE
-  
-  for (i in 1:length(exact_results)){
-    #print(i)
-    yi = NULL
-    yi.alt = NULL
-    vi = NULL
-    CIs = exact_results[[i]]$study.ci
-    if (transform){
-      for (j in 1:nrow(CIs)){
-        yi = c(yi, (ft(CIs[j,2])+ft(CIs[j,3]))/2)
-        yi.alt = c(yi.alt, ft(CIs[j,1]))
-        vi = c(vi,(ft(CIs[j,3]) - ft(CIs[j,2]))/2/qnorm(0.975))
-      }
-      vi = vi^2
-      tryCatch({mod <- rma.uni(yi, vi, method = "EE")
-      }, error = function(e) mod <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
-      output.hybrid = rbind(output.hybrid, c(ft.inverse(mod$beta),ft.inverse(mod$ci.lb), ft.inverse(mod$ci.ub), mod$pval))
-    } else {
-      for (j in 1:nrow(CIs)){
-        yi = c(yi, (CIs[j,2]+CIs[j,3])/2)
-        yi.alt = c(yi.alt, CIs[j,1])
-        vi = c(vi,(CIs[j,3] - CIs[j,2])/2/qnorm(0.975))
-      }
-      vi = vi^2
-      tryCatch({mod <- rma.uni(yi, vi, method = "EE")
-      }, error = function(e) mod <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
-      output.hybrid = rbind(output.hybrid, c(mod$beta,mod$ci.lb, mod$ci.ub, mod$pval))
-    }
-  }
-  output.hybrid = data.frame(output.hybrid)
-  colnames(output.hybrid) = c("est","ci.lb","ci.ub","pval")
-  output.hybrid$var = input_char_to_evaluate
-  
-  if( filter_p_val == TRUE ){
-    output <- output.hybrid %>% filter( pval < p_value)
-    print( output )
-    return( output )
-  }else{
-    return( output.hybrid )
-  }
-  
-}
 
 ## function to read and format the lab data
 continuous_outcome_data <- function(site_df, rdata_fileName, files_path){
@@ -249,8 +211,11 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
   site_list <- names( lab_data )
   
   # create an empty df to save the results
-  labs_results <- as.data.frame( matrix( ncol = 3, nrow = length(lab_list)))
-  colnames( labs_results) <- c("lab", "alpha_delta_pval", "alpha_omicron_pval")
+  labs_results <- as.data.frame( matrix( ncol = 9, nrow = length(lab_list)))
+  colnames( labs_results) <- c("lab", "alpha_delta_pval", "alpha_delta_est","alpha_delta_or","alpha_delta_CI", 
+                                      "alpha_omicron_pval", "alpha_omicron_est","alpha_omicron_or","alpha_omicron_CI")
+  
+  
   
   # create a list to save stat results to plot forest plot
   outputs_to_plot <- list()
@@ -308,14 +273,27 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
     }
     
     labs_results$lab[j] <- this_lab
-    labs_results$alpha_delta_pval[j] <- stats_output_alpha_delta$pval
+    labs_results$alpha_delta_pval[j] <- round(stats_output_alpha_delta$pval,3)
+    labs_results$alpha_delta_est[j] <- round(stats_output_alpha_delta$b, 3)
+    labs_results$alpha_delta_or[j] <- round(exp(stats_output_alpha_delta$b), 3)
+    labs_results$alpha_delta_CI[j] <- paste0("[", round(stats_output_alpha_delta$ci.lb, 3), ",", 
+                                             round(stats_output_alpha_delta$ci.ub, 3), "]")
+    
+    labs_results$alpha_omicron_pval[j] <- round(stats_output_alpha_omicron$pval,3)
+    labs_results$alpha_omicron_est[j] <- round(stats_output_alpha_omicron$b, 3)
+    labs_results$alpha_omicron_or[j] <- round(exp(stats_output_alpha_omicron$b), 3)
+    labs_results$alpha_omicron_CI[j] <- paste0("[", round(stats_output_alpha_omicron$ci.lb, 3), ",", 
+                                             round(stats_output_alpha_omicron$ci.ub, 3), "]")
+    
     labs_results$alpha_omicron_pval[j] <- stats_output_alpha_omicron$pval
     
     if( stats_output_alpha_delta$pval < p_value){
-      outputs_to_plot[[this_lab]] <- stats_output_alpha_delta
+      var<- paste0(this_lab, "_alphaDelta")
+      outputs_to_plot[[var]] <- stats_output_alpha_delta
     }
     if( stats_output_alpha_omicron$pval < p_value){
-      outputs_to_plot[[this_lab]] <- stats_output_alpha_omicron
+      var <- paste0(this_lab, "_alphaOmicron")
+      outputs_to_plot[[var]] <- stats_output_alpha_omicron
     }
   }
   return( list( labs_results, outputs_to_plot) )
@@ -387,7 +365,7 @@ stat_significant_outcomes <- list()
 stat_significant_outcomes[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_alloutcomes[[1]], 
                                                              p_value = 0.05, 
                                                              input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-                                                             filter_p_val = TRUE)
+                                                             filter_p_val = FALSE)
 
 stat_significant_outcomes[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_alloutcomes[[2]], 
                                                                         p_value = 0.05, 
@@ -481,6 +459,53 @@ forest( labs_during_admission_outputs_to_plot[[3]])
 
 
 ###### Method 3 not really needed
+### function to extract the results with method III: exact site CI, standard meta
+# exact_site_standardMeta <- function( exact_results, p_value, input_char_to_evaluate, filter_p_val){
+#   output.hybrid = NULL
+#   transform = FALSE
+#   
+#   for (i in 1:length(exact_results)){
+#     #print(i)
+#     yi = NULL
+#     yi.alt = NULL
+#     vi = NULL
+#     CIs = exact_results[[i]]$study.ci
+#     if (transform){
+#       for (j in 1:nrow(CIs)){
+#         yi = c(yi, (ft(CIs[j,2])+ft(CIs[j,3]))/2)
+#         yi.alt = c(yi.alt, ft(CIs[j,1]))
+#         vi = c(vi,(ft(CIs[j,3]) - ft(CIs[j,2]))/2/qnorm(0.975))
+#       }
+#       vi = vi^2
+#       tryCatch({mod <- rma.uni(yi, vi, method = "EE")
+#       }, error = function(e) mod <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
+#       output.hybrid = rbind(output.hybrid, c(ft.inverse(mod$beta),ft.inverse(mod$ci.lb), ft.inverse(mod$ci.ub), mod$pval))
+#     } else {
+#       for (j in 1:nrow(CIs)){
+#         yi = c(yi, (CIs[j,2]+CIs[j,3])/2)
+#         yi.alt = c(yi.alt, CIs[j,1])
+#         vi = c(vi,(CIs[j,3] - CIs[j,2])/2/qnorm(0.975))
+#       }
+#       vi = vi^2
+#       tryCatch({mod <- rma.uni(yi, vi, method = "EE")
+#       }, error = function(e) mod <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
+#       output.hybrid = rbind(output.hybrid, c(mod$beta,mod$ci.lb, mod$ci.ub, mod$pval))
+#     }
+#   }
+#   output.hybrid = data.frame(output.hybrid)
+#   colnames(output.hybrid) = c("est","ci.lb","ci.ub","pval")
+#   output.hybrid$var = input_char_to_evaluate
+#   
+#   if( filter_p_val == TRUE ){
+#     output <- output.hybrid %>% filter( pval < p_value)
+#     print( output )
+#     return( output )
+#   }else{
+#     return( output.hybrid )
+#   }
+#   
+# }
+
 ### run method 3, less restrictive
 # stat_significant_categories_standardMeta <- list()
 # stat_significant_categories_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_allcategories[[1]], 
