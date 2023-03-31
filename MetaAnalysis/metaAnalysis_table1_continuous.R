@@ -69,8 +69,11 @@ continous_var_test <- function( var_list, var_data, p_value ){
   site_list <- names( var_data )
   
   # create an empty df to save the results
-  var_results <- as.data.frame( matrix( ncol = 3, nrow = length(var_list)))
-  colnames( var_results) <- c("var", "alpha_delta_pval", "alpha_omicron_pval")
+  
+  var_results <- as.data.frame( matrix( ncol = 7, nrow = length(var_list)))
+  colnames( var_results) <- c("var", "alpha_delta_pval", "alpha_delta_est","alpha_delta_CI", 
+                               "alpha_omicron_pval", "alpha_omicron_est","alpha_omicron_CI")
+
   
   # create a list to save stat results to plot forest plot
   outputs_to_plot <- list()
@@ -120,34 +123,47 @@ continous_var_test <- function( var_list, var_data, p_value ){
     # run the meta-analysis, using the rma function
     if( is.null(sites.exclude )){
       
-      tryCatch({stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta)
+      tryCatch({stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta, method = "EE")
       }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
-      tryCatch({stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron)
+      tryCatch({stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron, method = "EE")
       }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       
       
     }else{
       
-      tryCatch({stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude])
+      tryCatch({stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude], method = "EE")
       }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       
-      tryCatch({stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude])
+      tryCatch({stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude], method = "EE")
       }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       
       
     }
     
     var_results$var[j] <- this_var
-    var_results$alpha_delta_pval[j] <- stats_output_alpha_delta$pval
-    var_results$alpha_omicron_pval[j] <- stats_output_alpha_omicron$pval
+
+    var_results$alpha_delta_pval[j] <- round(stats_output_alpha_delta$pval,3)
+    var_results$alpha_delta_est[j] <- round(stats_output_alpha_delta$b, 3)
+    var_results$alpha_delta_CI[j] <- paste0("[", round(stats_output_alpha_delta$ci.lb, 3), ",", 
+                                             round(stats_output_alpha_delta$ci.ub, 3), "]")
+    
+    var_results$alpha_omicron_pval[j] <- round(stats_output_alpha_omicron$pval,3)
+    var_results$alpha_omicron_est[j] <- round(stats_output_alpha_omicron$b, 3)
+    var_results$alpha_omicron_CI[j] <- paste0("[", round(stats_output_alpha_omicron$ci.lb, 3), ",", 
+                                               round(stats_output_alpha_omicron$ci.ub, 3), "]")
+    
+    
+    
     
     if( !is.na(stats_output_alpha_delta$pval)){
       if (stats_output_alpha_delta$pval < p_value){
-        outputs_to_plot[[this_var]] <- stats_output_alpha_delta
+        var<- paste0(this_var, "_alphaDelta")
+        outputs_to_plot[[var]] <- stats_output_alpha_delta
       }}
     if( !is.na(stats_output_alpha_omicron$pval)){
       if(stats_output_alpha_omicron$pval < p_value){
-        outputs_to_plot[[this_var]] <- stats_output_alpha_omicron
+        var<- paste0(this_var, "_alphaOmicron")
+        outputs_to_plot[[var]] <- stats_output_alpha_omicron
       }}    
     
   }
@@ -173,6 +189,12 @@ outputs_to_plot <- outputs[[2]]
 
 names(outputs_to_plot)
 forest( outputs_to_plot[[1]])
+forest( outputs_to_plot[[2]])
+
+outputs_df %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/age_lengthHosp_meta_analysis.docx")
+
 
 
 #########################################################
@@ -254,8 +276,9 @@ continous_var_test <- function( var_list, var_data, p_value ){
   site_list <- names( var_data )
   
   # create an empty df to save the results
-  var_results <- as.data.frame( matrix( ncol = 3, nrow = length(var_list)))
-  colnames( var_results) <- c("var", "alpha_delta_pval", "alpha_omicron_pval")
+  var_results <- as.data.frame( matrix( ncol = 7, nrow = length(var_list)))
+  colnames( var_results) <- c("var", "alpha_delta_pval", "alpha_delta_est","alpha_delta_CI", 
+                              "alpha_omicron_pval", "alpha_omicron_est","alpha_omicron_CI")
   
   # create a list to save stat results to plot forest plot
   outputs_to_plot <- list()
@@ -305,34 +328,46 @@ continous_var_test <- function( var_list, var_data, p_value ){
     # run the meta-analysis, using the rma function
     if( is.null(sites.exclude )){
       
-      tryCatch({stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta)
+      tryCatch({stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta, method = "EE")
       }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
-      tryCatch({stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron)
+      tryCatch({stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron, method = "EE")
       }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       
       
     }else{
       
-      tryCatch({stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude])
+      tryCatch({stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude], method = "EE")
       }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       
-      tryCatch({stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude])
+      tryCatch({stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude], method = "EE")
       }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
       
       
     }
     
     var_results$var[j] <- this_var
-    var_results$alpha_delta_pval[j] <- stats_output_alpha_delta$pval
-    var_results$alpha_omicron_pval[j] <- stats_output_alpha_omicron$pval
+    var_results$alpha_delta_pval[j] <- round(stats_output_alpha_delta$pval,3)
+    var_results$alpha_delta_est[j] <- round(stats_output_alpha_delta$b, 3)
+    var_results$alpha_delta_CI[j] <- paste0("[", round(stats_output_alpha_delta$ci.lb, 3), ",", 
+                                            round(stats_output_alpha_delta$ci.ub, 3), "]")
+    
+    var_results$alpha_omicron_pval[j] <- round(stats_output_alpha_omicron$pval,3)
+    var_results$alpha_omicron_est[j] <- round(stats_output_alpha_omicron$b, 3)
+    var_results$alpha_omicron_CI[j] <- paste0("[", round(stats_output_alpha_omicron$ci.lb, 3), ",", 
+                                              round(stats_output_alpha_omicron$ci.ub, 3), "]")
+    
+    
+    
     
     if( !is.na(stats_output_alpha_delta$pval)){
       if (stats_output_alpha_delta$pval < p_value){
-        outputs_to_plot[[this_var]] <- stats_output_alpha_delta
+        var<- paste0(this_var, "_alphaDelta")
+        outputs_to_plot[[var]] <- stats_output_alpha_delta
       }}
     if( !is.na(stats_output_alpha_omicron$pval)){
       if(stats_output_alpha_omicron$pval < p_value){
-        outputs_to_plot[[this_var]] <- stats_output_alpha_omicron
+        var<- paste0(this_var, "_alphaOmicron")
+        outputs_to_plot[[var]] <- stats_output_alpha_omicron
       }}    
     
   }
@@ -358,3 +393,4 @@ outputs_to_plot <- outputs[[2]]
 
 names(outputs_to_plot)
 forest( outputs_to_plot[[1]])
+forest( outputs_to_plot[[2]])

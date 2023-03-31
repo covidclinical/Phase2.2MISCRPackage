@@ -10,10 +10,15 @@
 library(metafor)
 library(exactmeta)
 library(dplyr)
+library(flextable)
 
 ## Read the file with the sample size for alpha, delta and omicron for each site
 sample_size <- read.delim("/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/sample_size.txt")
 sample_size <- sample_size[ sample_size$site != "CHOP", ]
+
+# Load the different variables to evaluate (outcomes, categories and all clinical variables)
+load( "/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/listOfVariablesForMetaAnalysis.RData")
+
 
 #####################
 ##### Functions #####
@@ -155,7 +160,6 @@ exact_method_format_results <- function( exact_results, p_value, input_char_to_e
   
   output.exact <- output.exact %>%
     mutate( outcome = input_char_to_evaluate, 
-            or = round(exp( est ), 3), 
             est = round( est, 3), 
             pVal = round(p, 3), 
             CI = paste0( "[", round(lower.CI, 3), ",", round(upper.CI, 3), "]")) %>%
@@ -211,9 +215,9 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
   site_list <- names( lab_data )
   
   # create an empty df to save the results
-  labs_results <- as.data.frame( matrix( ncol = 9, nrow = length(lab_list)))
-  colnames( labs_results) <- c("lab", "alpha_delta_pval", "alpha_delta_est","alpha_delta_or","alpha_delta_CI", 
-                                      "alpha_omicron_pval", "alpha_omicron_est","alpha_omicron_or","alpha_omicron_CI")
+  labs_results <- as.data.frame( matrix( ncol = 7, nrow = length(lab_list)))
+  colnames( labs_results) <- c("lab", "alpha_delta_pval", "alpha_delta_est","alpha_delta_CI", 
+                                      "alpha_omicron_pval", "alpha_omicron_est","alpha_omicron_CI")
   
   
   
@@ -275,13 +279,11 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
     labs_results$lab[j] <- this_lab
     labs_results$alpha_delta_pval[j] <- round(stats_output_alpha_delta$pval,3)
     labs_results$alpha_delta_est[j] <- round(stats_output_alpha_delta$b, 3)
-    labs_results$alpha_delta_or[j] <- round(exp(stats_output_alpha_delta$b), 3)
     labs_results$alpha_delta_CI[j] <- paste0("[", round(stats_output_alpha_delta$ci.lb, 3), ",", 
                                              round(stats_output_alpha_delta$ci.ub, 3), "]")
     
     labs_results$alpha_omicron_pval[j] <- round(stats_output_alpha_omicron$pval,3)
     labs_results$alpha_omicron_est[j] <- round(stats_output_alpha_omicron$b, 3)
-    labs_results$alpha_omicron_or[j] <- round(exp(stats_output_alpha_omicron$b), 3)
     labs_results$alpha_omicron_CI[j] <- paste0("[", round(stats_output_alpha_omicron$ci.lb, 3), ",", 
                                              round(stats_output_alpha_omicron$ci.ub, 3), "]")
     
@@ -315,8 +317,6 @@ outcome_allsite <- binary_outcome_data( site_df = sample_size,
                                   rdata_fileName =  "table3.RData", 
                                   files_path     =  "/Users/alba/Desktop/finalTablesTest/4CE_MISC_outputs/"  )
 
-# Load the different variables to evaluate (outcomes, categories and all clinical variables)
-load( "/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/listOfVariablesForMetaAnalysis.RData")
 
 
 # For the category level, format the data for the meta-analysis
@@ -370,9 +370,20 @@ stat_significant_outcomes[["alphavsdelta"]] <-exact_method_format_results( exact
 stat_significant_outcomes[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_alloutcomes[[2]], 
                                                                         p_value = 0.05, 
                                                                         input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-                                                                        filter_p_val = TRUE)
+                                                                        filter_p_val = FALSE)
 ### based on the most restrictive statistical method we find stat significant
 ### results on alpha vs. omicron for anti-coagulation therapy
+colnames(stat_significant_outcomes[["alphavsdelta"]]) <- c("outcome", "alpha_delta_est", 
+                                                           "alpha_delta_CI", "alpha_delta_pVal")
+
+colnames(stat_significant_outcomes[["alphavsomicron"]]) <- c("outcome", "alpha_omicron_est", 
+                                                           "alpha_omicron_CI", "alpha_omicron_pVal")
+
+outcome_results_meta_analysis <- merge( stat_significant_outcomes[["alphavsdelta"]], stat_significant_outcomes[["alphavsomicron"]])
+
+outcome_results_meta_analysis %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/outcome_results_meta_analysis.docx")
 
 # for the categories
 load("/Users/alba/Desktop/replace_earlier/exactMethod_categories.RData")
@@ -382,35 +393,57 @@ stat_significant_categories <- list()
 stat_significant_categories[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_allcategories[[1]], 
                                                                            p_value = 0.05, 
                                                                            input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
-                                                                           filter_p_val = TRUE)
+                                                                           filter_p_val = FALSE)
 ## respiratory symptoms and shock/IRS significant for alpha vs. delta
 
 
 stat_significant_categories[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_allcategories[[2]], 
                                                                              p_value = 0.05, 
                                                                              input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
-                                                                             filter_p_val = TRUE)
+                                                                             filter_p_val = FALSE)
 ## no stat significant results for alpha vs. omicron
+colnames(stat_significant_categories[["alphavsdelta"]]) <- c("diagnosis", "alpha_delta_est", 
+                                                             "alpha_delta_CI", "alpha_delta_pVal")
+
+colnames(stat_significant_categories[["alphavsomicron"]]) <- c("diagnosis", "alpha_omicron_est", 
+                                                               "alpha_omicron_CI", "alpha_omicron_pVal")
+
+stat_significant_categories_meta_analysis <- merge( stat_significant_categories[["alphavsdelta"]], 
+                                                    stat_significant_categories[["alphavsomicron"]])
 
 # for all diagnosis
 load("/Users/alba/Desktop/replace_earlier/exactMethod_allDiagnosis.RData")
 exact_method_alldiag <- list( res.exact.delta,res.exact.omicron )
 
-stat_significant_categories <- list()
-stat_significant_categories[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[1]], 
+stat_significant_diag <- list()
+stat_significant_diag[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[1]], 
                                                                              p_value = 0.05, 
                                                                              input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
-                                                                             filter_p_val = TRUE)
+                                                                             filter_p_val = FALSE)
 
 ## pneumonia_bronchities_lower_resp and SIRS significant for alpha vs. delta
 
 
-stat_significant_categories[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[2]], 
+stat_significant_diag[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[2]], 
                                                                                p_value = 0.05, 
                                                                                input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
-                                                                               filter_p_val = TRUE)
+                                                                               filter_p_val = FALSE)
 
 ## SIRS significant in alpha vs. omicron
+colnames(stat_significant_diag[["alphavsdelta"]]) <- c("diagnosis", "alpha_delta_est", 
+                                                           "alpha_delta_CI", "alpha_delta_pVal")
+
+colnames(stat_significant_diag[["alphavsomicron"]]) <- c("diagnosis", "alpha_omicron_est", 
+                                                             "alpha_omicron_CI", "alpha_omicron_pVal")
+
+stat_significant_diagnosis_meta_analysis <- merge( stat_significant_diag[["alphavsdelta"]], 
+                                                   stat_significant_diag[["alphavsomicron"]])
+
+final_diagnosis_meta_analysis <- rbind(stat_significant_categories_meta_analysis,  stat_significant_diagnosis_meta_analysis)
+
+final_diagnosis_meta_analysis %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/diagnosis_results_meta_analysis.docx")
 
 
 ##################################################################
@@ -441,7 +474,11 @@ names(labs_at_admission_outputs_to_plot)
 forest( labs_at_admission_outputs_to_plot[[1]])
 forest( labs_at_admission_outputs_to_plot[[2]])
 forest( labs_at_admission_outputs_to_plot[[3]])
+forest( labs_at_admission_outputs_to_plot[[4]])
 
+labs_at_admission_metaAnalysis_output_df %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/labs_metaAnalysis_at_admission.docx")
 # CRP, troponin normal sensitivity and lymphocyte stat significant
 
 # lab during admission meta-analysis results
@@ -457,6 +494,9 @@ forest( labs_during_admission_outputs_to_plot[[1]])
 forest( labs_during_admission_outputs_to_plot[[2]])
 forest( labs_during_admission_outputs_to_plot[[3]])
 
+labs_during_admission_metaAnalysis_output_df %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/labs_metaAnalysis_during_admission.docx")
 
 ###### Method 3 not really needed
 ### function to extract the results with method III: exact site CI, standard meta
