@@ -472,13 +472,20 @@ labs_at_admission_outputs_to_plot <- labs_at_admission_metaAnalysis_output[[2]]
 
 names(labs_at_admission_outputs_to_plot)
 
-#png("/Users/alba/Desktop/labs_atAdmission.png")
 par(mfrow=c(2,2))
-forest( labs_at_admission_outputs_to_plot[[4]], xlab = names(labs_at_admission_outputs_to_plot)[4])
-forest( labs_at_admission_outputs_to_plot[[3]], xlab = names(labs_at_admission_outputs_to_plot)[3])
-forest( labs_at_admission_outputs_to_plot[[1]], xlab = names(labs_at_admission_outputs_to_plot)[1])
-forest( labs_at_admission_outputs_to_plot[[2]], xlab = names(labs_at_admission_outputs_to_plot)[2])
-#dev.off()
+forest( labs_at_admission_outputs_to_plot[[3]])
+#mtext(names(labs_at_admission_outputs_to_plot)[3], cex = 1)
+mtext("Lymphocyte (Alpha vs. Delta)", cex = 1)
+forest( labs_at_admission_outputs_to_plot[[4]])
+#mtext(names(labs_at_admission_outputs_to_plot)[4], cex = 1)
+mtext("Lymphocyte (Alpha vs. Omicron)", cex = 1)
+forest( labs_at_admission_outputs_to_plot[[1]])
+#mtext(names(labs_at_admission_outputs_to_plot)[1], cex = 1)
+mtext("CRP (Alpha vs. Delta)", cex = 1)
+forest( labs_at_admission_outputs_to_plot[[2]])
+#mtext(names(labs_at_admission_outputs_to_plot)[2], cex = 1)
+mtext("Troponin Normal Sensitivity (Alpha vs. Delta)", cex = 1)
+mtext("Labs at admission", side = 3,line = - 2,outer = TRUE )
 
 labs_at_admission_metaAnalysis_output_df %>%
   flextable::flextable() %>%
@@ -493,13 +500,21 @@ labs_during_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_
 labs_during_admission_metaAnalysis_output_df <- labs_during_admission_metaAnalysis_output[[1]]
 labs_during_admission_outputs_to_plot <- labs_during_admission_metaAnalysis_output[[2]]
 
-#png("/Users/alba/Desktop/labs_duringAdmission.png")
 par(mfrow=c(2,2))
 forest( labs_during_admission_outputs_to_plot[[1]], xlab = names(labs_during_admission_outputs_to_plot)[1])
+#mtext(names(labs_during_admission_outputs_to_plot)[1], cex = 1)
+mtext("Alanine Aminotransferase (ALT) (Alpha vs. Delta)", cex = 1)
 forest( labs_during_admission_outputs_to_plot[[4]], xlab = names(labs_during_admission_outputs_to_plot)[4])
+#mtext(names(labs_during_admission_outputs_to_plot)[4], cex = 1)
+mtext("Lymphocyte (Alpha vs. Omicron)", cex = 1)
 forest( labs_during_admission_outputs_to_plot[[2]], xlab = names(labs_during_admission_outputs_to_plot)[2])
+#mtext(names(labs_during_admission_outputs_to_plot)[2], cex = 1)
+mtext("Troponin Normal Sensitivity (Alpha vs. Delta)", cex = 1)
 forest( labs_during_admission_outputs_to_plot[[3]], xlab = names(labs_during_admission_outputs_to_plot)[3])
-#dev.off()
+#mtext(names(labs_during_admission_outputs_to_plot)[3], cex = 1)
+mtext("Troponin Normal Sensitivity (Alpha vs. Omicron)", cex = 1)
+mtext("Labs during admission", side = 3,line = - 2,outer = TRUE )
+
 
 labs_during_admission_metaAnalysis_output_df %>%
   flextable::flextable() %>%
