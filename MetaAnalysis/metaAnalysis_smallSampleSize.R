@@ -269,11 +269,11 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
     
     # run the meta-analysis, using the rma function
     if( is.null(sites.exclude )){
-      stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta, method = "EE")
-      stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron, method = "EE")
+      stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta, method = "EE", slab = site_list )
+      stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron, method = "EE", slab = site_list)
     }else{
-      stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude], method = "EE")
-      stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude], method = "EE")
+      stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude], method = "EE", slab = site_list[-sites.exclude])
+      stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude], method = "EE", slab = site_list[-sites.exclude])
     }
     
     labs_results$lab[j] <- this_lab
@@ -471,10 +471,14 @@ labs_at_admission_metaAnalysis_output_df <- labs_at_admission_metaAnalysis_outpu
 labs_at_admission_outputs_to_plot <- labs_at_admission_metaAnalysis_output[[2]]
 
 names(labs_at_admission_outputs_to_plot)
-forest( labs_at_admission_outputs_to_plot[[1]])
-forest( labs_at_admission_outputs_to_plot[[2]])
-forest( labs_at_admission_outputs_to_plot[[3]])
-forest( labs_at_admission_outputs_to_plot[[4]])
+
+#png("/Users/alba/Desktop/labs_atAdmission.png")
+par(mfrow=c(2,2))
+forest( labs_at_admission_outputs_to_plot[[4]], xlab = names(labs_at_admission_outputs_to_plot)[4])
+forest( labs_at_admission_outputs_to_plot[[3]], xlab = names(labs_at_admission_outputs_to_plot)[3])
+forest( labs_at_admission_outputs_to_plot[[1]], xlab = names(labs_at_admission_outputs_to_plot)[1])
+forest( labs_at_admission_outputs_to_plot[[2]], xlab = names(labs_at_admission_outputs_to_plot)[2])
+#dev.off()
 
 labs_at_admission_metaAnalysis_output_df %>%
   flextable::flextable() %>%
@@ -489,10 +493,13 @@ labs_during_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_
 labs_during_admission_metaAnalysis_output_df <- labs_during_admission_metaAnalysis_output[[1]]
 labs_during_admission_outputs_to_plot <- labs_during_admission_metaAnalysis_output[[2]]
 
-names(labs_during_admission_outputs_to_plot)
-forest( labs_during_admission_outputs_to_plot[[1]])
-forest( labs_during_admission_outputs_to_plot[[2]])
-forest( labs_during_admission_outputs_to_plot[[3]])
+#png("/Users/alba/Desktop/labs_duringAdmission.png")
+par(mfrow=c(2,2))
+forest( labs_during_admission_outputs_to_plot[[1]], xlab = names(labs_during_admission_outputs_to_plot)[1])
+forest( labs_during_admission_outputs_to_plot[[4]], xlab = names(labs_during_admission_outputs_to_plot)[4])
+forest( labs_during_admission_outputs_to_plot[[2]], xlab = names(labs_during_admission_outputs_to_plot)[2])
+forest( labs_during_admission_outputs_to_plot[[3]], xlab = names(labs_during_admission_outputs_to_plot)[3])
+#dev.off()
 
 labs_during_admission_metaAnalysis_output_df %>%
   flextable::flextable() %>%
