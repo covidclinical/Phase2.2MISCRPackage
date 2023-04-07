@@ -86,83 +86,25 @@ ui <- fluidPage(
                                 
                                 radioButtons("variantC", label = h3("MISC Variant type:"),
                                              choices = list("Total" = "total", "Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron", "All" = "all"), 
-                                             selected = "all"),
-                                #sliderInput("significant_threshold", "p-value threshold:",
-                                #            min = 0, max = 1, value = 0.1
-                                #),
+                                             selected = "all")
                             ),
                             mainPanel(
                                 tabsetPanel(type = "tabs",
                                             tabPanel("Table 1: percentages", plotOutput("plot1_perc"),  width = "100%"),
-                                            tabPanel("Table 3: percentages", plotOutput("plot3_perc"),  width = "100%") 
-                                            #tabPanel("Table 3: p-values", plotOutput("plot3_pval"),  width = "100%"), 
-                                            #,
-                                            #tabPanel("Table 1: p-values", plotOutput("plot1_pval"),  width = "100%")
+                                            tabPanel("Table 3: percentages", plotOutput("plot3_perc"),  width = "100%")
                                 )
                             ))
                         )
                ),
-               tabPanel("Pooled proportion",
-                        fluidRow(p(
-                            "Meta-analysis per variant type and variable"
-                        ),
-                        br(),
-                        sidebarLayout(
-                            sidebarPanel(
-                                
-                                radioButtons("variants", label = h3("MISC Variant type:"),
-                                             choices = list("Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron"), 
-                                             selected = "Alpha"),
-                                
-                                sliderInput("sampleSizeCutOff", "Sample size cut-off",
-                                                       min = 0, max = 10, value = 10
-                                            ),
-                                
-                                radioButtons("var_category", label = h3("Chose a variable:"),
-                                             choices = list("CARDIOVASCULAR SYMPTOMS"  =  "CARDIOVASCULAR SYMPTOMS",                
-                                                            "GI SYMPTOMS"  =   "GI SYMPTOMS",                            
-                                                            "LIVER DYSFUNCTION" =   "LIVER DYSFUNCTION",                     
-                                                            "NEUROLOGIC SYMPTOMS"  = "NEUROLOGIC SYMPTOMS",                      
-                                                            "RENAL DYSFUNCTION" =  "RENAL DYSFUNCTION",                
-                                                            "RESPIRATORY SYMPTOMS"  = "RESPIRATORY SYMPTOMS", 
-                                                            "GENERALIZED SYMPTOMS"   =  "GENERALIZED SYMPTOMS", 
-                                                            "Kawasaki"   =   "Kawasaki", 
-                                                            "ANTICOAGULATION THERAPY" = "Anticoagulation therapy", 
-                                                            "CARDIACT ARREST" = "Cardiac arrest",                      
-                                                            "COMPOSITE ADVERSE CARDIOVASCULAR OUTCOME" = "Composite adverse cardiovascular outcome",
-                                                            "CORONARY ANEURYSM" = "Coronary aneurysm",  
-                                                            "DIURETUC THERAPY" =  "Diuretic therapy",                          
-                                                            "ECMO" = "ECMO", 
-                                                            "IN ICU" =  "in_icu",                                
-                                                            "INOTROPIC SUPPORT"   =  "Inotropic support",                     
-                                                            "INVASIVE MONITORING (ARTERIAL LINE)"  =   "Invasive monitoring (arterial line)" ,    
-                                                            "OXYGEN SUPPLEMENTATION"  =  "Oxygen supplementation",                 
-                                                            "SEDATION OR MUSCLE RELAXANT"  = "Sedation or muscle relaxant" ), selected = "CARDIOVASCULAR SYMPTOMS")
-                            ),
-                            mainPanel(
-                                tabsetPanel(type = "tabs",
-                                            tabPanel("Forest plot by site", plotOutput("forestsite"),  width = "100%"),
-                                            tabPanel("Forest plot by country", plotOutput("forestcountry"),  width = "100%")
-                                )
-                            ))
-                        )
-               ), 
                tabPanel("Labs meta-analysis",
-                        fluidRow(p(
-                            "Meta-analysis per labs"
-                        ),
-                        br(),
+                        fluidRow(
                         sidebarLayout(
                             sidebarPanel(
                                 
-                                radioButtons("variantLabMeta", label = h3("MISC Variant type:"),
-                                             choices = list( "Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron"), 
-                                             selected = "Alpha"),
-                                
-                                br(),
-                                sliderInput("sampleSizeLabsCutOff", "Sample size cut-off",
-                                            min = 0, max = 10, value = 10
-                                ),
+                              radioButtons("variantLabMeta", label = h3("Comparison:"),
+                                           choices = list( "delta vs. alpha" = "Delta", "omicron vs. alpha" ="Omicron"), 
+                                           selected = "Delta"),
+
                                 br(),
                                 
                                 radioButtons("timeLabMeta", "Time point:",
@@ -193,45 +135,7 @@ ui <- fluidPage(
                             ),
                             mainPanel(
                                 tabsetPanel(type = "tabs",
-                                            tabPanel("Forest plot by site", plotOutput("forestsiteLab"),  width = "100%"),
-                                            tabPanel("Forest plot by country", plotOutput("forestcountryLab"),  width = "100%")
-                                )
-                            ))
-                        )
-               ),
-               tabPanel("Pooled proportion: Outcomes",
-                        fluidRow(p(
-                            "Meta-analysis per variant type and variable"
-                        ),
-                        br(),
-                        sidebarLayout(
-                            sidebarPanel(
-                                
-                                radioButtons("variants_outcome", label = h3("MISC Variant type:"),
-                                             choices = list("Alpha" = "Alpha", "Delta" = "Delta", "Omicron" ="Omicron"), 
-                                             selected = "Alpha"),
-                                
-                                sliderInput("sampleSizeCutOff_outcome", "Sample size cut-off",
-                                            min = 0, max = 10, value = 10
-                                ),
-                                
-                                radioButtons("outcome_category", label = h3("Chose a variable:"),
-                                             choices = list("Anticoagulation therapy" = "Anticoagulation therapy",
-                                                            "Cardiac arrest" = "Cardiac arrest",                       
-                                                            "Composite adverse cardiovascular outcome"= "Composite adverse cardiovascular outcome",
-                                                            "Coronary aneurysm" = "Coronary aneurysm",                         
-                                                            "Diuretic therapy" = "Diuretic therapy",                         
-                                                            "ECMO" = "ECMO",                                 
-                                                            "in_icu"  = "in_icu",                                  
-                                                            "Inotropic support" = "Inotropic support",                       
-                                                            "Invasive monitoring (arterial line)" = "Invasive monitoring (arterial line)",        
-                                                            "Oxygen supplementation" = "Oxygen supplementation",                  
-                                                            "Sedation or muscle relaxant"  = "Sedation or muscle relaxant"  ), selected = "Composite adverse cardiovascular outcome")
-                            ),
-                            mainPanel(
-                                tabsetPanel(type = "tabs",
-                                            tabPanel("Forest plot by site", plotOutput("forestsiteoutcome"),  width = "100%"),
-                                            tabPanel("Forest plot by country", plotOutput("forestcountryoutcome"),  width = "100%")
+                                            tabPanel("Forest plot", plotOutput("forestsiteLab"),  width = "100%")
                                 )
                             ))
                         )
@@ -331,12 +235,14 @@ server <- function(input, output) {
         ### merge all the tables in one
         compareTable <- dplyr::full_join( totalCode, site_codes ) 
         compareTable <- compareTable[ order( compareTable$ICDcode, decreasing = FALSE), ]
-        compareTable
+        ### remove CHOP
+        compareTable <- compareTable %>% select( - CHOP_percPatients )
         
     }, options = list("pageLength" = 50),  filter = "top", rownames = FALSE))
     
     
-    ##### Forest plot 
+    
+    
     for( i in 1:length(sites)){
       if(i == 1){
         pvaluesFiles3 <-  list.files(paste0("./4CE_MISC_outputs/", sites[i], "/replace_earlier/"), pattern = "3.txt")
@@ -422,7 +328,8 @@ server <- function(input, output) {
       dplyr::left_join( totalOutcomeCounts, by = c('site', 'variant_misc'))
     
     complete_table3 <- rbind( complete_table3, toAdd) %>% 
-      dplyr::mutate( n = ifelse( n == 0.5, 1, n))#change obfuscation from 0.5 to 1
+      dplyr::mutate( n = ifelse( n == 0.5, 1, n)) %>% #change obfuscation from 0.5 to 1
+      dplyr::filter( site != "CHOP")
     ######
     
     ### table 1 generation
@@ -510,7 +417,8 @@ server <- function(input, output) {
       dplyr::left_join( counts, by = c('site', 'variant_misc'))
     
     complete_table1 <- rbind( complete_table1, toAdd) %>% 
-      dplyr::mutate( n = ifelse( n == 0.5, 1, n))#change obfuscation from 0.5 to 1
+      dplyr::mutate( n = ifelse( n == 0.5, 1, n)) %>% #change obfuscation from 0.5 to 1
+      dplyr::filter( site != "CHOP")
     
     ### change renal involvement by renal disfunction
     complete_table1$categories <- gsub("generalized symptoms", "GENERALIZED SYMPTOMS", complete_table1$categories)
@@ -655,114 +563,46 @@ server <- function(input, output) {
     ### labs meta Analysis
     output$forestsiteLab <- renderPlot({
         
-        labsToMetaAnalysis <- labs %>%
-            dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1
-            filter( total > input$sampleSizeLabsCutOff) %>% # filter based on total n per variant
-            select( variant_misc, variableName, mean_value, sd_value, n_patients, site, time ) %>%
-            mutate( site = sapply( strsplit(site, " "), '[', 1))
+      ###load the results from the actual meta-analysis
+      if( input$timeLabMeta == "admission"){
+        load("labs_at_admission_outputs_to_plot.RData")
         
-        toForestPlot <- labsToMetaAnalysis %>%
-            filter( variableName == input$labMeta &
-                        variant_misc == input$variantLabMeta &
-                        time == input$timeLabMeta)
+        if( input$variantLabMeta == "Delta"){
+          selection <- paste0( input$labMeta, "_alphaDelta")
+          newTitle <- paste0(input$labMeta, " at Admission \n (delta vs. alpha)")
+        }else if( input$variantLabMeta == "Omicron"){
+          selection <- paste0( input$labMeta, "_alphaOmicron")
+          newTitle <- paste0(input$labMeta, " at Admission \n (omicron vs. alpha)")
+        }
+        toplot <- labs_at_admission_outputs_to_plot[[selection]]
         
-        metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=site, data=toForestPlot, sm="MRAW", method.ci= "z",
-                 comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
+      }
+      if( input$timeLabMeta == "during"){
+        load("labs_during_admission_outputs_to_plot.RData")
         
-        mtmean <-  metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=site, data=toForestPlot, sm="MRAW", method.ci= "z",
-                            comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
+        if( input$variantLabMeta == "Delta"){
+          selection <- paste0( input$labMeta, "_alphaDelta")
+          newTitle <- paste0(input$labMeta, " During Hospitalization \n (delta vs. alpha)")
+        }else if( input$variantLabMeta == "Omicron"){
+          selection <- paste0( input$labMeta, "_alphaOmicron")
+          newTitle <- paste0(input$labMeta, " During Hospitalization \n (omicron vs. alpha)")
+        }
         
-        forest.meta(mtmean, layout = "JAMA")
-        
-    }, height = 500, width = 900)
-    
-    output$forestcountryLab<- renderPlot({
-        
-        labsToMetaAnalysis <- labs %>%
-            dplyr::mutate( n_patients = ifelse( n_patients == 0.5, 1, n_patients )) %>% #### change obfuscation from 0.5 to 1
-            filter( n_total > input$sampleSizeLabsCutOff) %>% ## filter based on total n per variant
-            select( variant_misc, variableName, mean_value, sd_value, n_patients, site, time ) %>%
-            mutate( site = sapply( strsplit(site, " "), '[', 1), 
-                    site = gsub("\n", "", site ))
-        
-        countryMap <- read.delim("./siteCountry.txt")
-        
-        allLabsDataForestCountry <-labsToMetaAnalysis  %>%
-            left_join( countryMap )
-        
-        ### to review
-        toForestPlot <- allLabsDataForestCountry %>%
-          filter( variableName == input$labMeta &
-                        variant_misc == input$variantLabMeta &
-                        time == input$timeLabMeta) %>%
-            group_by( Country ) %>%
-            summarise( mean_value = mean( mean_value ), 
-                       sd_value = mean( sd_value ),
-                       n_patients = sum( n_patients ))
-        
-        mtmean <-  metamean(n=n_patients, mean=mean_value, sd=sd_value, studlab=Country, data=toForestPlot, sm="MRAW", method.ci= "z",
-                            comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
-        
-        forest.meta(mtmean, layout = "JAMA")
-    }, height = 500, width = 900)
-    
-    
-    
-    
-    
+        toplot <- labs_during_admission_outputs_to_plot[[selection]]
+      }
+      
+      forest( toplot)
+      mtext(newTitle, cex = 1.5)
 
-    
-    
-    
-    
-    output$forestsite <- renderPlot({
-        
-        complete_table1_forest <- complete_table1 %>%
-            filter( categories %in% categoriesToVisualize) %>%
-            filter( total >= input$sampleSizeCutOff )
-        
-        allDataForest <- rbind( complete_table3, complete_table1_forest )
-            
-        toForestPlot <- allDataForest %>%
-            filter( categories == input$var_category &
-                        variant_misc == input$variants )
-        
-        mtprop <- metaprop(event=n, n=total, studlab=site, data=toForestPlot, method = "GLMM", sm = "PLOGIT",
-                           comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
-        
-        forest.meta(mtprop, layout = "JAMA")
-        
     }, height = 500, width = 900)
     
-    output$forestcountry<- renderPlot({
-        
-        complete_table1 <- complete_table1 %>%
-            filter( categories %in% categoriesToVisualize)%>%
-            filter( total >= input$sampleSizeCutOff )
-        
-        countryMap <- read.delim("./siteCountry.txt")
-        
-        allDataForestCountry <- rbind( complete_table3, complete_table1 ) %>%
-            left_join( countryMap )
-        
-        toForestPlot <- allDataForestCountry %>%
-            filter( categories == input$var_category &
-                        variant_misc == input$variants ) %>%
-            group_by( Country ) %>%
-            summarise( n = sum( n ), 
-                       total = sum( total ))
-        
-        mtprop <- metaprop(event=n, n=total, studlab=Country, data=toForestPlot, method = "GLMM", sm = "PLOGIT",
-                           comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
-        
-        forest.meta(mtprop, layout = "JAMA")
-        
-    }, height = 500, width = 900)
+    
     
     ### compare categorical var in table 1 and 3 across sites 
     output$plot3_perc <- renderPlot({
         
-        allCombined_t3 <- complete_table3 %>% 
+        allCombined_t3 <- complete_table3 %>%
+          filter( site != "CHOP") %>%
             group_by( categories, variant_misc ) %>%
             summarise( n = sum(n), 
                        total = sum( total ) ) %>%
@@ -793,7 +633,7 @@ server <- function(input, output) {
         }else{
             toPlot <- complete_table3 %>%
                 mutate( perc = n/total*100) %>% 
-                filter( variant_misc == input$variantC) 
+                filter( variant_misc == input$variantC)
             
             ggplot(toPlot, aes(site, categories, fill= perc)) +
                 geom_tile() + 
@@ -823,7 +663,8 @@ server <- function(input, output) {
                        total = sum( total ) ) %>%
             mutate( site = "ALL Combined")
         
-        complete_table1 <- rbind( complete_table1, allCombined_t1 ) 
+        complete_table1 <- rbind( complete_table1, allCombined_t1 ) %>%
+          filter( site != "CHOP") 
         
         if( input$variantC == "all"){
             toPlot <- complete_table1 %>%
@@ -870,48 +711,6 @@ server <- function(input, output) {
             
         }
     }, height = 900, width = 1100)
-    
-    
-    output$forestsiteoutcome <- renderPlot({
-        
-        complete_table3_forest <- complete_table3 %>%
-            filter( total >= input$sampleSizeCutOff_outcome )
-        
-        toForestPlot <- complete_table3_forest %>%
-            filter( categories == input$outcome_category &
-                        variant_misc == input$variants_outcome )
-        
-        mtprop <- metaprop(event=n, n=total, studlab=site, data=toForestPlot, method = "GLMM", sm = "PLOGIT",
-                           comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
-        
-        forest.meta(mtprop, layout = "JAMA")
-        
-    }, height = 500, width = 900)
-    
-    output$forestcountryoutcome<- renderPlot({
-        
-        complete_table3_forest_country <- complete_table3 %>%
-            filter( total >= input$sampleSizeCutOff_outcome )
-        
-        countryMap <- read.delim("./siteCountry.txt")
-        
-        allDataForestCountry <- complete_table3_forest_country %>%
-            left_join( countryMap )
-        
-        toForestPlot <- allDataForestCountry %>%
-            filter( categories == input$outcome_category &
-                        variant_misc == input$variants_outcome ) %>%
-            group_by( Country ) %>%
-            summarise( n = sum( n ), 
-                       total = sum( total ))
-        
-        mtprop <- metaprop(event=n, n=total, studlab=Country, data=toForestPlot, method = "GLMM", sm = "PLOGIT",
-                           comb.fixed = TRUE, comb.random = TRUE, hakn = TRUE)
-        
-        forest.meta(mtprop, layout = "JAMA")
-        
-    }, height = 500, width = 900)
-    
 }
 
 # Run the application 
