@@ -3,7 +3,7 @@ library(tidyr)
 library(meta)
 library(stringr)
 rm(list=ls())
-setwd("/Users/alba/Desktop/finalTablesTestWithP-val/4CE_MISC_outputs/")
+setwd("/Users/alba/Desktop/")
 sites <- list.files("./")
 
 ########################
