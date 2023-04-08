@@ -481,10 +481,10 @@ forest( labs_at_admission_outputs_to_plot[[4]])
 mtext("Lymphocyte Count at Admission \n (omicron vs. alpha)", cex = 1)
 forest( labs_at_admission_outputs_to_plot[[1]])
 #mtext(names(labs_at_admission_outputs_to_plot)[1], cex = 1)
-mtext("CRP at Admission \n (delta vs. alpha))", cex = 1)
+mtext("CRP at Admission \n (delta vs. alpha)", cex = 1)
 forest( labs_at_admission_outputs_to_plot[[2]])
 #mtext(names(labs_at_admission_outputs_to_plot)[2], cex = 1)
-mtext("Troponin Normal Sensitivity at Admission \n (delta vs. alpha))", cex = 1)
+mtext("Troponin Normal Sensitivity at Admission \n (delta vs. alpha)", cex = 1)
 #mtext("Labs at admission", side = 3,line = - 2,outer = TRUE )
 
 labs_at_admission_metaAnalysis_output_df %>%
