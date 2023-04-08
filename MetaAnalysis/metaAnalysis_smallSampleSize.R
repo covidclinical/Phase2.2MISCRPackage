@@ -460,12 +460,12 @@ labs_during_admission <- continuous_outcome_data( site_df = sample_size,
 
 
 # extract all the lab names 
-lab_names_list <- labs_at_admission[[1]]$variableName
+lab_names_list <- c(labs_at_admission[[1]]$variableName, "troponin high sensitivity")
 
 # lab at admission meta-analysis results
 labs_at_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
                             lab_data = labs_at_admission, 
-                            p_value = 0.05) 
+                            p_value = 1) 
 
 labs_at_admission_metaAnalysis_output_df <- labs_at_admission_metaAnalysis_output[[1]]
 labs_at_admission_outputs_to_plot <- labs_at_admission_metaAnalysis_output[[2]]
@@ -495,7 +495,7 @@ labs_at_admission_metaAnalysis_output_df %>%
 # lab during admission meta-analysis results
 labs_during_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
                                                              lab_data = labs_during_admission, 
-                                                             p_value = 0.05) 
+                                                             p_value = 1) 
 
 labs_during_admission_metaAnalysis_output_df <- labs_during_admission_metaAnalysis_output[[1]]
 labs_during_admission_outputs_to_plot <- labs_during_admission_metaAnalysis_output[[2]]
