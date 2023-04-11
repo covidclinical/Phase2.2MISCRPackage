@@ -445,6 +445,68 @@ final_diagnosis_meta_analysis %>%
   flextable::flextable() %>%
   flextable::save_as_docx(path = "/Users/alba/Desktop/diagnosis_results_meta_analysis.docx")
 
+########################################################
+## Sex counts (extracted from the ratios of the logs) ##
+########################################################
+sex_counts <- read.delim("/Users/alba/Desktop/sex_counts_replaceEarlier.tsv")
+sex_counts$site <- gsub("Pitt CHP", "PittCHP", sex_counts$site )
+sex_counts$site <- gsub("H120", "H12O", sex_counts$site )
+
+females_for_mt <- sex_counts %>%
+  filter( sex == "Female") %>%
+  select( site, variant, count) %>%
+  pivot_wider( names_from = variant, 
+               values_from = count ) %>%
+  group_by( site ) %>%
+  mutate( n.total = sum( Alpha, Delta, Omicron)) %>%
+  select( n.Alpha = Alpha, n.Delta = Delta, n.Omicron = Omicron, n.total, site )
+
+
+males_for_mt <- sex_counts %>%
+  filter( sex == "Male") %>%
+  select( site, variant, count) %>%
+  pivot_wider( names_from = variant, 
+               values_from = count ) %>%
+  group_by( site ) %>%
+  mutate( n.total = sum( Alpha, Delta, Omicron)) %>%
+  select( n.Alpha = Alpha, n.Delta = Delta, n.Omicron = Omicron, n.total, site )
+
+data_all_sex_counts <- list()
+data_all_sex_counts$female <- as.data.frame(females_for_mt)
+data_all_sex_counts$male <- as.data.frame(males_for_mt)
+
+# run the exact method (the most conservative one)
+exact_method_sex_counts <- exact_method(
+  input_char_to_evaluate = c("female", "male"),
+  formated_meta_analysis_list = data_all_sex_counts,
+  outputPath = "/Users/alba/Desktop/exactMethod_sex.RData",
+  sample_size_df = sample_size
+)
+
+# get the statistically significant results 
+stat_significant_sex <- list()
+stat_significant_sex[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_sex_counts[[1]], 
+                                                                           p_value = 0.05, 
+                                                                           input_char_to_evaluate = c("female", "male"), 
+                                                                           filter_p_val = FALSE)
+
+stat_significant_sex[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_sex_counts[[2]], 
+                                                                             p_value = 0.05, 
+                                                                             input_char_to_evaluate = c("female", "male"), 
+                                                                             filter_p_val = FALSE)
+### based on the most restrictive statistical method we find stat significant
+colnames(stat_significant_sex[["alphavsdelta"]]) <- c("outcome", "alpha_delta_est", 
+                                                           "alpha_delta_CI", "alpha_delta_pVal")
+
+colnames(stat_significant_sex[["alphavsomicron"]]) <- c("outcome", "alpha_omicron_est", 
+                                                             "alpha_omicron_CI", "alpha_omicron_pVal")
+
+sex_results_meta_analysis <- merge( stat_significant_sex[["alphavsdelta"]], stat_significant_sex[["alphavsomicron"]])
+
+sex_results_meta_analysis %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/sex_results_meta_analysis.docx")
+
 
 ##################################################################
 ## Labs; Continuous outputs: meta analysis of two-sample t-test ##
