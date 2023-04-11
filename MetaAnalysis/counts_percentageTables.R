@@ -179,6 +179,34 @@ table1_output %>%
 
 save(table1_output, file = "../../table1_counts_perc.RData")
 
+###### Add the counts and percentage for sex
+sex_counts <- read.delim("/Users/alba/Desktop/sex_counts_replaceEarlier.tsv")
+sex_counts$site <- gsub("Pitt CHP", "PittCHP", sex_counts$site )
+sex_counts$site <- gsub("H120", "H12O", sex_counts$site )
+
+sex_counts <- sex_counts %>%
+  select( categories = sex, variant_misc = variant, n = count, site = site, total = total.n.for.variant)
+
+sex_counts_output <- sex_counts %>%
+  ungroup() %>%
+  mutate( n = ifelse( n == 0.5, 1, n )) %>% 
+  group_by(categories, variant_misc) %>%
+  summarise(new_n = sum(n),
+            new_total = sum(total), 
+            perc = round(new_n/new_total*100, 2),
+            cell_content = paste0( new_n, " (", perc, "%)"), 
+            variant_name = paste0( variant_misc, " (N = ", new_total, ")")
+  ) %>%
+  ungroup() %>%
+  select( - new_n, -perc, -variant_misc, -new_total ) %>%
+  unique() %>%
+  pivot_wider( names_from =  variant_name, 
+               values_from = cell_content)
+
+sex_counts_output %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "../../sex_counts_perc.docx")
+
 ##################################
 ###### TABLE 3: categorical ######
 ##################################
