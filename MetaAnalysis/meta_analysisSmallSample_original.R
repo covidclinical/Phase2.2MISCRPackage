@@ -263,6 +263,17 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
   colnames( labs_results) <- c("lab", "alpha_delta_pval", "alpha_omicron_pval")
   
   # create a list to save stat results to plot forest plot
+  # create a vector with the sites
+  site_list <- names( lab_data )
+  
+  # create an empty df to save the results
+  labs_results <- as.data.frame( matrix( ncol = 7, nrow = length(lab_list)))
+  colnames( labs_results) <- c("lab", "alpha_delta_pval", "alpha_delta_est","alpha_delta_CI", 
+                               "alpha_omicron_pval", "alpha_omicron_est","alpha_omicron_CI")
+  
+  
+  
+  # create a list to save stat results to plot forest plot
   outputs_to_plot <- list()
   
   for( j in 1:length(lab_list)){
@@ -310,39 +321,37 @@ continous_var_test <- function( lab_list, lab_data, p_value ){
     
     # run the meta-analysis, using the rma function
     if( is.null(sites.exclude )){
-      
-      tryCatch({stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta, method = "EE")
-      }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
-      tryCatch({stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron, method = "EE")
-      }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
-      
-      
+      stats_output_alpha_delta <- rma(diff_alpha_delta, var.diff_alpha_delta, method = "EE", slab = site_list )
+      stats_output_alpha_omicron <- rma(diff_alpha_omicron, var.diff_alpha_omicron, method = "EE", slab = site_list)
     }else{
-      
-      tryCatch({stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude], method = "EE")
-      }, error = function(e) stats_output_alpha_delta <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
-      
-      tryCatch({stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude], method = "EE")
-      }, error = function(e) stats_output_alpha_omicron <<- list('beta' = NA, 'ci.lib' = NA, 'ci.ub' = NA, 'pval' = NA))
-      
-      
+      stats_output_alpha_delta  <- rma(diff_alpha_delta[-sites.exclude], var.diff_alpha_delta[-sites.exclude], method = "EE", slab = site_list[-sites.exclude])
+      stats_output_alpha_omicron  <- rma(diff_alpha_omicron[-sites.exclude], var.diff_alpha_omicron[-sites.exclude], method = "EE", slab = site_list[-sites.exclude])
     }
     
     labs_results$lab[j] <- this_lab
-    labs_results$alpha_delta_pval[j] <- stats_output_alpha_delta$pval
+    labs_results$alpha_delta_pval[j] <- round(stats_output_alpha_delta$pval,3)
+    labs_results$alpha_delta_est[j] <- round(stats_output_alpha_delta$b, 3)
+    labs_results$alpha_delta_CI[j] <- paste0("[", round(stats_output_alpha_delta$ci.lb, 3), ",", 
+                                             round(stats_output_alpha_delta$ci.ub, 3), "]")
+    
+    labs_results$alpha_omicron_pval[j] <- round(stats_output_alpha_omicron$pval,3)
+    labs_results$alpha_omicron_est[j] <- round(stats_output_alpha_omicron$b, 3)
+    labs_results$alpha_omicron_CI[j] <- paste0("[", round(stats_output_alpha_omicron$ci.lb, 3), ",", 
+                                               round(stats_output_alpha_omicron$ci.ub, 3), "]")
+    
     labs_results$alpha_omicron_pval[j] <- stats_output_alpha_omicron$pval
     
-    if( !is.na(stats_output_alpha_delta$pval)){
-      if (stats_output_alpha_delta$pval < p_value){
-        outputs_to_plot[[this_lab]] <- stats_output_alpha_delta
-      }}
-    if( !is.na(stats_output_alpha_omicron$pval)){
-      if(stats_output_alpha_omicron$pval < p_value){
-        outputs_to_plot[[this_lab]] <- stats_output_alpha_omicron
-      }}
-   
+    if( stats_output_alpha_delta$pval < p_value){
+      var<- paste0(this_lab, "_alphaDelta")
+      outputs_to_plot[[var]] <- stats_output_alpha_delta
+    }
+    if( stats_output_alpha_omicron$pval < p_value){
+      var <- paste0(this_lab, "_alphaOmicron")
+      outputs_to_plot[[var]] <- stats_output_alpha_omicron
+    }
   }
   return( list( labs_results, outputs_to_plot) )
+  
   
 }
 
