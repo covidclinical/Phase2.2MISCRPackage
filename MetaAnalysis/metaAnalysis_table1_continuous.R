@@ -394,3 +394,8 @@ outputs_to_plot <- outputs[[2]]
 names(outputs_to_plot)
 forest( outputs_to_plot[[1]])
 forest( outputs_to_plot[[2]])
+
+outputs_df %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/age_lengthHosp_meta_analysis_original.docx")
+
