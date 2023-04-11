@@ -13,7 +13,10 @@ library(dplyr)
 
 ## Read the file with the sample size for alpha, delta and omicron for each site
 sample_size <- read.delim("/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/sample_size_original.txt")
-#sample_size <- sample_size[ sample_size$site != "CHOP", ]
+sample_size <- sample_size[ sample_size$site != "CHOP", ]
+
+# Load the different variables to evaluate (outcomes, categories and all clinical variables)
+load( "/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/listOfVariablesForMetaAnalysis.RData")
 
 #####################
 ##### Functions #####
@@ -152,10 +155,17 @@ exact_method_format_results <- function( exact_results, p_value, input_char_to_e
     output.exact = rbind(output.exact,exact_results[[i]]$ci.fixed[,2])
   }
   output.exact = data.frame(output.exact)
-  output.exact$outcome = input_char_to_evaluate
+  
+  output.exact <- output.exact %>%
+    mutate( outcome = input_char_to_evaluate, 
+            est = round( est, 3), 
+            pVal = round(p, 3), 
+            CI = paste0( "[", round(lower.CI, 3), ",", round(upper.CI, 3), "]")) %>%
+    select( outcome,  est, CI, pVal )
+  
   
   if( filter_p_val == TRUE ){
-    output <- output.exact %>% filter( p < p_value)
+    output <- output.exact %>% filter( pVal < p_value)
     print( output )
     return( output )
   }else{
@@ -351,8 +361,6 @@ outcome_allsite <- binary_outcome_data( site_df = sample_size,
                                         rdata_fileName =  "table3.RData", 
                                         files_path     =  "/Users/alba/Desktop/finalTablesTest/4CE_MISC_outputs/"  )
 
-# Load the different variables to evaluate (outcomes, categories and all clinical variables)
-load( "/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/listOfVariablesForMetaAnalysis.RData")
 
 
 # For the category level, format the data for the meta-analysis
@@ -399,14 +407,24 @@ stat_significant_outcomes <- list()
 stat_significant_outcomes[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_alloutcomes[[1]], 
                                                                            p_value = 0.05, 
                                                                            input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-                                                                           filter_p_val = TRUE)
+                                                                           filter_p_val = FALSE)
 
 stat_significant_outcomes[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_alloutcomes[[2]], 
                                                                              p_value = 0.05, 
                                                                              input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-                                                                             filter_p_val = TRUE)
-### based on the most restrictive statistical method we find stat significant
-### results on alpha vs. omicron for anti-coagulation therapy
+                                                                             filter_p_val = FALSE)
+
+colnames(stat_significant_outcomes[["alphavsdelta"]]) <- c("outcome", "alpha_delta_est", 
+                                                           "alpha_delta_CI", "alpha_delta_pVal")
+
+colnames(stat_significant_outcomes[["alphavsomicron"]]) <- c("outcome", "alpha_omicron_est", 
+                                                             "alpha_omicron_CI", "alpha_omicron_pVal")
+
+outcome_results_meta_analysis <- merge( stat_significant_outcomes[["alphavsdelta"]], stat_significant_outcomes[["alphavsomicron"]])
+
+outcome_results_meta_analysis %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/outcome_results_meta_analysis_original.docx")
 
 # for the categories
 load("/Users/alba/Desktop/original/exactMethod_categories.RData")
@@ -416,29 +434,116 @@ stat_significant_categories <- list()
 stat_significant_categories[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_allcategories[[1]], 
                                                                              p_value = 0.05, 
                                                                              input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
-                                                                             filter_p_val = TRUE)
+                                                                             filter_p_val = FALSE)
 
 stat_significant_categories[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_allcategories[[2]], 
                                                                                p_value = 0.05, 
                                                                                input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
-                                                                               filter_p_val = TRUE)
-### no statistical results for the categories with the restrictive method
+                                                                               filter_p_val = FALSE)
+colnames(stat_significant_categories[["alphavsdelta"]]) <- c("diagnosis", "alpha_delta_est", 
+                                                             "alpha_delta_CI", "alpha_delta_pVal")
+
+colnames(stat_significant_categories[["alphavsomicron"]]) <- c("diagnosis", "alpha_omicron_est", 
+                                                               "alpha_omicron_CI", "alpha_omicron_pVal")
+
+stat_significant_categories_meta_analysis <- merge( stat_significant_categories[["alphavsdelta"]], 
+                                                    stat_significant_categories[["alphavsomicron"]])
+
 
 # for all diagnosis
 load("/Users/alba/Desktop/original/exactMethod_allDiagnosis.RData")
 exact_method_alldiag <- list( res.exact.delta,res.exact.omicron )
 
-stat_significant_categories <- list()
-stat_significant_categories[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[1]], 
-                                                                             p_value = 0.05, 
-                                                                             input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
-                                                                             filter_p_val = TRUE)
+stat_significant_diag <- list()
+stat_significant_diag[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[1]], 
+                                                                       p_value = 0.05, 
+                                                                       input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
+                                                                       filter_p_val = FALSE)
 
-stat_significant_categories[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[2]], 
-                                                                               p_value = 0.05, 
-                                                                               input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
-                                                                               filter_p_val = TRUE)
 
+stat_significant_diag[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_alldiag[[2]], 
+                                                                         p_value = 0.05, 
+                                                                         input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
+                                                                         filter_p_val = FALSE)
+
+
+colnames(stat_significant_diag[["alphavsdelta"]]) <- c("diagnosis", "alpha_delta_est", 
+                                                       "alpha_delta_CI", "alpha_delta_pVal")
+
+colnames(stat_significant_diag[["alphavsomicron"]]) <- c("diagnosis", "alpha_omicron_est", 
+                                                         "alpha_omicron_CI", "alpha_omicron_pVal")
+
+stat_significant_diagnosis_meta_analysis <- merge( stat_significant_diag[["alphavsdelta"]], 
+                                                   stat_significant_diag[["alphavsomicron"]])
+
+final_diagnosis_meta_analysis <- rbind(stat_significant_categories_meta_analysis,  stat_significant_diagnosis_meta_analysis)
+
+final_diagnosis_meta_analysis %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/diagnosis_results_meta_analysis_original.docx")
+
+########################################################
+## Sex counts (extracted from the ratios of the logs) ##
+########################################################
+sex_counts <- read.delim("/Users/alba/Desktop/sex_counts_original.tsv")
+sex_counts$site <- gsub("Pitt CHP", "PittCHP", sex_counts$site )
+sex_counts$site <- gsub("H120", "H12O", sex_counts$site )
+
+females_for_mt <- sex_counts %>%
+  filter( sex == "Female") %>%
+  select( site, variant, count) %>%
+  pivot_wider( names_from = variant, 
+               values_from = count ) %>%
+  group_by( site ) %>%
+  mutate( n.total = sum( Alpha, Delta, Omicron)) %>%
+  select( n.Alpha = Alpha, n.Delta = Delta, n.Omicron = Omicron, n.total, site )
+
+
+males_for_mt <- sex_counts %>%
+  filter( sex == "Male") %>%
+  select( site, variant, count) %>%
+  pivot_wider( names_from = variant, 
+               values_from = count ) %>%
+  group_by( site ) %>%
+  mutate( n.total = sum( Alpha, Delta, Omicron)) %>%
+  select( n.Alpha = Alpha, n.Delta = Delta, n.Omicron = Omicron, n.total, site )
+
+data_all_sex_counts <- list()
+data_all_sex_counts$female <- as.data.frame(females_for_mt)
+data_all_sex_counts$male <- as.data.frame(males_for_mt)
+
+# run the exact method (the most conservative one)
+exact_method_sex_counts <- exact_method(
+  input_char_to_evaluate = c("female", "male"),
+  formated_meta_analysis_list = data_all_sex_counts,
+  outputPath = "/Users/alba/Desktop/exactMethod_sex.RData",
+  sample_size_df = sample_size
+)
+
+# get the statistically significant results 
+stat_significant_sex <- list()
+stat_significant_sex[["alphavsdelta"]] <-exact_method_format_results( exact_results = exact_method_sex_counts[[1]], 
+                                                                      p_value = 0.05, 
+                                                                      input_char_to_evaluate = c("female", "male"), 
+                                                                      filter_p_val = FALSE)
+
+stat_significant_sex[["alphavsomicron"]] <-exact_method_format_results( exact_results = exact_method_sex_counts[[2]], 
+                                                                        p_value = 0.05, 
+                                                                        input_char_to_evaluate = c("female", "male"), 
+                                                                        filter_p_val = FALSE)
+### based on the most restrictive statistical method we find stat significant
+
+colnames(stat_significant_sex[["alphavsdelta"]]) <- c("outcome", "alpha_delta_est", 
+                                                      "alpha_delta_CI", "alpha_delta_pVal")
+
+colnames(stat_significant_sex[["alphavsomicron"]]) <- c("outcome", "alpha_omicron_est", 
+                                                        "alpha_omicron_CI", "alpha_omicron_pVal")
+
+sex_results_meta_analysis <- merge( stat_significant_sex[["alphavsdelta"]], stat_significant_sex[["alphavsomicron"]])
+
+sex_results_meta_analysis %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/sex_results_meta_analysis_original.docx")
 
 
 ##################################################################
@@ -455,7 +560,7 @@ labs_during_admission <- continuous_outcome_data( site_df = sample_size,
 
 
 # extract all the lab names 
-lab_names_list <- labs_at_admission[[1]]$variableName
+lab_names_list <- c(labs_at_admission[[1]]$variableName, "troponin high sensitivity")
 
 # lab at admission meta-analysis results
 labs_at_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
@@ -471,7 +576,11 @@ forest( labs_at_admission_outputs_to_plot[[2]])
 forest( labs_at_admission_outputs_to_plot[[3]])
 forest( labs_at_admission_outputs_to_plot[[4]])
 forest( labs_at_admission_outputs_to_plot[[5]])
-# CRP, d_dimer, PT, troponin normal sensitivity and lymphocyte stat significant
+
+labs_at_admission_metaAnalysis_output_df %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/labs_metaAnalysis_at_admission_original.docx")
+
 
 # lab during admission meta-analysis results
 labs_during_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
@@ -484,52 +593,7 @@ labs_during_admission_outputs_to_plot <- labs_during_admission_metaAnalysis_outp
 names(labs_during_admission_outputs_to_plot)
 forest( labs_during_admission_outputs_to_plot[[1]])
 forest( labs_during_admission_outputs_to_plot[[2]])
-# alt, troponin, lymphocyte and pt
 
-#### method 3 not needed
-# ### run method 3, less restrictive
-# stat_significant_categories_standardMeta <- list()
-# stat_significant_categories_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_allcategories[[1]], 
-#                                                                                        p_value = 0.05, 
-#                                                                                        input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
-#                                                                                        filter_p_val = TRUE)
-# 
-# # in alpha vs. delta we find neurological symptoms and shock/irs with sig p-value
-# 
-# stat_significant_categories_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_allcategories[[2]], 
-#                                                                                          p_value = 0.05, 
-#                                                                                          input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_categories, 
-#                                                                                          filter_p_val = TRUE)
-# 
-# 
-# ### run method 3, for outcomes
-# stat_significant_outcomes_standardMeta <- list()
-# stat_significant_outcomes_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_alloutcomes[[1]], 
-#                                                                                      p_value = 0.05, 
-#                                                                                      input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-#                                                                                      filter_p_val = TRUE)
-# 
-# # composite adverse cardiovascular outcome is significant 
-# 
-# stat_significant_outcomes_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_alloutcomes[[2]], 
-#                                                                                        p_value = 0.05, 
-#                                                                                        input_char_to_evaluate = list_to_evaluate$Outcomes_all, 
-#                                                                                        filter_p_val = FALSE)
-# 
-# # with this method anticoagulation therapy is not stat significant
-# 
-# ### run method 3, for allDiagnosis
-# stat_significant_allDiag_standardMeta <- list()
-# stat_significant_allDiag_standardMeta[["alphavsdelta"]] <- exact_site_standardMeta( exact_results = exact_method_alldiag[[1]], 
-#                                                                                     p_value = 0.05, 
-#                                                                                     input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
-#                                                                                     filter_p_val = TRUE)
-# 
-# # history of covid, NEUROLOGY SYMPTOMS and SHOCK/IRS
-# 
-# stat_significant_allDiag_standardMeta[["alphavsomicron"]] <- exact_site_standardMeta( exact_results = exact_method_alldiag[[2]], 
-#                                                                                       p_value = 0.05, 
-#                                                                                       input_char_to_evaluate = list_to_evaluate$ClinicalCharacteristic_all, 
-#                                                                                       filter_p_val = TRUE)
-
-
+labs_during_admission_metaAnalysis_output_df %>%
+  flextable::flextable() %>%
+  flextable::save_as_docx(path = "/Users/alba/Desktop/labs_metaAnalysis_during_admission_original.docx")
