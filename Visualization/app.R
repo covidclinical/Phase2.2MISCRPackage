@@ -6,6 +6,7 @@ library(shinycssloaders)
 library(ggplot2)
 library(dplyr)
 library(meta)
+library(forestploter)
 
 
 ui <- fluidPage(
@@ -121,7 +122,8 @@ ui <- fluidPage(
                                                             "creatinine"   = "creatinine",                        
                                                             "ferritin"    = "ferritin",                        
                                                             "d_dimer" = "d_dimer",                              
-                                                            "troponin normal sensitivity" = "troponin normal sensitivity",         
+                                                            "troponin normal sensitivity" = "troponin normal sensitivity",    
+                                                            "troponin high sensitivity" = "troponin high sensitivity",         
                                                             "white blood cell count (Leukocytes)" = "white blood cell count (Leukocytes)" , 
                                                             "lymphocyte" = "lymphocyte" ,                        
                                                             "neutrophil"   = "neutrophil",                        
@@ -139,6 +141,57 @@ ui <- fluidPage(
                                 )
                             ))
                         )
+               ), 
+               tabPanel("Clinical Characteristics Meta-analysis",
+                        fluidRow(
+                        sidebarLayout(
+                          sidebarPanel(
+                            
+                            radioButtons("variantCategoryMeta", label = h3("Comparison:"),
+                                         choices = list( "delta vs. alpha" = "Delta", "omicron vs. alpha" ="Omicron"), 
+                                         selected = "Delta"),
+                            
+                            radioButtons("var_category", label = h3("Chose a variable:"),
+                                         choices = list("CARDIOVASCULAR SYMPTOMS"  =  "CARDIOVASCULAR SYMPTOMS",                
+                                                        "GI SYMPTOMS"  =   "GI SYMPTOMS",                            
+                                                        "LIVER DYSFUNCTION" =   "LIVER DYSFUNCTION",                     
+                                                        "NEUROLOGIC SYMPTOMS"  = "NEUROLOGIC SYMPTOMS",                      
+                                                        "RENAL DYSFUNCTION" =  "RENAL DYSFUNCTION",                
+                                                        "RESPIRATORY SYMPTOMS"  = "RESPIRATORY SYMPTOMS", 
+                                                        "SHOCK/SIRS"   =  "SHOCK/SIRS" ), selected = "CARDIOVASCULAR SYMPTOMS")
+                          ),
+                          mainPanel(
+                            tabsetPanel(type = "tabs",
+                                        tabPanel("Forest plot", plotOutput("forestsiteCategories"),  width = "100%")
+                            ))
+                          ))
+                        ), 
+               tabPanel("Outcomes Meta-analysis",
+                        fluidRow(
+                          sidebarLayout(
+                            sidebarPanel(
+                              
+                              radioButtons("variantOutcomeMeta", label = h3("Comparison:"),
+                                           choices = list( "delta vs. alpha" = "Delta", "omicron vs. alpha" ="Omicron"), 
+                                           selected = "Delta"),
+                              
+                              radioButtons("var_outcomes", label = h3("Chose an outcome:"),
+                                           choices = list("Anticoagulation therapy"  =  "Anticoagulation therapy",                
+                                                          "Cardiac arrest"  =   "Cardiac arrest",                            
+                                                          "Composite adverse cardiovascular outcome" =   "Composite adverse cardiovascular outcome",                     
+                                                          "Diuretic therapy"  = "Diuretic therapy",                      
+                                                          "ECMO" =  "ECMO",                
+                                                          "in_icu"  = "in_icu", 
+                                                          "Inotropic support"   =  "Inotropic support", 
+                                                          "Invasive monitoring (arterial line)" = "Invasive monitoring (arterial line)" , 
+                                                          "Oxygen supplementation" = "Oxygen supplementation", 
+                                                          "Sedation or muscle relaxant"  = "Sedation or muscle relaxant" ), selected = "Composite adverse cardiovascular outcome")
+                            ),
+                            mainPanel(
+                              tabsetPanel(type = "tabs",
+                                          tabPanel("Forest plot", plotOutput("forestsiteOutcomes"),  width = "100%")
+                              ))
+                          ))
                )
     )
 )
@@ -591,7 +644,7 @@ server <- function(input, output) {
         toplot <- labs_during_admission_outputs_to_plot[[selection]]
       }
       
-      forest( toplot)
+      meta::forest( toplot)
       mtext(newTitle, cex = 1.5)
 
     }, height = 500, width = 900)
@@ -711,6 +764,144 @@ server <- function(input, output) {
             
         }
     }, height = 900, width = 1100)
+    
+    ### categorical meta Analysis
+    output$forestsiteCategories <- renderPlot({
+      
+      load("exactMethod_categories.RData")
+      load( "listOfVariablesForMetaAnalysis.RData")
+      names(res.exact.delta) <- list_to_evaluate$ClinicalCharacteristic_categories
+      names(res.exact.omicron) <- list_to_evaluate$ClinicalCharacteristic_categories
+      
+      if(input$variantCategoryMeta == "Delta"){
+        
+        meta_analysis <- as.data.frame( res.exact.delta[[input$var_category]]$study.ci, row.names = FALSE )
+        summaryValues <- as.data.frame(res.exact.delta[[input$var_category]]$ci.fixed)
+        newRow <- c( est  = summaryValues$`inverse-variance`[1], 
+                     lower = summaryValues$`inverse-variance`[2], 
+                     upper = summaryValues$`inverse-variance`[3],
+                     site = "Summary",
+                     val = paste0( "                                                                                  ",  round( summaryValues$`inverse-variance`[1], 3), " [", round( summaryValues$`inverse-variance`[2], 3), ", ", round( summaryValues$`inverse-variance`[3], 3), "]"))
+        
+        dt <- meta_analysis %>%
+          mutate( site = c("BCH", "FRBDX", "H12O", "PittCHP", "RP401ped", "UMICH"), 
+                  est =  est, 
+                  lower = `lower CI`, 
+                  upper = `upper CI`,  
+                  val = paste0( "                                                                                  ",  round(est, 3), " [", round(`lower CI`, 3), ", ", round( `upper CI`, 3), "]")) %>%
+          select( est, lower, upper,
+                  site, -p, -limit,  val ) %>%
+          rbind( newRow )
+        
+        colnames( dt )[5] = ""
+        title_toPlot <- paste0( tolower(input$var_category), " (delta vs. alpha)")
+        
+      }else if( input$variantCategoryMeta == "Omicron"){
+        
+        meta_analysis <- as.data.frame( res.exact.omicron[[input$var_category]]$study.ci, row.names = FALSE )
+        summaryValues <- as.data.frame(res.exact.omicron[[input$var_category]]$ci.fixed)
+        newRow <- c( est  = summaryValues$`inverse-variance`[1], 
+                     lower = summaryValues$`inverse-variance`[2], 
+                     upper = summaryValues$`inverse-variance`[3],
+                     site = "Summary",
+                     val = paste0( "                                                                                  ",  round( summaryValues$`inverse-variance`[1], 3), " [", round( summaryValues$`inverse-variance`[2], 3), ", ", round( summaryValues$`inverse-variance`[3], 3), "]"))
+        
+        dt <- meta_analysis %>%
+          mutate( site = c("BCH", "FRBDX", "H12O", "PittCHP", "RP401ped", "UMICH"), 
+                  est =  est, 
+                  lower = `lower CI`, 
+                  upper = `upper CI`,  
+                  val = paste0( "                                                                                  ",  round(est, 3), " [", round(`lower CI`, 3), ", ", round( `upper CI`, 3), "]")) %>%
+          select( est, lower, upper,
+                  site, -p, -limit,  val ) %>%
+          rbind( newRow )
+        
+        colnames( dt )[5] = ""
+        title_toPlot <- paste0( tolower(input$var_category), " (omicron vs. alpha)")
+        
+      }
+      
+      forestploter::forest(dt[,c(4:5)],
+             est = as.numeric(dt$est),
+             lower = as.numeric(dt$lower), 
+             upper = as.numeric(dt$upper),
+             ci_column = 2,
+             ref_line = 0,
+             xlim = c(-1, 1),
+             ticks_at = c(-1,-0.5,0, 0.5, 1), 
+             title = title_toPlot)
+      
+    }, height = 500, width = 900)
+    
+    ##### outcomes meta analysis
+    output$forestsiteOutcomes <- renderPlot({
+      
+      load("exactMethod_outcomes.RData")
+      load( "listOfVariablesForMetaAnalysis.RData")
+      names(res.exact.delta) <- list_to_evaluate$Outcomes_all
+      names(res.exact.omicron) <- list_to_evaluate$Outcomes_all
+      
+      if(input$variantOutcomeMeta == "Delta"){
+        
+        meta_analysis <- as.data.frame( res.exact.delta[[input$var_outcomes]]$study.ci, row.names = FALSE )
+        summaryValues <- as.data.frame(res.exact.delta[[input$var_outcomes]]$ci.fixed)
+        newRow <- c( est  = summaryValues$`inverse-variance`[1], 
+                     lower = summaryValues$`inverse-variance`[2], 
+                     upper = summaryValues$`inverse-variance`[3],
+                     site = "Summary",
+                     val = paste0( "                                                                                  ",  round( summaryValues$`inverse-variance`[1], 3), " [", round( summaryValues$`inverse-variance`[2], 3), ", ", round( summaryValues$`inverse-variance`[3], 3), "]"))
+        
+        dt <- meta_analysis %>%
+          mutate( site = c("BCH", "FRBDX", "H12O", "PittCHP", "RP401ped", "UMICH"), 
+                  est =  est, 
+                  lower = `lower CI`, 
+                  upper = `upper CI`,  
+                  val = paste0( "                                                                                  ",  round(est, 3), " [", round(`lower CI`, 3), ", ", round( `upper CI`, 3), "]")) %>%
+          select( est, lower, upper,
+                  site, -p, -limit,  val ) %>%
+          rbind( newRow )
+        
+        colnames( dt )[5] = ""
+        title_toPlot <- paste0( tolower(input$var_outcomes), " (delta vs. alpha)")
+        
+      }else if( input$variantOutcomeMeta == "Omicron"){
+        
+        meta_analysis <- as.data.frame( res.exact.omicron[[input$var_outcomes]]$study.ci, row.names = FALSE )
+        summaryValues <- as.data.frame(res.exact.omicron[[input$var_outcomes]]$ci.fixed)
+        newRow <- c( est  = summaryValues$`inverse-variance`[1], 
+                     lower = summaryValues$`inverse-variance`[2], 
+                     upper = summaryValues$`inverse-variance`[3],
+                     site = "Summary",
+                     val = paste0( "                                                                                  ",  round( summaryValues$`inverse-variance`[1], 3), " [", round( summaryValues$`inverse-variance`[2], 3), ", ", round( summaryValues$`inverse-variance`[3], 3), "]"))
+        
+        dt <- meta_analysis %>%
+          mutate( site = c("BCH", "FRBDX", "H12O", "PittCHP", "RP401ped", "UMICH"), 
+                  est =  est, 
+                  lower = `lower CI`, 
+                  upper = `upper CI`,  
+                  val = paste0( "                                                                                  ",  round(est, 3), " [", round(`lower CI`, 3), ", ", round( `upper CI`, 3), "]")) %>%
+          select( est, lower, upper,
+                  site, -p, -limit,  val ) %>%
+          rbind( newRow )
+        
+        colnames( dt )[5] = ""
+        title_toPlot <- paste0( tolower(input$var_outcomes), " (omicron vs. alpha)")
+        
+      }
+      
+      forestploter::forest(dt[,c(4:5)],
+                           est = as.numeric(dt$est),
+                           lower = as.numeric(dt$lower), 
+                           upper = as.numeric(dt$upper),
+                           ci_column = 2,
+                           ref_line = 0,
+                           xlim = c(-1, 1),
+                           ticks_at = c(-1,-0.5,0, 0.5, 1), 
+                           title = title_toPlot)
+      
+    }, height = 500, width = 900)
+    
+    
 }
 
 # Run the application 
