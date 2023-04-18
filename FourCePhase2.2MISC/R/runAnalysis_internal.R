@@ -110,6 +110,7 @@ runAnalysis_internal <- function( dir.input,
     hospitalisations_seq_df <- clinical_raw %>%
       distinct(patient_num, days_since_admission, in_hospital) %>%
       group_by(patient_num) %>%
+      arrange(days_since_admission) %>%
       group_modify(count_sequences_hospitalisation)
 
     clinical_raw <- left_join(clinical_raw,
