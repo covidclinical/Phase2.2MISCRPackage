@@ -14,7 +14,7 @@ library(flextable)
 
 ## Read the file with the sample size for alpha, delta and omicron for each site
 sample_size <- read.delim("/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/sample_size.txt")
-sample_size <- sample_size[ sample_size$site != "CHOP", ]
+#sample_size <- sample_size[ sample_size$site != "CHOP", ]
 
 # Load the different variables to evaluate (outcomes, categories and all clinical variables)
 load( "/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/listOfVariablesForMetaAnalysis.RData")
@@ -381,7 +381,15 @@ colnames(stat_significant_outcomes[["alphavsomicron"]]) <- c("outcome", "alpha_o
 
 outcome_results_meta_analysis <- merge( stat_significant_outcomes[["alphavsdelta"]], stat_significant_outcomes[["alphavsomicron"]])
 
+outcome_results_meta_analysis$alpha_delta_CI <- gsub( "\\[", "(",outcome_results_meta_analysis$alpha_delta_CI )
+outcome_results_meta_analysis$alpha_delta_CI <- gsub( "\\]", ")",outcome_results_meta_analysis$alpha_delta_CI )
+outcome_results_meta_analysis$alpha_omicron_CI <- gsub( "\\[", "(",outcome_results_meta_analysis$alpha_omicron_CI )
+outcome_results_meta_analysis$alpha_omicron_CI <- gsub( "\\]", ")",outcome_results_meta_analysis$alpha_omicron_CI )
+
 outcome_results_meta_analysis %>%
+  mutate(alpha_delta = paste0( alpha_delta_est, " ", alpha_delta_CI), 
+         alpha_omicron = paste0( alpha_omicron_est, " ", alpha_omicron_CI)) %>%
+  select( outcome, alpha_delta, alpha_delta_pVal, alpha_omicron, alpha_omicron_pVal) %>%
   flextable::flextable() %>%
   flextable::save_as_docx(path = "/Users/alba/Desktop/outcome_results_meta_analysis.docx")
 
@@ -441,14 +449,23 @@ stat_significant_diagnosis_meta_analysis <- merge( stat_significant_diag[["alpha
 
 final_diagnosis_meta_analysis <- rbind(stat_significant_categories_meta_analysis,  stat_significant_diagnosis_meta_analysis)
 
+
+final_diagnosis_meta_analysis$alpha_delta_CI <- gsub( "\\[", "(",final_diagnosis_meta_analysis$alpha_delta_CI )
+final_diagnosis_meta_analysis$alpha_delta_CI <- gsub( "\\]", ")",final_diagnosis_meta_analysis$alpha_delta_CI )
+final_diagnosis_meta_analysis$alpha_omicron_CI <- gsub( "\\[", "(",final_diagnosis_meta_analysis$alpha_omicron_CI )
+final_diagnosis_meta_analysis$alpha_omicron_CI <- gsub( "\\]", ")",final_diagnosis_meta_analysis$alpha_omicron_CI )
+
+
 final_diagnosis_meta_analysis %>%
+  mutate(alpha_delta = paste0( alpha_delta_est, " ", alpha_delta_CI), 
+         alpha_omicron = paste0( alpha_omicron_est, " ", alpha_omicron_CI)) %>%
   flextable::flextable() %>%
   flextable::save_as_docx(path = "/Users/alba/Desktop/diagnosis_results_meta_analysis.docx")
 
 ########################################################
 ## Sex counts (extracted from the ratios of the logs) ##
 ########################################################
-sex_counts <- read.delim("/Users/alba/Desktop/sex_counts_replaceEarlier.tsv")
+sex_counts <- read.delim("/Users/alba/Desktop/replace_earlier/sex_counts_replaceEarlier.tsv")
 sex_counts$site <- gsub("Pitt CHP", "PittCHP", sex_counts$site )
 sex_counts$site <- gsub("H120", "H12O", sex_counts$site )
 
@@ -505,7 +522,7 @@ sex_results_meta_analysis <- merge( stat_significant_sex[["alphavsdelta"]], stat
 
 sex_results_meta_analysis %>%
   flextable::flextable() %>%
-  flextable::save_as_docx(path = "/Users/alba/Desktop/sex_results_meta_analysis.docx")
+  flextable::save_as_docx(path = "/Users/alba/Desktop/updated_sex_results_meta_analysis.docx")
 
 
 ##################################################################
@@ -527,60 +544,70 @@ lab_names_list <- c(labs_at_admission[[1]]$variableName, "troponin high sensitiv
 # lab at admission meta-analysis results
 labs_at_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
                             lab_data = labs_at_admission, 
-                            p_value = 1) 
+                            p_value = 0.05) 
 
 labs_at_admission_metaAnalysis_output_df <- labs_at_admission_metaAnalysis_output[[1]]
 labs_at_admission_outputs_to_plot <- labs_at_admission_metaAnalysis_output[[2]]
 
 names(labs_at_admission_outputs_to_plot)
 
-par(mfrow=c(2,2))
-forest( labs_at_admission_outputs_to_plot[[3]])
-#mtext(names(labs_at_admission_outputs_to_plot)[3], cex = 1)
-mtext("Lymphocyte Count at Admission \n (delta vs. alpha)", cex = 1)
-forest( labs_at_admission_outputs_to_plot[[4]])
-#mtext(names(labs_at_admission_outputs_to_plot)[4], cex = 1)
-mtext("Lymphocyte Count at Admission \n (omicron vs. alpha)", cex = 1)
-forest( labs_at_admission_outputs_to_plot[[1]])
-#mtext(names(labs_at_admission_outputs_to_plot)[1], cex = 1)
-mtext("CRP at Admission \n (delta vs. alpha)", cex = 1)
-forest( labs_at_admission_outputs_to_plot[[2]])
-#mtext(names(labs_at_admission_outputs_to_plot)[2], cex = 1)
-mtext("Troponin Normal Sensitivity at Admission \n (delta vs. alpha)", cex = 1)
-#mtext("Labs at admission", side = 3,line = - 2,outer = TRUE )
+par(mfrow=c(3,2))
+forest( labs_at_admission_outputs_to_plot[[1]], xlab = "")
+mtext("Albumin at Admission \n (delta vs. alpha)", cex = 0.5)
+forest( labs_at_admission_outputs_to_plot[[2]], xlab = "")
+mtext("Albumin at Admission \n (omicron vs. alpha)", cex = 0.5)
+forest( labs_at_admission_outputs_to_plot[[5]], xlab = "")
+mtext("Lymphocyte Count at Admission \n (delta vs. alpha)", cex = 0.5)
+forest( labs_at_admission_outputs_to_plot[[6]], xlab = "")
+mtext("Lymphocyte Count at Admission \n (omicron vs. alpha)", cex = 0.5)
+forest( labs_at_admission_outputs_to_plot[[3]], xlab = "")
+mtext("CRP at Admission \n (delta vs. alpha)", cex = 0.5)
+forest( labs_at_admission_outputs_to_plot[[4]], xlab = "")
+mtext("Troponin Normal Sensitivity at Admission \n (delta vs. alpha)", cex = 0.5)
+
+labs_at_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
+                                                             lab_data = labs_at_admission, 
+                                                             p_value = 1) 
+
+labs_at_admission_metaAnalysis_output_df <- labs_at_admission_metaAnalysis_output[[1]]
 
 labs_at_admission_metaAnalysis_output_df %>%
   flextable::flextable() %>%
-  flextable::save_as_docx(path = "/Users/alba/Desktop/labs_metaAnalysis_at_admission.docx")
+  flextable::save_as_docx(path = "/Users/alba/Desktop/updated_labs_metaAnalysis_at_admission.docx")
 # CRP, troponin normal sensitivity and lymphocyte stat significant
 
 # lab during admission meta-analysis results
 labs_during_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
                                                              lab_data = labs_during_admission, 
-                                                             p_value = 1) 
+                                                             p_value = 0.05) 
 
 labs_during_admission_metaAnalysis_output_df <- labs_during_admission_metaAnalysis_output[[1]]
 labs_during_admission_outputs_to_plot <- labs_during_admission_metaAnalysis_output[[2]]
 
-par(mfrow=c(2,2))
-forest( labs_during_admission_outputs_to_plot[[1]], xlab = names(labs_during_admission_outputs_to_plot)[1])
-#mtext(names(labs_during_admission_outputs_to_plot)[1], cex = 1)
-mtext("Highest ALT During Hospitalization \n (delta vs. alpha)", cex = 1)
-forest( labs_during_admission_outputs_to_plot[[4]], xlab = names(labs_during_admission_outputs_to_plot)[4])
-#mtext(names(labs_during_admission_outputs_to_plot)[4], cex = 1)
-mtext("Lowest Lymphocyte Count During Hospitalization \n (omicron vs. alpha)", cex = 1)
-forest( labs_during_admission_outputs_to_plot[[2]], xlab = names(labs_during_admission_outputs_to_plot)[2])
-#mtext(names(labs_during_admission_outputs_to_plot)[2], cex = 1)
-mtext("Highest Troponin T During Hospitalization \n (delta vs. alpha)", cex = 1)
-forest( labs_during_admission_outputs_to_plot[[3]], xlab = names(labs_during_admission_outputs_to_plot)[3])
-#mtext(names(labs_during_admission_outputs_to_plot)[3], cex = 1)
-mtext("Highest Troponin T During Hospitalization \n (omicron vs. alpha)", cex = 1)
-#mtext("Labs during admission", side = 3,line = - 2,outer = TRUE )
+names(labs_during_admission_outputs_to_plot)
+
+par(mfrow=c(3,2))
+forest( labs_during_admission_outputs_to_plot[[3]], xlab = "")
+mtext("Lowest Lymphocyte Count During Hospitalization \n (omicron vs. alpha)", cex = 0.5)
+forest( labs_during_admission_outputs_to_plot[[4]], xlab = "")
+mtext("Prothrombin Time (PT) During Hospitalization \n (delta vs. alpha)", cex = 0.5)
+forest( labs_during_admission_outputs_to_plot[[1]], xlab = "")
+mtext("Highest Troponin T During Hospitalization \n (delta vs. alpha)", cex = 0.5)
+forest( labs_during_admission_outputs_to_plot[[2]], xlab = "")
+mtext("Highest Troponin T During Hospitalization \n (omicron vs. alpha)", cex = 0.5)
+forest( labs_during_admission_outputs_to_plot[[5]], xlab = "")
+mtext("NL Ratio During Hospitalization \n (omicron vs. alpha)", cex = 0.5)
+
+labs_during_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
+                                                                 lab_data = labs_during_admission, 
+                                                                 p_value = 1) 
+
+labs_during_admission_metaAnalysis_output_df <- labs_during_admission_metaAnalysis_output[[1]]
 
 
 labs_during_admission_metaAnalysis_output_df %>%
   flextable::flextable() %>%
-  flextable::save_as_docx(path = "/Users/alba/Desktop/labs_metaAnalysis_during_admission.docx")
+  flextable::save_as_docx(path = "/Users/alba/Desktop/updated_labs_metaAnalysis_during_admission.docx")
 
 ###### Method 3 not really needed
 ### function to extract the results with method III: exact site CI, standard meta

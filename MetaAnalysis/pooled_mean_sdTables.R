@@ -285,7 +285,7 @@ pooled_var = function(site_mean,site_sd,site_size){
 ####################################################
 ########## Age and length hospitalization ##########
 ####################################################
-sample_size <- read.delim("/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/sample_size.txt")
+sample_size <- read.delim("/Users/alba/Desktop/Phase2.2MISCRPackage/MetaAnalysis/sample_size_original.txt")
 
 
 continuous_data <- function(site_df, rdata_fileName, files_path){

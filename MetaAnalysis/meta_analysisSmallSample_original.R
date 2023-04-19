@@ -494,7 +494,7 @@ final_diagnosis_meta_analysis %>%
 ########################################################
 ## Sex counts (extracted from the ratios of the logs) ##
 ########################################################
-sex_counts <- read.delim("/Users/alba/Desktop/sex_counts_original.tsv")
+sex_counts <- read.delim("/Users/alba/Desktop/original/sex_counts_original.tsv")
 sex_counts$site <- gsub("Pitt CHP", "PittCHP", sex_counts$site )
 sex_counts$site <- gsub("H120", "H12O", sex_counts$site )
 
@@ -574,7 +574,7 @@ lab_names_list <- c(labs_at_admission[[1]]$variableName, "troponin high sensitiv
 # lab at admission meta-analysis results
 labs_at_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
                                                              lab_data = labs_at_admission, 
-                                                             p_value = 0.05) 
+                                                             p_value = 1) 
 
 labs_at_admission_metaAnalysis_output_df <- labs_at_admission_metaAnalysis_output[[1]]
 labs_at_admission_outputs_to_plot <- labs_at_admission_metaAnalysis_output[[2]]
@@ -594,7 +594,7 @@ labs_at_admission_metaAnalysis_output_df %>%
 # lab during admission meta-analysis results
 labs_during_admission_metaAnalysis_output <- continous_var_test( lab_list = lab_names_list,
                                                                  lab_data = labs_during_admission, 
-                                                                 p_value = 0.05) 
+                                                                 p_value = 1) 
 
 labs_during_admission_metaAnalysis_output_df <- labs_during_admission_metaAnalysis_output[[1]]
 labs_during_admission_outputs_to_plot <- labs_during_admission_metaAnalysis_output[[2]]
